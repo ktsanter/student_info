@@ -46,3 +46,16 @@ body {
   display: none;
 }
 
+.studentinfo-item {
+  margin-bottom: 4px;
+}
+
+.studentinfo-item-label {
+  margin-right: 8px;
+}
+
+.notes {
+  border: 1px solid black;
+  min-height: 20px;
+}
+

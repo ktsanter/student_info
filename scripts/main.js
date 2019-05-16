@@ -126,18 +126,73 @@ const app = function () {
     page.studentinfo.innerHTML = '';
     var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'studentinfo', {"first": first, "last": last}, _reportError);
     if (requestResult.success) {
-      var details = first + ' ' + last + '<br>';
-      for (var i = 0; i < requestResult.data.length; i++) {
-        var singleinfo = requestResult.data[i];
-        for (var key in singleinfo) {
-          if (key != 'first' && key != 'last') {
-            details += '<br>' + key + '(' + settings.fieldinfo[key] + '): ' + singleinfo[key];
-          }
-        }
-        details += '<br>';
-      }
-      page.studentinfo.innerHTML = details;
+      _setNotice('');
+      _renderStudentInfo(first, last, requestResult.data);
     }
+  }
+  
+  function _renderStudentInfo(first, last, studentinfo) {
+    while (page.studentinfo.firstChild) {
+      page.studentinfo.removeChild(page.studentinfo.firstChild);
+    }
+    
+    for (var i = 0; i < studentinfo.length; i++) {
+      var iteminfo = studentinfo[i];
+      for (var key in iteminfo) {
+        if (key != 'first' && key != 'last') {
+          page.studentinfo.appendChild(_renderStudentInfoItem(key, settings.fieldinfo[key], iteminfo[key]));
+        }
+      }
+    }
+  }
+  
+  function _renderStudentInfoItem(key, fieldtype, fieldvalue) {
+    var elemContainer = document.createElement('div');
+    elemContainer.classList.add('studentinfo-item');
+    
+    var formattedFieldValue = null;
+
+    var elemLabel = document.createElement('span');
+    elemLabel.classList.add('studentinfo-item-label');
+    elemLabel.innerHTML = key;
+    elemContainer.appendChild(elemLabel);
+    
+    if (fieldtype == 'text') {
+      formattedFieldValue = fieldvalue;
+    } else if (fieldtype == 'percent') {
+      formattedFieldValue = (fieldvalue * 100) + '%';
+      
+    } else if (fieldtype == 'flag') {
+      formattedFieldValue = fieldvalue ? 'yes': 'no';
+      
+    } else if (fieldtype == 'notes') {
+      formattedFieldValue = null;
+      var elemNotes = document.createElement('div');
+      elemNotes.classList.add('notes');
+      var splitNotes = fieldvalue.split('\n');
+      console.log(splitNotes);
+      var html = '';
+      for (var i = 0; i < splitNotes.length; i++) {
+        var note = splitNotes[i];
+        console.log(note);
+        if (note != '') {
+          html += note + '<br>';
+        }
+      }
+      elemNotes.innerHTML = html;
+      elemContainer.appendChild(elemNotes);
+      
+    } else {
+      formattedFieldValue = '[unrecognized type: ' + fieldtype + ']';
+    }
+
+    if (formattedFieldValue != null) {
+      var elemValue = document.createElement('span');
+      elemValue.innerHTML = fieldvalue;   
+      elemContainer.appendChild(elemValue);
+    }
+
+    return elemContainer;;
   }
   
 	//-----------------------------------------------------------------------------
