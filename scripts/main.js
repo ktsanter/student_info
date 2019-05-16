@@ -19,7 +19,7 @@ const app = function () {
 	//---------------------------------------
 	// get things going
 	//----------------------------------------
-	async function init (navmode) {
+	async function init () {
 		page.body = document.getElementsByTagName('body')[0];
     
     page.body.appendChild(_renderTitle());
@@ -27,10 +27,8 @@ const app = function () {
 		
     _setNotice('loading student list...');
     var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    var requestResult_fields = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'fieldinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    if (requestResult_students.success && requestResult_fields.success) {
+    if (requestResult_students.success) {
       settings.studentinfo = requestResult_students.data;
-      settings.fieldinfo = requestResult_fields.data;
       _setNotice('');
       _makeStudentList();
       _renderContents();
@@ -128,73 +126,8 @@ const app = function () {
     var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'studentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID, "first": first, "last": last}, _reportError);
     if (requestResult.success) {
       _setNotice('');
-      _renderStudentInfo(first, last, requestResult.data);
+      _renderDeck(page.studentinfo, requestResult.data);
     }
-  }
-  
-  function _renderStudentInfo(first, last, studentinfo) {
-    while (page.studentinfo.firstChild) {
-      page.studentinfo.removeChild(page.studentinfo.firstChild);
-    }
-    
-    for (var i = 0; i < studentinfo.length; i++) {
-      var iteminfo = studentinfo[i];
-      for (var key in iteminfo) {
-        if (key != 'first' && key != 'last') {
-          page.studentinfo.appendChild(_renderStudentInfoItem(key, settings.fieldinfo[key], iteminfo[key]));
-        }
-      }
-      page.studentinfo.appendChild(document.createElement('br'));
-    }
-  }
-  
-  function _renderStudentInfoItem(key, fieldtype, fieldvalue) {
-    var elemContainer = document.createElement('div');
-    elemContainer.classList.add('studentinfo-item');
-    
-    var formattedFieldValue = null;
-
-    var elemLabel = document.createElement('span');
-    elemLabel.classList.add('studentinfo-item-label');
-    elemLabel.innerHTML = key + ':';
-    elemContainer.appendChild(elemLabel);
-    
-    if (fieldtype == 'text') {
-      formattedFieldValue = fieldvalue;
-    } else if (fieldtype == 'percent') {
-      formattedFieldValue = (fieldvalue * 100) + '%';
-      
-    } else if (fieldtype == 'flag') {
-      formattedFieldValue = fieldvalue ? 'yes': 'no';
-      
-    } else if (fieldtype == 'date') {
-      formattedFieldValue = _formatDate(fieldvalue);
-      
-    } else if (fieldtype == 'notes') {
-      formattedFieldValue = null;
-      var splitNotes = fieldvalue.split('\n');
-      if (splitNotes.length > 0 && splitNotes[0] != '') {
-        var elemNotes = document.createElement('ul');
-        elemNotes.classList.add('studentinfo-item-notes');
-        for (var i = 0; i < splitNotes.length; i++) {
-          var elemNote = document.createElement('li');
-          elemNote.innerHTML = splitNotes[i];
-          elemNotes.appendChild(elemNote);
-        }
-        elemContainer.appendChild(elemNotes);
-      }
-      
-    } else {
-      formattedFieldValue = '[unrecognized field type: <i>' + fieldtype + '</i>]';
-    }
-
-    if (formattedFieldValue != null) {
-      var elemValue = document.createElement('span');
-      elemValue.innerHTML = formattedFieldValue;   
-      elemContainer.appendChild(elemValue);
-    }
-
-    return elemContainer;;
   }
   
 	//-----------------------------------------------------------------------------
@@ -230,20 +163,6 @@ const app = function () {
   function _reportError(src, err) {
     _setNotice('Error in ' + src + ': ' + err.name + ' "' + err.message + '"');
   }
-  
-  function _formatDate(theDate) {
-    var formattedDate = '';
-    
-    if (theDate != null & theDate != '') {
-      var objDate = new Date(theDate);
-      var day = ("00" + objDate.getDate()).slice(-2);
-      var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
-      var year = (objDate.getFullYear() + '').slice(-2);
-      formattedDate = month + "/" + day + "/" + year;
-    }
-    
-    return formattedDate;
-  }  
 
 	//---------------------------------------
 	// return from wrapper function
