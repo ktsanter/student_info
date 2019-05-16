@@ -8,9 +8,10 @@ const app = function () {
   
 	const settings = {};
   
+  const TEMP_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';
   const apiInfo = {
     studentinfo: {
-      apibase: 'https://script.google.com/macros/s/AKfycbw_m3wFqlr3oxLDYi8hfbEEJ8q78eazGNA4OZhQUYioNzico-U/exec',
+      apibase: 'https://script.google.com/macros/s/AKfycbxpMfjVsVXjZuSdkI5FABJHFY5azMdbep7YfMI_OVndxtN_VwI/exec',
       apikey: 'MV_studeninfoAPI'
     }
   };
@@ -25,8 +26,8 @@ const app = function () {
     page.body.appendChild(_renderNoticeElement());
 		
     _setNotice('loading student list...');
-    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {}, _reportError);
-    var requestResult_fields = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'fieldinfo', {}, _reportError);
+    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
+    var requestResult_fields = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'fieldinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
     if (requestResult_students.success && requestResult_fields.success) {
       settings.studentinfo = requestResult_students.data;
       settings.fieldinfo = requestResult_fields.data;
@@ -124,7 +125,7 @@ const app = function () {
     
     _setNotice('loading info for ' + first + ' ' + last + '...');
     page.studentinfo.innerHTML = '';
-    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'studentinfo', {"first": first, "last": last}, _reportError);
+    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'studentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID, "first": first, "last": last}, _reportError);
     if (requestResult.success) {
       _setNotice('');
       _renderStudentInfo(first, last, requestResult.data);
