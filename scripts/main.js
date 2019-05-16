@@ -1,6 +1,6 @@
 "use strict";
 //
-// TODO: general purpose approach to layout of results
+// TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 //
 
 const app = function () {
@@ -143,6 +143,7 @@ const app = function () {
           page.studentinfo.appendChild(_renderStudentInfoItem(key, settings.fieldinfo[key], iteminfo[key]));
         }
       }
+      page.studentinfo.appendChild(document.createElement('br'));
     }
   }
   
@@ -154,7 +155,7 @@ const app = function () {
 
     var elemLabel = document.createElement('span');
     elemLabel.classList.add('studentinfo-item-label');
-    elemLabel.innerHTML = key;
+    elemLabel.innerHTML = key + ':';
     elemContainer.appendChild(elemLabel);
     
     if (fieldtype == 'text') {
@@ -165,30 +166,30 @@ const app = function () {
     } else if (fieldtype == 'flag') {
       formattedFieldValue = fieldvalue ? 'yes': 'no';
       
+    } else if (fieldtype == 'date') {
+      formattedFieldValue = _formatDate(fieldvalue);
+      
     } else if (fieldtype == 'notes') {
       formattedFieldValue = null;
-      var elemNotes = document.createElement('div');
-      elemNotes.classList.add('notes');
       var splitNotes = fieldvalue.split('\n');
-      console.log(splitNotes);
-      var html = '';
-      for (var i = 0; i < splitNotes.length; i++) {
-        var note = splitNotes[i];
-        console.log(note);
-        if (note != '') {
-          html += note + '<br>';
+      if (splitNotes.length > 0 && splitNotes[0] != '') {
+        var elemNotes = document.createElement('ul');
+        elemNotes.classList.add('studentinfo-item-notes');
+        for (var i = 0; i < splitNotes.length; i++) {
+          var elemNote = document.createElement('li');
+          elemNote.innerHTML = splitNotes[i];
+          elemNotes.appendChild(elemNote);
         }
+        elemContainer.appendChild(elemNotes);
       }
-      elemNotes.innerHTML = html;
-      elemContainer.appendChild(elemNotes);
       
     } else {
-      formattedFieldValue = '[unrecognized type: ' + fieldtype + ']';
+      formattedFieldValue = '[unrecognized field type: <i>' + fieldtype + '</i>]';
     }
 
     if (formattedFieldValue != null) {
       var elemValue = document.createElement('span');
-      elemValue.innerHTML = fieldvalue;   
+      elemValue.innerHTML = formattedFieldValue;   
       elemContainer.appendChild(elemValue);
     }
 
@@ -228,6 +229,20 @@ const app = function () {
   function _reportError(src, err) {
     _setNotice('Error in ' + src + ': ' + err.name + ' "' + err.message + '"');
   }
+  
+  function _formatDate(theDate) {
+    var formattedDate = '';
+    
+    if (theDate != null & theDate != '') {
+      var objDate = new Date(theDate);
+      var day = ("00" + objDate.getDate()).slice(-2);
+      var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
+      var year = (objDate.getFullYear() + '').slice(-2);
+      formattedDate = month + "/" + day + "/" + year;
+    }
+    
+    return formattedDate;
+  }  
 
 	//---------------------------------------
 	// return from wrapper function

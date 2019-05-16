@@ -54,8 +54,7 @@ body {
   margin-right: 8px;
 }
 
-.notes {
-  border: 1px solid black;
-  min-height: 20px;
+.studentinfo-item-notes {
+  margin-top: 0px;
 }
 
