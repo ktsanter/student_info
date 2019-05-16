@@ -1,6 +1,5 @@
 "use strict";
 //
-// TODO: make student list hold unique values only
 // TODO: general purpose approach to layout of results
 //
 
@@ -26,9 +25,11 @@ const app = function () {
     page.body.appendChild(_renderNoticeElement());
 		
     _setNotice('loading student list...');
-    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {}, _reportError);
-    if (requestResult.success) {
-      settings.studentinfo = requestResult.data;
+    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {}, _reportError);
+    var requestResult_fields = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'fieldinfo', {}, _reportError);
+    if (requestResult_students.success && requestResult_fields.success) {
+      settings.studentinfo = requestResult_students.data;
+      settings.fieldinfo = requestResult_fields.data;
       _setNotice('');
       _makeStudentList();
       _renderContents();
@@ -37,13 +38,15 @@ const app = function () {
 	}
 		
   function _makeStudentList() {
-    settings.studentlist = [];
+    var listwithdupes = [];
     for (var i = 0; i < settings.studentinfo.length; i++) {
       var student = settings.studentinfo[i];
       var first = student.first.trim();
       var last = student.last.trim();
-      settings.studentlist.push(last + ', ' + first)
+      listwithdupes.push(last + ', ' + first)
     }      
+    
+    settings.studentlist = Array.from(new Set(listwithdupes));
   }
   
 	//-----------------------------------------------------------------------------
@@ -128,7 +131,7 @@ const app = function () {
         var singleinfo = requestResult.data[i];
         for (var key in singleinfo) {
           if (key != 'first' && key != 'last') {
-            details += '<br>' + key + ': ' + singleinfo[key];
+            details += '<br>' + key + '(' + settings.fieldinfo[key] + '): ' + singleinfo[key];
           }
         }
         details += '<br>';
