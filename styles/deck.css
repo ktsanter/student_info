@@ -6,6 +6,7 @@
   display: inline-block;
   padding: 4px;
   filter: drop-shadow(6px 6px 4px #444);
+  min-width: 32em;
 }
 
 /*--- nav menu ----------------------------*/
@@ -84,13 +85,17 @@
   min-height: 3em;
 }
 
+.decklayout-notes {
+  margin-top: 8px;
+}
+
 .decklayout-noteslabel {
   font-weight: bold;
   font-size: 0.9em;
 }
 
-.decklayout-notes {
-  margin-top: 8px;
+.decklayout-notes-plus {
+  margin-left: 0.5em;
 }
 
 .decklayout-notecontrol {

@@ -1,8 +1,9 @@
 "use strict";
 //
-// TODO: 
+// TODO: handle multiple cards in one deck
+// TODO: implement doConfigure (possibly as a callback specified in the constructor params?)
+// TODO: adapt to work with Noah's config approach
 //
-
 
 class InfoDeck {
   constructor(deckParams) {
@@ -33,11 +34,11 @@ class InfoDeck {
     var elemCardContainer = document.createElement('div');
     elemCardContainer.classList.add('decklayout-card');
 
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerPicture', 'decklayout-picture',''));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerGenericItems', 'decklayout-genericitems','<i>generic items</i>'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerBadges', 'decklayout-badges','<i>badges</i>'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerNotes', 'decklayout-notes','<i>notes</i>'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerCardLabel', 'decklayout-cardlabel',''));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerPicture', 'decklayout-picture'));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerGenericItems', 'decklayout-genericitems'));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerBadges', 'decklayout-badges'));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerNotes', 'decklayout-notes'));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerCardLabel', 'decklayout-cardlabel'));  
     
     this._elemDeckContainer.appendChild(elemCardContainer);
 
@@ -103,11 +104,10 @@ class InfoDeck {
     return {container: elemContainer, inputelement: elemInput};
   } 
 
-  static _renderContainer(id, className, contents) {
+  static _renderContainer(id, className) {
     var elemContainer = document.createElement('div');
     elemContainer.id = id;
     elemContainer.classList.add(className);
-    elemContainer.innerHTML = contents;
     return elemContainer;
   }
     
@@ -120,11 +120,15 @@ class InfoDeck {
       console.log('Error: internal error - failed to find item details for ' + indexvalue);
       return;
     }
+
+    this._removeChildren(this._getContainer('decklayout-genericitems'));
+    this._removeChildren(this._getContainer('decklayout-badges'));
+    this._removeChildren(this._getContainer('decklayout-notes'));
+    this._getContainer('decklayout-cardlabel').innerHTML = '';
     
     for (var key in item) {
-      console.log(key + ' ' + item[key] + ' ' + this._layout.fieldtype[key] + ' ' + this._layout.fieldtitle[key]);
+      this._renderCardItem(item, key);
     }
-    //this._renderCardLabel(item);
   }
   
   _getMatchingItemDetails(indexvalue) {  // expand to handle multiple matches
@@ -140,10 +144,129 @@ class InfoDeck {
     
     return matchingItem;
   }
-
-  _renderCardLabel(item) {
-    var elemLabel = this._elemDeckContainer.getElementsByClassName('decklayout-cardlabel')[0];
-    elemLabel.innerHTML = item[this._layout.labelfield];
+  
+  _renderCardItem(item, key) {
+    var fieldValue = item[key];
+    var fieldType = this._layout.fieldtype[key];
+    var fieldTitle = this._layout.fieldtitle[key];
+    
+    if (fieldType == 'dontrender' || fieldType == 'index') {
+      // do nothing
+      
+    } else if (fieldType == 'notes') {
+      this._renderCardItemNotes(fieldTitle, fieldValue);
+      
+    } else if (fieldType == 'label') {
+      this._getContainer('decklayout-cardlabel').innerHTML = fieldValue;
+      
+    } else if (fieldType == 'text') {
+      this._renderGenericItem(fieldTitle, fieldValue);
+      
+    } else if (fieldType.slice(0, 6) == 'badge_') {
+      this._renderBadge(fieldType, fieldValue);
+      
+    } else {
+      console.log('ERROR: unrecognized field type (' + fieldType + ') for field key = ' + key);
+    }
+  }
+  
+  _getContainer(className) {
+    return this._elemDeckContainer.getElementsByClassName(className)[0];
+  }
+  
+  _removeChildren(elem) {
+    while (elem.firstChild) {
+      elem.removeChild(elem.firstChild);
+    }
+  }
+  
+  _renderCardItemNotes(title, notes) {
+    var arrNotes = notes.split('\n');
+    var elemContainer = this._getContainer('decklayout-notes');
+    
+    var elemLabelContainer = document.createElement('div');
+    elemLabelContainer.classList.add('decklayout-noteslabel');
+    
+    var elemLabel = document.createElement('span');
+    elemLabel.innerHTML = title;
+    elemLabelContainer.appendChild(elemLabel);
+    
+    var elemIcon = document.createElement('i');
+    elemIcon.classList.add('fa');
+    elemIcon.classList.add('fa-plus-square');
+    elemIcon.classList.add('decklayout-notes-plus');
+    elemIcon.id = 'addTitle';
+    elemIcon.title = 'add note';
+    elemIcon.addEventListener('click', e => this._addNote(e), false);
+    elemLabelContainer.appendChild(elemIcon);
+    
+    elemContainer.appendChild(elemLabelContainer);
+    
+    var elemSelect = document.createElement('select');
+    elemSelect.classList.add('decklayout-notecontrol');
+    elemSelect.size = 5;
+    for (var i = 0; i < arrNotes.length; i++) {
+      var note = arrNotes[i];
+      if (note != '') {
+        var elemOption = document.createElement('option');
+        elemOption.value = i;
+        elemOption.innerHTML = note;
+        elemSelect.appendChild(elemOption);
+      }
+    }
+    elemContainer.appendChild(elemSelect);
+  }
+  
+  _renderGenericItem(title, itemValue) {
+    var elemContainer = this._getContainer('decklayout-genericitems');
+    
+    var elemItem = document.createElement('div');
+    
+    var elemLabel = document.createElement('div');
+    elemLabel.classList.add('decklayout-genericitemlabel');
+    elemLabel.innerHTML = title;
+    elemItem.appendChild(elemLabel);
+    
+    var elemValue = document.createElement('span');
+    elemValue.innerHTML = itemValue;
+    elemItem.appendChild(elemValue);
+    
+    elemContainer.appendChild(elemItem);
+  }
+  
+  _renderBadge(itemKey, itemValue) {
+    var badgeName = itemKey.slice(-1 * (itemKey.length - 6));
+    var elemContainer = this._getContainer('decklayout-badges');
+    
+    if (badgeName == 'grade') {
+      var arrImages = ['badge_grade09_transparent.png', 'badge_grade10_transparent.png', 'badge_grade11_transparent.png', 'badge_grade12_transparent.png'];
+      var imageindex = itemValue - 9;
+      if (imageindex >= 0 && imageindex < arrImages.length) {
+        elemContainer.appendChild( this._renderBadgeImage(arrImages[imageindex], 'grade ' + itemValue) );
+      }
+      
+    } else if (badgeName == '504') {
+      if (itemValue) {
+        elemContainer.appendChild( this._renderBadgeImage('badge_504_transparent.png', 'has 504 plan') );
+      }
+      
+    } else if (badgeName == 'iep') {
+      if (itemValue) {
+        elemContainer.appendChild( this._renderBadgeImage('badge_504_transparent.png', 'has 504 plan') );
+      }
+      
+    } else {
+      console.log('ERROR: badge type (' + itemKey + ') not recognized');
+    }
+  }
+  
+  _renderBadgeImage(imgName, title) {
+    var elemImage = document.createElement('img');
+    elemImage.classList.add('decklayout-badges-badge');
+    elemImage.src = './images/' + imgName;
+    elemImage.title = title;
+    
+    return elemImage;
   }
   
   //--------------------------------------------------------------------------
@@ -153,7 +276,7 @@ class InfoDeck {
     this._renderCardInfo(this._elemSelectionInput.value);
   }
     
-  static _doConfigure() { InfoDeck._doMenu('configure'); }
+  static _doConfigure() { InfoDeck._doMenu('configure'); }  // callback specified in constructor?
   static _doFullPage() { InfoDeck._doMenu('full page'); }
   static _doAbout() { InfoDeck._doMenu('about'); }
   
@@ -171,69 +294,13 @@ class InfoDeck {
       x.style.display = "block";
     }
   }
+  
+  _addNote() {
+    console.log('add note');
+  }
 }
 
-//-----------------------------------------------------------------------------
-// original stuff
-//-----------------------------------------------------------------------------  
-
-function _renderCardInfoItem(key, fieldtype, fieldvalue) {
-  var elemContainer = document.createElement('div');
-  elemContainer.classList.add('cardinfo-item');
-  
-  var formattedFieldValue = null;
-  var elemNotes = null;
-
-  var elemLabel = document.createElement('span');
-  elemLabel.classList.add('cardinfo-item-label');
-  elemLabel.innerHTML = key + ':';
-  
-  if (fieldtype == 'text') {
-    formattedFieldValue = fieldvalue;
-  } else if (fieldtype == 'percent') {
-    formattedFieldValue = (fieldvalue * 100) + '%';
-    
-  } else if (fieldtype == 'flag') {
-    formattedFieldValue = fieldvalue ? 'yes': 'no';
-    
-  } else if (fieldtype == 'date') {
-    formattedFieldValue = _formatDate(fieldvalue);
-    
-  } else if (fieldtype == 'notes') {
-    formattedFieldValue = null;
-    var splitNotes = fieldvalue.split('\n');
-    if (splitNotes.length > 0 && splitNotes[0] != '') {
-      elemNotes = document.createElement('ul');
-      elemNotes.classList.add('cardinfo-item-notes');
-      for (var i = 0; i < splitNotes.length; i++) {
-        var elemNote = document.createElement('li');
-        elemNote.innerHTML = splitNotes[i];
-        elemNotes.appendChild(elemNote);
-      }
-    }
-    
-  } else if (fieldtype == 'dontrender') {
-    formattedFieldValue = null;
-    
-  } else {
-    formattedFieldValue = '[unrecognized field type: <i>' + fieldtype + '</i>]';
-  }
-
-  if (fieldtype != 'dontrender') {
-    elemContainer.appendChild(elemLabel);
-  }
-  if (elemNotes != null) {
-      elemContainer.appendChild(elemNotes);
-  }
-  if (formattedFieldValue != null) {
-    var elemValue = document.createElement('span');
-    elemValue.innerHTML = formattedFieldValue;   
-    elemContainer.appendChild(elemValue);
-  }
-
-  return elemContainer;
-}
-
+/*
 //---------------------------------------
 // utility functions
 //----------------------------------------
@@ -250,4 +317,4 @@ function _formatDate(theDate) {
   
   return formattedDate;
 }  
-
+*/

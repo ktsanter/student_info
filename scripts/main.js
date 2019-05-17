@@ -15,18 +15,17 @@ const app = function () {
   };
    
   const temp_layoutinfo = {
-    labelfield: 'course',
     fieldtype: {
       "fullname": 'dontrender',
       "last": 'dontrender',	
       "first": 'dontrender',
-      "course": 'text',
+      "course": 'label',
       "preferred_name": 'text',
       "email" : 'text',
       "start_end": 'text',
       "grade_level": 'badge_grade',	
-      "IEP": 'flag',
-      "504": 'flag',	
+      "IEP": 'badge_iep',
+      "504": 'badge_504',	
       "mentor": 'text',	
       "mentor_email": 'text',
       "notes": 'notes'
@@ -43,8 +42,8 @@ const app = function () {
       "IEP": 'IEP',	
       "504": '504',	
       "mentor": 'mentor',	
-      "mentor_email": 'mentor',
-      "notes": 'notes'
+      "mentor_email": 'mentor email',
+      "notes": 'Notes'
     }
   }
       
@@ -54,7 +53,6 @@ const app = function () {
 	async function init () {
 		page.body = document.getElementsByTagName('body')[0];
     
-    page.body.appendChild(_renderTitle());
     page.body.appendChild(_renderNoticeElement());
 		
     _testInfoDeckClass();
@@ -92,15 +90,6 @@ const app = function () {
 	//-----------------------------------------------------------------------------
 	// page rendering
 	//-----------------------------------------------------------------------------  
-  function _renderTitle() {
-    var elemTitle = document.createElement('div');
-    
-    elemTitle.innerHTML = 'Student info';
-    elemTitle.classList.add('title');
-    
-    return elemTitle;
-  }
-
   function _renderNoticeElement() {
     var elemNotice = document.createElement('div');
     
