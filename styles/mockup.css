@@ -104,14 +104,14 @@ body {
   overflow-x: auto;
 }
 
-.decklayout-index {
+.decklayout-label {
   font-size: 0.9em;
   font-style: italic;
   text-align: center;
   margin-top: 6px;
 }
 
-.decklayout-index-control-right {
+.decklayout-label-control-right {
   float: right;
 }
 
