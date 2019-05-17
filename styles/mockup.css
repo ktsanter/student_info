@@ -12,16 +12,21 @@ body {
 .decklayout-main {
   background-color: #eee;
   border: 1px solid black;
+  border-radius: 8px;
   display: inline-block;
   padding: 4px;
-  /*filter: drop-shadow(4px 4px 3px #111);*/
+  filter: drop-shadow(6px 6px 4px #444);
 }
 
 /*--- nav menu ----------------------------*/
 .decklayout-topnav {
   overflow: hidden;
   background-color: #333;
+  border-radius: 8px 8px 0px 0px;
   position: relative;
+  margin-top: -4px;
+  margin-right: -4px;
+  margin-left: -4px;  
 }
 
 /* Hide the links inside the navigation menu (except for logo/home) */
@@ -35,6 +40,11 @@ body {
   padding: 6px 8px;
   text-decoration: none;  /* no underline on link */
   display: block;
+}
+
+.decklayout-title {
+  background-color: #4CAF50;
+  color: white;
 }
 
 #deckNavLinks a:hover {
@@ -51,11 +61,6 @@ body {
   top: 0;
 }
 /*--- end of nav menu ----------------------------*/
-
-.decklayout-title {
-  background-color: #4CAF50;
-  color: white;
-}
 
 .decklayout-select {
   margin-top: 6px;
