@@ -60,6 +60,10 @@
   margin-bottom: 6px;
 }
 
+.decklayout-select-control {
+  width: 20em;
+}
+
 .decklayout-picture {
   float: right;
 }

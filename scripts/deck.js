@@ -93,8 +93,10 @@ class InfoDeck {
     elemContainer.classList.add('decklayout-select');
     
     var elemInputDiv = document.createElement('div');
+    elemInputDiv.classList.add('autocomplete');
     
     var elemInput = document.createElement('input');
+    elemInput.classList.add('decklayout-select-control');
     elemInput.type = 'text';
     elemInput.autocomplete = 'off';
     elemInputDiv.appendChild(elemInput);
@@ -125,6 +127,7 @@ class InfoDeck {
     this._removeChildren(this._getContainer('decklayout-badges'));
     this._removeChildren(this._getContainer('decklayout-notes'));
     this._getContainer('decklayout-cardlabel').innerHTML = '';
+    this._getContainer('decklayout-badges').style.minHeight = '3em';
     
     for (var key in item) {
       this._renderCardItem(item, key);
