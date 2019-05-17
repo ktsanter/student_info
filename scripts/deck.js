@@ -1,8 +1,9 @@
 "use strict";
 //
-// TODO: handle multiple cards in one deck
-// TODO: implement doConfigure (possibly as a callback specified in the constructor params?)
+// TODO: handle consequences of configure callback (re-initialize, destroy and create?)
 // TODO: adapt to work with Noah's config approach
+// TODO: develop edit/add notes features
+// TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 //
 
 class InfoDeck {
@@ -12,8 +13,11 @@ class InfoDeck {
     this._indexfield = deckParams.indexfield;
     this._layout = deckParams.layout;
     this._itemdetails = deckParams.itemdetails;
+    this._configcallback = deckParams.configcallback;
     
     this._elemDeckContainer = null;
+    this._currentCardItems = null;
+    this._currentCardNumber = 0;
   }
   
   //--------------------------------------------------------------------------------
@@ -23,7 +27,7 @@ class InfoDeck {
     this._elemDeckContainer = document.createElement('div');
     this._elemDeckContainer.classList.add('decklayout-main');
     
-    var elemNav = InfoDeck._renderNavigation(this._title);
+    var elemNav = this._renderNavigation(this._title);
     this._elemDeckContainer.appendChild(elemNav);
 
     var elemSelect = InfoDeck._renderSelect();
@@ -45,7 +49,7 @@ class InfoDeck {
     return this._elemDeckContainer;
   }
   
-  static _renderNavigation(title) {
+  _renderNavigation(title) {
     var navLinks = [
       {id: 'menuConfigure', label: 'configure'},
       {id: 'menuFullPage',  label: 'open in full page'},
@@ -67,7 +71,7 @@ class InfoDeck {
       elemLink.classList.add('decklayout-navlink');
       elemLink.id = navLinks[i].id;
       elemLink.innerHTML = navLinks[i].label;
-      if (i == 0) { elemLink.addEventListener('click', e => InfoDeck._doConfigure(e), false); }
+      if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
       else if (i == 1) { elemLink.addEventListener('click', e => InfoDeck._doFullPage(e), false); }
       else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
       elemSubLinksContainer.appendChild(elemLink);
@@ -116,36 +120,56 @@ class InfoDeck {
   //--------------------------------------------------------------------------
   // render card info
   //--------------------------------------------------------------------------
-  _renderCardInfo(indexvalue) {
-    var item = this._getMatchingItemDetails(indexvalue);
-    if (item == null) {
+  _processSelection(indexvalue) {
+    this._currentCardItems = this._getMatchingItems(indexvalue);
+    if (this._currentCardItems.length == 0) {
       console.log('Error: internal error - failed to find item details for ' + indexvalue);
       return;
     }
+        
+    this._currentCardNumber = 0;
+    this._renderCardInfo();
+  }
+ 
+  _getMatchingItems(indexvalue) {  
+    var arrItems = this._itemdetails;
+    var matchingItems = [];
+    
+    for (var i = 0; i < arrItems.length; i++) {
+      var item = arrItems[i];
+      if (item[this._indexfield] == indexvalue) {
+        matchingItems.push(item);
+      }
+    }
+    
+    return matchingItems;
+  }
 
+  _renderPreviousCardInfo() {
+    if (this._currentCardNumber > 0) {
+      this._currentCardNumber--;
+      this._renderCardInfo();
+    }
+  }
+  
+  _renderNextCardInfo() {
+    if (this._currentCardNumber < this._currentCardItems.length - 1) {
+      this._currentCardNumber++;
+      this._renderCardInfo();
+    }
+  }
+  
+  _renderCardInfo(item) {
     this._removeChildren(this._getContainer('decklayout-genericitems'));
     this._removeChildren(this._getContainer('decklayout-badges'));
     this._removeChildren(this._getContainer('decklayout-notes'));
     this._getContainer('decklayout-cardlabel').innerHTML = '';
     this._getContainer('decklayout-badges').style.minHeight = '3em';
     
+    var item = this._currentCardItems[this._currentCardNumber];
     for (var key in item) {
       this._renderCardItem(item, key);
     }
-  }
-  
-  _getMatchingItemDetails(indexvalue) {  // expand to handle multiple matches
-    var arrItems = this._itemdetails;
-    var matchingItem = null;
-    
-    for (var i = 0; i < arrItems.length && matchingItem == null; i++) {
-      var item = arrItems[i];
-      if (item[this._indexfield] == indexvalue) {
-        matchingItem = item;
-      }
-    }
-    
-    return matchingItem;
   }
   
   _renderCardItem(item, key) {
@@ -160,7 +184,7 @@ class InfoDeck {
       this._renderCardItemNotes(fieldTitle, fieldValue);
       
     } else if (fieldType == 'label') {
-      this._getContainer('decklayout-cardlabel').innerHTML = fieldValue;
+      this._renderLabel(fieldValue);
       
     } else if (fieldType == 'text') {
       this._renderGenericItem(fieldTitle, fieldValue);
@@ -217,7 +241,61 @@ class InfoDeck {
         elemSelect.appendChild(elemOption);
       }
     }
+    elemSelect.addEventListener('dblclick', e => this._handleNoteDoubleClick(e), false);
     elemContainer.appendChild(elemSelect);
+    elemContainer.appendChild(this._renderNotesEditingSection());
+  }
+
+  _renderNotesEditingSection() {
+    var elemContainer = document.createElement('div');
+    elemContainer.classList.add('decklayout-notes-editing');
+   
+    var elemCheck = document.createElement('i');
+    elemCheck.classList.add('fa');
+    elemCheck.classList.add('fa-check-square');
+    elemCheck.classList.add('fa-lg');
+    elemCheck.classList.add('decklayout-notes-editing-icon');
+    elemContainer.appendChild(elemCheck);
+    
+    var elemTrash = document.createElement('i');
+    elemTrash.classList.add('fa');
+    elemTrash.classList.add('fa-trash');
+    elemTrash.classList.add('fa-lg');
+    elemTrash.classList.add('decklayout-notes-editing-icon');
+    elemContainer.appendChild(elemTrash);
+
+    return elemContainer;
+  }
+  
+  _renderLabel(label) {
+    var elemContainer = this._getContainer('decklayout-cardlabel');
+    var numCards = this._currentCardItems.length;
+
+    if (numCards > 0 && this._currentCardNumber > 0) {
+      var elemPrev = document.createElement('i');
+      elemPrev.classList.add('decklayout-label-control-left');
+      elemPrev.classList.add('fa');
+      elemPrev.classList.add('fa-angle-double-left');
+      elemPrev.classList.add('fa-lg');
+      elemPrev.title = 'previous card';    
+      elemPrev.addEventListener('click', e => this._renderPreviousCardInfo(e), false);
+      elemContainer.appendChild(elemPrev);
+    }
+    
+    var elemLabel = document.createElement('span');
+    elemLabel.innerHTML = label;
+    elemContainer.appendChild(elemLabel);
+    
+    if (numCards > 0 && this._currentCardNumber < numCards - 1) {
+      var elemNext = document.createElement('i');
+      elemNext.classList.add('decklayout-label-control-right');
+      elemNext.classList.add('fa');
+      elemNext.classList.add('fa-angle-double-right');
+      elemNext.classList.add('fa-lg');
+      elemNext.title = 'next card';
+      elemNext.addEventListener('click', e => this._renderNextCardInfo(e), false);
+      elemContainer.appendChild(elemNext);
+    }
   }
   
   _renderGenericItem(title, itemValue) {
@@ -255,7 +333,7 @@ class InfoDeck {
       
     } else if (badgeName == 'iep') {
       if (itemValue) {
-        elemContainer.appendChild( this._renderBadgeImage('badge_504_transparent.png', 'has 504 plan') );
+        elemContainer.appendChild( this._renderBadgeImage('badge_iep_transparent.png', 'has IEP') );
       }
       
     } else {
@@ -276,10 +354,14 @@ class InfoDeck {
   // handlers
   //--------------------------------------------------------------------------
   _handleSelection() {
-    this._renderCardInfo(this._elemSelectionInput.value);
+    this._processSelection(this._elemSelectionInput.value);
   }
     
-  static _doConfigure() { InfoDeck._doMenu('configure'); }  // callback specified in constructor?
+  _doConfigure() { 
+    InfoDeck._toggleHamburgerMenu();
+    this._configcallback();
+  }  
+  
   static _doFullPage() { InfoDeck._doMenu('full page'); }
   static _doAbout() { InfoDeck._doMenu('about'); }
   
@@ -300,6 +382,11 @@ class InfoDeck {
   
   _addNote() {
     console.log('add note');
+  }
+  
+  _handleNoteDoubleClick(e) {
+    var msg = 'note selected: ' + e.target.innerHTML;
+    console.log(msg);
   }
 }
 

@@ -1,6 +1,6 @@
 "use strict";
 //
-// TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
+// TODO: add query params for deck data and layout
 //
 
 const app = function () {
@@ -71,7 +71,8 @@ const app = function () {
       indexlist: _makeIndexList(indexfield, studentdata),
       indexfield: indexfield,
       layout: temp_layoutinfo,
-      itemdetails: studentdata
+      itemdetails: studentdata,
+      configcallback: _configCallback
     };
     
     var deck = new InfoDeck(deckParams);
@@ -85,6 +86,10 @@ const app = function () {
     }
     
     return Array.from(new Set(indexlistWithDupes));
+  }
+  
+  function _configCallback() {
+    console.log('config callback');
   }
   
 	//-----------------------------------------------------------------------------

@@ -7,12 +7,13 @@
   padding: 4px;
   filter: drop-shadow(6px 6px 4px #444);
   min-width: 32em;
+  background: linear-gradient(#BBD2C5,#536976);
 }
 
 /*--- nav menu ----------------------------*/
 .decklayout-topnav {
   overflow: hidden;
-  background-color: #333;
+  background-color: #777;/*#333;*/
   border-radius: 8px 8px 0px 0px;
   position: relative;
   margin-top: -4px;
@@ -34,7 +35,7 @@
 }
 
 .decklayout-title {
-  background-color: #4CAF50;
+  background-color: black;/* #4CAF50;*/
   color: white;
 }
 
@@ -45,7 +46,9 @@
 
 /* Style the hamburger menu */
 .decklayout-topnav a.icon {
-  background: black;
+  /*background: black;*/
+  color: black;
+  background: #ddd;
   display: block;
   position: absolute;
   right: 0;
@@ -86,7 +89,10 @@
 
 .decklayout-badges {
   margin-top: 8px;
-  /*min-height: 3em;*/
+}
+
+.decklayout-badges-badge {
+  margin-right: 0.2em;
 }
 
 .decklayout-notes {
@@ -96,6 +102,7 @@
 .decklayout-noteslabel {
   font-weight: bold;
   font-size: 0.9em;
+  margin-bottom: 4px;
 }
 
 .decklayout-notes-plus {
@@ -107,13 +114,24 @@
   overflow-x: auto;
 }
 
+.decklayout-notes-editing {
+  margin-top: 8px;
+}
+
+.decklayout-notes-editing-icon {}
+
 .decklayout-cardlabel {
-  font-size: 0.9em;
+  color: #ddd;
+  font-weight: bold;
   font-style: italic;
   text-align: center;
   margin-top: 6px;
 }
 
-.decklayout-index-control-right {
+.decklayout-label-control-right {
   float: right;
+}
+
+.decklayout-label-control-left {
+  float: left;
 }
