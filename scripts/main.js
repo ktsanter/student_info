@@ -6,15 +6,47 @@
 const app = function () {
 	const page = {};
   
-	const settings = {};
-  
-  const TEMP_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';
+  const TEMP_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';  // should get from either "config" or query param
   const apiInfo = {
     studentinfo: {
       apibase: 'https://script.google.com/macros/s/AKfycbxpMfjVsVXjZuSdkI5FABJHFY5azMdbep7YfMI_OVndxtN_VwI/exec',
       apikey: 'MV_studeninfoAPI'
     }
   };
+   
+  const temp_layoutinfo = {
+    labelfield: 'course',
+    fieldtype: {
+      "fullname": 'dontrender',
+      "last": 'dontrender',	
+      "first": 'dontrender',
+      "course": 'text',
+      "preferred_name": 'text',
+      "email" : 'text',
+      "start_end": 'text',
+      "grade_level": 'badge_grade',	
+      "IEP": 'flag',
+      "504": 'flag',	
+      "mentor": 'text',	
+      "mentor_email": 'text',
+      "notes": 'notes'
+    },
+    fieldtitle: {
+      "fullname": '',
+      "last": '',	
+      "first": '',
+      "course": 'course',
+      "preferred_name": 'preferred name',
+      "email" : 'text',
+      "start_end": 'start/end',
+      "grade_level": '',	
+      "IEP": 'IEP',	
+      "504": '504',	
+      "mentor": 'mentor',	
+      "mentor_email": 'mentor',
+      "notes": 'notes'
+    }
+  }
       
 	//---------------------------------------
 	// get things going
@@ -25,27 +57,36 @@ const app = function () {
     page.body.appendChild(_renderTitle());
     page.body.appendChild(_renderNoticeElement());
 		
-    _setNotice('loading student list...');
-    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    if (requestResult_students.success) {
-      settings.studentinfo = requestResult_students.data;
-      _setNotice('');
-      _makeStudentList();
-      _renderContents();
-      autocomplete(page.studentinput, settings.studentlist, _processStudentSelection);
-    }
+    _testInfoDeckClass();
 	}
-		
-  function _makeStudentList() {
-    var listwithdupes = [];
-    for (var i = 0; i < settings.studentinfo.length; i++) {
-      var student = settings.studentinfo[i];
-      var first = student.first.trim();
-      var last = student.last.trim();
-      listwithdupes.push(last + ', ' + first)
-    }      
+
+  async function _testInfoDeckClass() {
+    _setNotice('initializing deck...');
+    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
+    if (!requestResult.success) return;
+    _setNotice('');
+
+    var indexfield = 'fullname';
+    var studentdata = requestResult.data;
+    var deckParams = {
+      title: 'Student info',
+      indexlist: _makeIndexList(indexfield, studentdata),
+      indexfield: indexfield,
+      layout: temp_layoutinfo,
+      itemdetails: studentdata
+    };
     
-    settings.studentlist = Array.from(new Set(listwithdupes));
+    var deck = new InfoDeck(deckParams);
+    page.body.appendChild(deck.renderDeck());
+  }
+  
+  function _makeIndexList(indexfield, data) {
+    var indexlistWithDupes = [];
+    for (var i = 0; i < data.length; i++) {
+      indexlistWithDupes.push(data[i][indexfield])
+    }
+    
+    return Array.from(new Set(indexlistWithDupes));
   }
   
 	//-----------------------------------------------------------------------------
@@ -69,67 +110,7 @@ const app = function () {
     
     return elemNotice;    
   }
-  
-  function _renderContents() {
-    page.contents = document.createElement('div');
-    page.contents.id = 'contents';
-    page.body.appendChild(page.contents);
-
-    page.contents.appendChild(_renderStudentSelection());
-    page.contents.appendChild(_renderStudentInfoSection());
-  }  
-  
-  function _renderStudentSelection() {
-    var elemContainer = document.createElement('div');
-    
-    var elemInputDiv = document.createElement('div');
-    elemInputDiv.classList.add('autocomplete'); 
-    elemInputDiv.style.width = '300px';
-    
-    var elemInput = document.createElement('input');
-    elemInput.type = 'text';
-    elemInput.placeholder = 'student name';
-    elemInput.autocomplete = 'off';
-    page.studentinput = elemInput;
-    elemInputDiv.appendChild(elemInput);
-        
-    elemContainer.appendChild(elemInputDiv);
-    
-    return elemContainer;
-  } 
-  
-  function _renderStudentInfoSection() {
-    var elemContainer = document.createElement('div');
-    
-    page.studentinfo = elemContainer;
-    
-    return elemContainer;
-  }
-  
-  async function _processStudentSelection() {
-    var studentval = page.studentinput.value.split(',');
-    var first = studentval[1].trim();
-    var last = studentval[0].trim();
-    
-    var info = null;
-    for (var i = 0; i < settings.studentinfo.length && info == null; i++) {
-      var student = settings.studentinfo[i];
-      if (student.first == first && student.last == last) {
-        info = student;
-      }
-    }
-    
-    if (info == null) return;
-    
-    _setNotice('loading info for ' + first + ' ' + last + '...');
-    page.studentinfo.innerHTML = '';
-    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'studentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID, "first": first, "last": last}, _reportError);
-    if (requestResult.success) {
-      _setNotice('');
-      _renderDeck(page.studentinfo, requestResult.data);
-    }
-  }
-  
+ 
 	//-----------------------------------------------------------------------------
 	// control styling, visibility, and enabling
 	//-----------------------------------------------------------------------------    

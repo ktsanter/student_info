@@ -115,25 +115,6 @@ body {
   float: right;
 }
 
-.dummy-card {
-  background-color: #ccc;
-  border: 1px solid black;
-  width: 402px;
-  height: 250px;
-  position: absolute;
-  top: 100px;
-  left: 36px;
-  z-index: -1;
-}
-
-.dummy-card-course {
-  position: absolute;
-  bottom: 0;
-  left: 110px;
-  font-size: 0.9em;
-  font-style: italic;
-}
-
 .debug {
   margin-top: 20px;
   font-style: italic;
