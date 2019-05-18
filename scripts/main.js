@@ -1,6 +1,9 @@
 "use strict";
 //
 // TODO: add query params for deck data and layout
+// TODO: implement config callback
+// TODO: implement notes callback
+// TODO: get layout via API
 //
 
 const app = function () {
@@ -72,7 +75,10 @@ const app = function () {
       indexfield: indexfield,
       layout: temp_layoutinfo,
       itemdetails: studentdata,
-      configcallback: _configCallback
+      callbacks: {
+        config: _configCallback,
+        notes: _notesCallback
+      }
     };
     
     var deck = new InfoDeck(deckParams);
@@ -89,7 +95,12 @@ const app = function () {
   }
   
   function _configCallback() {
-    console.log('config callback');
+    console.log('main.js: config callback');
+  }
+  
+  function _notesCallback(params) {
+    console.log('main.js: notes callback');
+    console.log(params);
   }
   
 	//-----------------------------------------------------------------------------

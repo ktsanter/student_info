@@ -101,7 +101,6 @@
 
 .decklayout-noteslabel {
   font-weight: bold;
-  font-size: 0.9em;
   margin-bottom: 4px;
 }
 
@@ -115,10 +114,26 @@
 }
 
 .decklayout-notes-editing {
-  margin-top: 8px;
+  display: none;
+  margin-top: 12px;
 }
 
-.decklayout-notes-editing-icon {}
+.decklayout-notes-editing-date {
+  font-weight: bold;
+  font-style: italic;
+  display: inline-block;
+}
+
+.decklayout-notes-editing-icon {
+  float: right;
+  margin-right: 4px;
+}
+
+.decklayout-notes-editing-input {
+  width: 97%;
+  height: 10em;
+  margin-top: 6px;
+}
 
 .decklayout-cardlabel {
   color: #ddd;

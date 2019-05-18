@@ -2,7 +2,6 @@
 //
 // TODO: handle consequences of configure callback (re-initialize, destroy and create?)
 // TODO: adapt to work with Noah's config approach
-// TODO: develop edit/add notes features
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 //
 
@@ -13,7 +12,7 @@ class InfoDeck {
     this._indexfield = deckParams.indexfield;
     this._layout = deckParams.layout;
     this._itemdetails = deckParams.itemdetails;
-    this._configcallback = deckParams.configcallback;
+    this._callbacks = deckParams.callbacks;
     
     this._elemDeckContainer = null;
     this._currentCardItems = null;
@@ -220,17 +219,19 @@ class InfoDeck {
     
     var elemIcon = document.createElement('i');
     elemIcon.classList.add('fa');
-    elemIcon.classList.add('fa-plus-square');
+    elemIcon.classList.add('fa-plus');
     elemIcon.classList.add('decklayout-notes-plus');
+    //elemIcon.classList.add('fa-lg');
     elemIcon.id = 'addTitle';
     elemIcon.title = 'add note';
-    elemIcon.addEventListener('click', e => this._addNote(e), false);
+    elemIcon.addEventListener('click', e => this._handleAddNote(e), false);
     elemLabelContainer.appendChild(elemIcon);
     
     elemContainer.appendChild(elemLabelContainer);
     
     var elemSelect = document.createElement('select');
     elemSelect.classList.add('decklayout-notecontrol');
+    elemSelect.id = 'notesSelect';
     elemSelect.size = 5;
     for (var i = 0; i < arrNotes.length; i++) {
       var note = arrNotes[i];
@@ -249,20 +250,54 @@ class InfoDeck {
   _renderNotesEditingSection() {
     var elemContainer = document.createElement('div');
     elemContainer.classList.add('decklayout-notes-editing');
+    elemContainer.id = 'notesEditing';
    
+    var elemWorkingNoteIndex = document.createElement('div');
+    elemWorkingNoteIndex.style.display = 'none';
+    elemWorkingNoteIndex.id = 'notesEditingWorkingIndex';
+    elemWorkingNoteIndex.innerHTML = '-1';
+    elemContainer.appendChild(elemWorkingNoteIndex);
+    
+    var elemDate = document.createElement('div');
+    elemDate.classList.add('decklayout-notes-editing-date');
+    elemDate.id = 'notesEditingDate';
+    elemDate.innerHTML = '02/14/2019';
+    elemContainer.appendChild(elemDate);
+    
     var elemCheck = document.createElement('i');
     elemCheck.classList.add('fa');
-    elemCheck.classList.add('fa-check-square');
+    elemCheck.classList.add('fa-check');
     elemCheck.classList.add('fa-lg');
     elemCheck.classList.add('decklayout-notes-editing-icon');
+    elemCheck.title = 'save changes';
+    elemCheck.addEventListener('click', e => this._handleEditingCheckClick(e), false);
     elemContainer.appendChild(elemCheck);
+
+    var elemDiscard = document.createElement('i');
+    elemDiscard.classList.add('fa');
+    elemDiscard.classList.add('fa-close');
+    elemDiscard.classList.add('fa-lg');
+    elemDiscard.classList.add('decklayout-notes-editing-icon');
+    elemDiscard.title = 'discard changes';
+    elemDiscard.addEventListener('click', e => this._handleEditingDiscardClick(e), false);
+    elemContainer.appendChild(elemDiscard);
     
     var elemTrash = document.createElement('i');
     elemTrash.classList.add('fa');
     elemTrash.classList.add('fa-trash');
     elemTrash.classList.add('fa-lg');
     elemTrash.classList.add('decklayout-notes-editing-icon');
+    elemTrash.title = 'delete note';
+    elemTrash.id = 'deleteNoteIcon';
+    elemTrash.addEventListener('click', e => this._handleEditingTrashClick(e), false);
     elemContainer.appendChild(elemTrash);
+
+    var elemInputContainer = document.createElement('div');
+    var elemInput = document.createElement('textarea');
+    elemInput.classList.add('decklayout-notes-editing-input');
+    elemInput.id = 'notesEditingInput';
+    elemInputContainer.appendChild(elemInput);
+    elemContainer.appendChild(elemInputContainer);
 
     return elemContainer;
   }
@@ -351,6 +386,78 @@ class InfoDeck {
   }
   
   //--------------------------------------------------------------------------
+  // notes editing
+  //--------------------------------------------------------------------------
+  _beginNotesEditing(noteIndex, initialNote) {
+    document.getElementById('notesSelect').disabled = true;
+    document.getElementById('notesEditing').style.display = 'block';
+    
+    var elemDeleteIcon = document.getElementById('deleteNoteIcon');
+    if (noteIndex < document.getElementById('notesSelect').length) {
+      elemDeleteIcon.style.display = 'block';
+    } else {
+      elemDeleteIcon.style.display = 'none';
+    }
+    
+    document.getElementById('notesEditingWorkingIndex').innerHTML = noteIndex;
+    
+    var noteDate = InfoDeck._formatDate(Date.now());
+    var noteText = '';
+    if (initialNote != '') {
+      var arrNote = initialNote.split(':');
+      noteDate = arrNote[0].trim();
+      noteText = arrNote[1].trim();
+    }
+    document.getElementById('notesEditingDate').innerHTML = noteDate;
+    document.getElementById('notesEditingInput').value = noteText;
+  }
+  
+  _endNotesEditing(saveNote) {
+    var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML
+    document.getElementById('notesSelect').disabled = false;
+    document.getElementById('notesEditing').style.display = 'none';
+    
+    if (saveNote) {
+      var noteDate = document.getElementById('notesEditingDate').innerHTML;
+      var noteText = document.getElementById('notesEditingInput').value;
+      var fullNoteText = noteDate + ': ' + noteText;
+      
+      var elemSelect = document.getElementById('notesSelect');
+      if (noteIndex < elemSelect.length) {
+        elemSelect.options[noteIndex].text = fullNoteText;
+        
+      } else {
+        var elemOption = document.createElement('option');
+        elemOption.value = noteIndex;
+        elemOption.innerHTML = fullNoteText;
+        elemSelect.appendChild(elemOption);
+        elemSelect.selectedIndex = noteIndex;
+      }
+      
+      this._callbacks.notes({command: 'save', noteindex: noteIndex, notetext: fullNoteText});
+    }
+  }
+  
+  _deleteNote() {
+    var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML;
+    
+    var elemSelect = document.getElementById('notesSelect');
+    var elemOption = elemSelect.options[noteIndex];
+    var noteText = elemOption.text;
+    
+    var msg = 'This note will be permanently deleted';
+    msg += '\n"' + elemOption.text + '"';
+    msg += '\n\nPress OK to confirm';
+    if (confirm(msg)) {
+      elemSelect.removeChild(elemOption);
+      document.getElementById('notesSelect').disabled = false;
+      document.getElementById('notesEditing').style.display = 'none';
+      
+      this._callbacks.notes({command: 'delete', noteindex: noteIndex, notetext: noteText});
+    }
+  }
+    
+  //--------------------------------------------------------------------------
   // handlers
   //--------------------------------------------------------------------------
   _handleSelection() {
@@ -359,52 +466,69 @@ class InfoDeck {
     
   _doConfigure() { 
     InfoDeck._toggleHamburgerMenu();
-    this._configcallback();
+    this._callbacks.config();
   }  
   
-  static _doFullPage() { InfoDeck._doMenu('full page'); }
-  static _doAbout() { InfoDeck._doMenu('about'); }
+  static _doFullPage() { InfoDeck._dummyMenu('full page'); }
+  static _doAbout() { InfoDeck._dummyMenu('about'); }
   
-  static _doMenu(menuOption) {
+  static _dummyMenu(menuOption) {
     var msg = 'menu option selected: ' + menuOption;
     console.log(msg);
+    alert(msg);
     document.getElementById('deckNavLinks').style.display = 'none';
   }
   
   static _toggleHamburgerMenu() {
-    var x = document.getElementById("deckNavLinks");
-    if (x.style.display === "block") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
-    }
+    InfoDeck._toggleDisplay(document.getElementById("deckNavLinks"));
   }
   
-  _addNote() {
-    console.log('add note');
+  static _toggleDisplay(elem) {
+    if (elem.style.display === "block") {
+      elem.style.display = "none";
+    } else {
+      elem.style.display = "block";
+    }
+  }
+
+  _handleAddNote() {
+    if (document.getElementById('notesSelect').disabled) return;
+    this._beginNotesEditing(document.getElementById('notesSelect').length, '');
   }
   
   _handleNoteDoubleClick(e) {
-    var msg = 'note selected: ' + e.target.innerHTML;
-    console.log(msg);
+    if (document.getElementById('notesSelect').disabled) return;
+    var elem = document.getElementById("notesSelect");
+    var noteText = elem.options[elem.selectedIndex].text;
+    this._beginNotesEditing(elem.selectedIndex, noteText);
   }
-}
 
-/*
-//---------------------------------------
-// utility functions
-//----------------------------------------
-function _formatDate(theDate) {
-  var formattedDate = '';
-  
-  if (theDate != null & theDate != '') {
-    var objDate = new Date(theDate);
-    var day = ("00" + objDate.getDate()).slice(-2);
-    var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
-    var year = (objDate.getFullYear() + '').slice(-2);
-    formattedDate = month + "/" + day + "/" + year;
+  _handleEditingCheckClick() {
+    this._endNotesEditing(true);
   }
   
-  return formattedDate;
-}  
-*/
+  _handleEditingDiscardClick() {
+    this._endNotesEditing(false);
+  }
+  
+  _handleEditingTrashClick() {
+    this._deleteNote();
+  }
+  
+  //---------------------------------------
+  // utility functions
+  //----------------------------------------
+  static _formatDate(theDate) {
+    var formattedDate = '';
+    
+    if (theDate != null & theDate != '') {
+      var objDate = new Date(theDate);
+      var day = ("00" + objDate.getDate()).slice(-2);
+      var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
+      var year = (objDate.getFullYear() + '').slice(-2);
+      formattedDate = month + "/" + day + "/" + year;
+    }
+    
+    return formattedDate;
+  }    
+}
