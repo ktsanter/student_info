@@ -4,6 +4,7 @@
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 // TODO: more general purpose badge approach?
+// TODO: update internal representation of notes when saving and/or deleting (not just the select element), also change delimiter from : to |
 //
 
 class InfoDeck {
@@ -435,8 +436,9 @@ class InfoDeck {
         elemSelect.selectedIndex = noteIndex;
       }
       
-      var deckIndexVal = this._currentCardItems[this._currentCardNumber][this._indexfield];
-      this._callbacks.notes({command: 'save', deckindex: deckIndexVal, noteindex: noteIndex, notetext: fullNoteText});
+      var cardNumber = this._currentCardNumber;
+      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
+      this._callbacks.notes({command: 'save', deckindexval: deckIndexVal, cardnumber: cardNumber, noteindex: noteIndex, notetext: fullNoteText});
     }
   }
   
@@ -455,8 +457,9 @@ class InfoDeck {
       document.getElementById('notesSelect').disabled = false;
       document.getElementById('notesEditing').style.display = 'none';
       
-      var deckIndexVal = this._currentCardItems[this._currentCardNumber][this._indexfield];
-      this._callbacks.notes({command: 'delete', deckindex: deckIndexVal, noteindex: noteIndex, notetext: noteText});
+      var cardNumber = this._currentCardNumber;
+      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
+      this._callbacks.notes({command: 'delete', deckindexval: deckIndexVal, cardnumber: cardNumber, noteindex: noteIndex, notetext: noteText});
     }
   }
     
