@@ -102,22 +102,15 @@ const app = function () {
   
   async function _notesCallback(params) {
     _setNotice('updating notes...');
-    console.log(params);
+
     var postParams = {
       spreadsheetid: TEMP_SPREADSHEET_ID,
       fullname: params.deckindexval,
       cardnumber: params.cardnumber,
-      noteindex: params.noteindex,
-      notetext: params.notetext
+      notes: params.notes
     }
 
-    var requestResult = {success: false};    
-    if (params.command == 'save') {
-      requestResult = await googleSheetWebAPI.webAppPost(apiInfo.studentinfo, 'savenote', postParams, _reportError);
-    } else if (params.command == 'delete') {
-      requestResult = await googleSheetWebAPI.webAppPost(apiInfo.studentinfo, 'deletenote', postParams, _reportError);
-    }
-    
+    var requestResult = await googleSheetWebAPI.webAppPost(apiInfo.studentinfo, 'savenote', postParams, _reportError);
     if (requestResult.success) {
       _setNotice('');
     }

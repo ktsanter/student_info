@@ -160,7 +160,7 @@ class InfoDeck {
     }
   }
   
-  _renderCardInfo(item) {
+  _renderCardInfo() {
     this._removeChildren(this._getContainer('decklayout-genericitems'));
     this._removeChildren(this._getContainer('decklayout-badges'));
     this._removeChildren(this._getContainer('decklayout-notes'));
@@ -223,7 +223,6 @@ class InfoDeck {
     elemIcon.classList.add('fa');
     elemIcon.classList.add('fa-plus');
     elemIcon.classList.add('decklayout-notes-plus');
-    //elemIcon.classList.add('fa-lg');
     elemIcon.id = 'addTitle';
     elemIcon.title = 'add note';
     elemIcon.addEventListener('click', e => this._handleAddNote(e), false);
@@ -240,7 +239,7 @@ class InfoDeck {
       if (note != '') {
         var elemOption = document.createElement('option');
         elemOption.value = i;
-        elemOption.innerHTML = note;
+        elemOption.innerHTML = note.replace('|', ': ');
         elemSelect.appendChild(elemOption);
       }
     }
@@ -406,9 +405,14 @@ class InfoDeck {
     var noteDate = InfoDeck._formatDate(Date.now());
     var noteText = '';
     if (initialNote != '') {
-      var arrNote = initialNote.split(':');
-      noteDate = arrNote[0].trim();
-      noteText = arrNote[1].trim();
+      var arrNote = initialNote.split(': ');
+      if (arrNote.length < 2) {
+        noteDate = 'undated';
+        noteText = initialNote;
+      } else {
+        noteDate = arrNote[0].trim();
+        noteText = arrNote[1].trim();
+      }
     }
     document.getElementById('notesEditingDate').innerHTML = noteDate;
     document.getElementById('notesEditingInput').value = noteText;
@@ -422,27 +426,53 @@ class InfoDeck {
     if (saveNote) {
       var noteDate = document.getElementById('notesEditingDate').innerHTML;
       var noteText = document.getElementById('notesEditingInput').value;
-      var fullNoteText = noteDate + ': ' + noteText;
+      var fullNoteText = noteDate + '|' + noteText;
       
-      var elemSelect = document.getElementById('notesSelect');
-      if (noteIndex < elemSelect.length) {
-        elemSelect.options[noteIndex].text = fullNoteText;
-        
-      } else {
-        var elemOption = document.createElement('option');
-        elemOption.value = noteIndex;
-        elemOption.innerHTML = fullNoteText;
-        elemSelect.appendChild(elemOption);
-        elemSelect.selectedIndex = noteIndex;
-      }
+      var newNotes = this._modifyNotes(fullNoteText, noteIndex);
+      this._currentCardItems[this._currentCardNumber].notes = newNotes;
       
       var cardNumber = this._currentCardNumber;
       var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
-      this._callbacks.notes({command: 'save', deckindexval: deckIndexVal, cardnumber: cardNumber, noteindex: noteIndex, notetext: fullNoteText});
+      this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
+      this._renderCardInfo();
     }
   }
   
+  _modifyNotes(noteText, noteIndex) {
+     var origNotes = this._currentCardItems[this._currentCardNumber].notes;
+     var arrNotes = origNotes.split('\n');
+     if (noteIndex < arrNotes.length) {
+       arrNotes[noteIndex] = noteText;
+     } else {
+       arrNotes = arrNotes.concat([noteText]);
+     }
+     return arrNotes.join('\n');
+  }
+  
   _deleteNote() {
+    
+    var msg = 'This note will be permanently deleted';
+    msg += '\n\nPress OK to confirm';
+    if (confirm(msg)) {
+      var cardNumber = this._currentCardNumber;
+      var arrOrigNotes = this._currentCardItems[cardNumber].notes.split('\n');
+      var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML;      
+      var arrNewNotes = [];
+      for (var i = 0; i < arrOrigNotes.length; i++) {
+        if (i != noteIndex ) arrNewNotes = arrNewNotes.concat([arrOrigNotes[i]]);
+      }
+      var newNotes = arrNewNotes.join('\n');
+      this._currentCardItems[cardNumber].notes = newNotes;
+      
+      document.getElementById('notesSelect').disabled = false;
+      document.getElementById('notesEditing').style.display = 'none';
+
+      this._renderCardInfo();
+      
+      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
+      this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
+    }
+    /*
     var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML;
     
     var elemSelect = document.getElementById('notesSelect');
@@ -461,6 +491,7 @@ class InfoDeck {
       var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
       this._callbacks.notes({command: 'delete', deckindexval: deckIndexVal, cardnumber: cardNumber, noteindex: noteIndex, notetext: noteText});
     }
+    */
   }
     
   //--------------------------------------------------------------------------
@@ -505,6 +536,7 @@ class InfoDeck {
   _handleNoteDoubleClick(e) {
     if (document.getElementById('notesSelect').disabled) return;
     var elem = document.getElementById("notesSelect");
+    if (elem.selectedIndex == -1) return;
     var noteText = elem.options[elem.selectedIndex].text;
     this._beginNotesEditing(elem.selectedIndex, noteText);
   }
