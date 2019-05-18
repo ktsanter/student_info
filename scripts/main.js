@@ -31,6 +31,7 @@ const app = function () {
       "504": 'badge_504',	
       "mentor": 'text',	
       "mentor_email": 'text',
+      "early_grade": 'text',
       "notes": 'notes'
     },
     fieldtitle: {
@@ -46,6 +47,7 @@ const app = function () {
       "504": '504',	
       "mentor": 'mentor',	
       "mentor_email": 'mentor email',
+      "early_grade": 'early grade',
       "notes": 'Notes'
     }
   }

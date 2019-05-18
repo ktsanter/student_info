@@ -3,6 +3,7 @@
 // TODO: handle consequences of configure callback (re-initialize, destroy and create?)
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
+// TODO: more general purpose badge approach?
 //
 
 class InfoDeck {
@@ -434,7 +435,8 @@ class InfoDeck {
         elemSelect.selectedIndex = noteIndex;
       }
       
-      this._callbacks.notes({command: 'save', noteindex: noteIndex, notetext: fullNoteText});
+      var deckIndexVal = this._currentCardItems[this._currentCardNumber][this._indexfield];
+      this._callbacks.notes({command: 'save', deckindex: deckIndexVal, noteindex: noteIndex, notetext: fullNoteText});
     }
   }
   
@@ -453,7 +455,8 @@ class InfoDeck {
       document.getElementById('notesSelect').disabled = false;
       document.getElementById('notesEditing').style.display = 'none';
       
-      this._callbacks.notes({command: 'delete', noteindex: noteIndex, notetext: noteText});
+      var deckIndexVal = this._currentCardItems[this._currentCardNumber][this._indexfield];
+      this._callbacks.notes({command: 'delete', deckindex: deckIndexVal, noteindex: noteIndex, notetext: noteText});
     }
   }
     
