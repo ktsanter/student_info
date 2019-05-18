@@ -4,7 +4,6 @@
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 // TODO: more general purpose badge approach?
-// TODO: update internal representation of notes when saving and/or deleting (not just the select element), also change delimiter from : to |
 //
 
 class InfoDeck {
@@ -176,7 +175,7 @@ class InfoDeck {
   _renderCardItem(item, key) {
     var fieldValue = item[key];
     var fieldType = this._layout.fieldtype[key];
-    var fieldTitle = this._layout.fieldtitle[key];
+    var fieldTitle = key; //this._layout.fieldtitle[key];
     
     if (fieldType == 'dontrender' || fieldType == 'index') {
       // do nothing
@@ -192,6 +191,9 @@ class InfoDeck {
       
     } else if (fieldType.slice(0, 6) == 'badge_') {
       this._renderBadge(fieldType, fieldValue);
+      
+    } else if (fieldType == 'date') {
+      this._renderGenericItem(fieldTitle, InfoDeck._formatDate(fieldValue));
       
     } else {
       console.log('ERROR: unrecognized field type (' + fieldType + ') for field key = ' + key);
@@ -450,7 +452,6 @@ class InfoDeck {
   }
   
   _deleteNote() {
-    
     var msg = 'This note will be permanently deleted';
     msg += '\n\nPress OK to confirm';
     if (confirm(msg)) {
@@ -472,26 +473,6 @@ class InfoDeck {
       var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
       this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
     }
-    /*
-    var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML;
-    
-    var elemSelect = document.getElementById('notesSelect');
-    var elemOption = elemSelect.options[noteIndex];
-    var noteText = elemOption.text;
-    
-    var msg = 'This note will be permanently deleted';
-    msg += '\n"' + elemOption.text + '"';
-    msg += '\n\nPress OK to confirm';
-    if (confirm(msg)) {
-      elemSelect.removeChild(elemOption);
-      document.getElementById('notesSelect').disabled = false;
-      document.getElementById('notesEditing').style.display = 'none';
-      
-      var cardNumber = this._currentCardNumber;
-      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
-      this._callbacks.notes({command: 'delete', deckindexval: deckIndexVal, cardnumber: cardNumber, noteindex: noteIndex, notetext: noteText});
-    }
-    */
   }
     
   //--------------------------------------------------------------------------

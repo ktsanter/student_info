@@ -2,7 +2,6 @@
 //
 // TODO: add query params for deck data and layout
 // TODO: implement config callback
-// TODO: implement notes callback
 // TODO: get layout via API
 //
 
@@ -65,17 +64,25 @@ const app = function () {
 
   async function _testInfoDeckClass() {
     _setNotice('initializing deck...');
-    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    if (!requestResult.success) return;
+    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
+    if (!requestResult_students.success) return;
+    var requestResult_layout = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'layout', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
+    if (!requestResult_layout.success) return;
+    
     _setNotice('');
 
     var indexfield = 'fullname';
-    var studentdata = requestResult.data;
+    var studentdata = requestResult_students.data;
+    var layoutinfo = {
+      fieldtype: _makeFieldTypeParams(requestResult_layout.data),
+      fieldtitle: temp_layoutinfo.fieldtitle
+    };
+    
     var deckParams = {
       title: 'Student info',
       indexlist: _makeIndexList(indexfield, studentdata),
       indexfield: indexfield,
-      layout: temp_layoutinfo,
+      layout: layoutinfo, //temp_layoutinfo,
       itemdetails: studentdata,
       callbacks: {
         config: _configCallback,
@@ -94,6 +101,15 @@ const app = function () {
     }
     
     return Array.from(new Set(indexlistWithDupes));
+  }
+  
+  function _makeFieldTypeParams(layout) {
+    var fieldtypes = {};
+    var fields = layout.fields;
+    for (var key in fields) {
+      fieldtypes[key] = fields[key].fieldtype;
+    }
+    return fieldtypes;
   }
   
   function _configCallback() {
