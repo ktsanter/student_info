@@ -120,6 +120,7 @@ const app = function () {
         itemdetails: studentAndLayoutData.studentinfo,
         callbacks: {
           config: _configCallback,
+          fullpage: _openInFullPageCallback,
           notes: _notesCallback
         }
       };
@@ -152,6 +153,10 @@ const app = function () {
   //-------------------------------------------------------------------------------------
   function _configCallback() {
     _renderReconfigureUI();
+  }
+  
+  function _openInFullPageCallback() {
+    alert('The information is already being displayed from a full page');
   }
   
   async function _notesCallback(params) {

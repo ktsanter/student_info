@@ -2,10 +2,14 @@
 //
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
+// TODO: implement "About"
+// TODO: implement "open in full page"
 //
 
 class InfoDeck {
-  constructor() {}
+  constructor() {
+    this._version = '1.00.00';
+  }
   
   //--------------------------------------------------------------------------------
   // initializing
@@ -49,6 +53,8 @@ class InfoDeck {
     autocomplete(elemSelect.inputelement, this._indexlist, e => this._handleSelection(e));
     this._elemDeckContainer.appendChild(elemSelect.container);
     
+    this._elemDeckContainer.appendChild(InfoDeck._renderAbout());
+    
     var elemCardContainer = document.createElement('div');
     elemCardContainer.classList.add('decklayout-card');
 
@@ -56,7 +62,7 @@ class InfoDeck {
     elemCardContainer.appendChild(InfoDeck._renderContainer('containerGenericItems', 'decklayout-genericitems'));  
     elemCardContainer.appendChild(InfoDeck._renderContainer('containerBadges', 'decklayout-badges'));  
     elemCardContainer.appendChild(InfoDeck._renderContainer('containerNotes', 'decklayout-notes'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerCardLabel', 'decklayout-cardlabel'));  
+    elemCardContainer.appendChild(InfoDeck._renderContainer('containerCardLabel', 'decklayout-cardlabel'));
     
     this._elemDeckContainer.appendChild(elemCardContainer);
 
@@ -86,7 +92,7 @@ class InfoDeck {
       elemLink.id = navLinks[i].id;
       elemLink.innerHTML = navLinks[i].label;
       if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
-      else if (i == 1) { elemLink.addEventListener('click', e => InfoDeck._doFullPage(e), false); }
+      else if (i == 1) { elemLink.addEventListener('click', e => this._doFullPage(e), false); }
       else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
       elemSubLinksContainer.appendChild(elemLink);
     }
@@ -124,12 +130,47 @@ class InfoDeck {
     return {container: elemContainer, inputelement: elemInput};
   } 
 
+  static _renderAbout() {
+    var details = ['version: ' + this._version, 'author: Kevin Santer', 'contact: ktsanter@gmail.com'];
+    var elemContainer = this._renderContainer('infoDeckAbout', 'decklayout-about');
+    
+    var elemTitle = document.createElement('div');
+    var elemLabel = document.createElement('div');
+    elemLabel.classList.add('decklayout-about-label');
+    elemLabel.innerHTML = 'About <em>InfoDeck</em>';
+    elemTitle.appendChild(elemLabel);
+
+    var elemClose = document.createElement('i');
+    elemClose.classList.add('fa');
+    elemClose.classList.add('fa-close');
+    elemClose.classList.add('fa-lg');
+    elemClose.classList.add('decklayout-about-close');
+    elemClose.title = 'close "About"';
+    elemClose.addEventListener('click', e => this._handleAboutCloseClick(e), false);
+    elemTitle.appendChild(elemClose);
+    elemContainer.appendChild(elemTitle);
+    
+    var elemDetailContainer = document.createElement('div');
+    for (var i = 0; i < details.length; i++) {
+      var elemDetail = InfoDeck._renderContainer('', 'deck-layout-about-detail');
+      elemDetail.innerHTML = details[i];
+      elemDetailContainer.appendChild(elemDetail);      
+    }
+    elemContainer.appendChild(elemDetailContainer);
+        
+    return elemContainer;
+  }
+
+  
   static _renderContainer(id, className) {
     var elemContainer = document.createElement('div');
     elemContainer.id = id;
-    elemContainer.classList.add(className);
+    if (className != '') {
+      elemContainer.classList.add(className);
+    }
     return elemContainer;
   }
+  
     
   //--------------------------------------------------------------------------
   // render card info
@@ -513,14 +554,18 @@ class InfoDeck {
     this._callbacks.config();
   }  
   
-  static _doFullPage() { InfoDeck._dummyMenu('full page'); }
-  static _doAbout() { InfoDeck._dummyMenu('about'); }
+  _doFullPage() { 
+    InfoDeck._toggleHamburgerMenu();
+    this._callbacks.fullpage();
+  }
   
-  static _dummyMenu(menuOption) {
-    var msg = 'menu option selected: ' + menuOption;
-    console.log(msg);
-    alert(msg);
+  static _doAbout() { 
     document.getElementById('deckNavLinks').style.display = 'none';
+    document.getElementById('infoDeckAbout').style.display = 'block';
+  }
+  
+  static _handleAboutCloseClick() {
+    document.getElementById('infoDeckAbout').style.display = 'none';
   }
   
   static _toggleHamburgerMenu() {

@@ -150,3 +150,23 @@
 .decklayout-label-control-left {
   float: left;
 }
+
+.decklayout-about {
+  display: none;
+  border: 1px solid black;
+  border-radius: 8px;
+  background-color: #ccc;
+  padding: 6px 4px;
+  margin-bottom: 6px;
+}
+
+.decklayout-about-label {
+  display: inline-block;
+  font-weight: bold;
+}
+
+.decklayout-about-close {
+  float: right;
+}
+
+.deck-layout-about-detail {}
