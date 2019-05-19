@@ -2,8 +2,6 @@
 //
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
-// TODO: implement "About"
-// TODO: implement "open in full page"
 //
 
 class InfoDeck {

@@ -10,12 +10,7 @@ const app = function () {
   };
   
   const settings = { deck: null };
-  
-  /*
-  const TEMP_STUDENTINO_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';  // should get from either "config" or query param
-  const TEMP_LAYOUTDEF_SPREADSHEET_ID = '1pBVYZdKv1U6FErHhiI1mTiGemFDOY5CVCcPCa31bY9g';  // should get from either "config" or query param
-  */
-  
+
   const apiInfo = {
     studentinfo: {
       apibase: 'https://script.google.com/macros/s/AKfycbxpMfjVsVXjZuSdkI5FABJHFY5azMdbep7YfMI_OVndxtN_VwI/exec',
@@ -193,40 +188,60 @@ const app = function () {
     page.reconfigureUI = document.createElement('div');
     page.reconfigureUI.classList.add('reconfigure');
   
+    elemContainer = document.createElement('div');
+    elemContainer.classList.add('reconfigure-title');
+    var elemTitle = document.createElement('div');
+    elemTitle.classList.add('reconfigure-title-label');
+    elemTitle.innerHTML = 'Configure student information data sources';
+    elemContainer.appendChild(elemTitle);
+    
+    var elemCheck = document.createElement('i');
+    elemCheck.classList.add('fa');
+    elemCheck.classList.add('fa-check');
+    elemCheck.classList.add('fa-lg');
+    elemCheck.classList.add('reconfigure-icon');
+    elemCheck.title = 'save changes';
+    elemCheck.addEventListener('click', _completeReconfigure, false);
+    elemContainer.appendChild(elemCheck);
+    
+    var elemDiscard = document.createElement('i');
+    elemDiscard.classList.add('fa');
+    elemDiscard.classList.add('fa-close');
+    elemDiscard.classList.add('fa-lg');
+    elemDiscard.classList.add('reconfigure-icon');
+    elemDiscard.title = 'discard changes';
+    elemDiscard.addEventListener('click', _cancelReconfigure, false);
+    elemContainer.appendChild(elemDiscard);        
+    page.reconfigureUI.appendChild(elemContainer);
+
     var elemContainer = document.createElement('div');
-    var elemLabel = document.createElement('span');
+    elemContainer.classList.add('reconfigure-item');
+    var elemLabel = document.createElement('div');
+    elemLabel.classList.add('reconfigure-label');
     elemLabel.innerHTML = 'student info spreadsheet file ID';
     elemContainer.appendChild(elemLabel);
     
     var elemInput = document.createElement('input');
+    elemInput.classList.add('reconfigure-input');
     elemInput.id = 'studentinfoSpreadsheetId';
     elemInput.value = settings.studentfileid;
     elemContainer.appendChild(elemInput);
     page.reconfigureUI.appendChild(elemContainer);
     
     elemContainer = document.createElement('div');
-    elemLabel = document.createElement('span');
+    elemContainer.classList.add('reconfigure-item');
+    elemLabel = document.createElement('div');
+    elemLabel.classList.add('reconfigure-label');
     elemLabel.innerHTML = 'layout definitions spreadsheet file ID';
     elemContainer.appendChild(elemLabel);
 
     elemInput = document.createElement('input');
+    elemInput.classList.add('reconfigure-input');
     elemInput.id = 'layoutdefinitionSpreadsheetId';
     elemInput.value = settings.layoutfileid;
     elemContainer.appendChild(elemInput);
     page.reconfigureUI.appendChild(elemContainer);
-    
-    elemContainer = document.createElement('div');
-    var elemButton = document.createElement('button');
-    elemButton.innerHTML = 'save';
-    elemButton.addEventListener('click', _completeReconfigure, false);
-    elemContainer.appendChild(elemButton);
-    
-    elemButton = document.createElement('button');
-    elemButton.innerHTML = 'cancel';
-    elemButton.addEventListener('click', _cancelReconfigure, false);
-    elemContainer.appendChild(elemButton);
-    page.reconfigureUI.appendChild(elemContainer);
-    
+        
     page.body.appendChild(page.reconfigureUI);    
   }
   

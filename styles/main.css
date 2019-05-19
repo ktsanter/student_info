@@ -46,3 +46,47 @@ body {
   display: none;
 }
 
+/* reconfigure dialog */
+.reconfigure {
+  display: inline-block;
+  border: 1px solid black;
+  border-radius: 6px;
+  background: linear-gradient(#BBD2C5,#536976);
+}
+
+.reconfigure-title {
+  color: white;
+  background-color: black;
+  border-radius: 6px;
+  padding-top: 6px;
+}
+
+.reconfigure-title-label {
+  display: inline-block;
+  font-weight: bold;
+  margin-bottom: 6px;
+  margin-left: 4px;
+}
+
+.reconfigure-icon {
+  float: right;
+  margin-left: 4px;
+}
+
+.reconfigure-item {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  margin-right: 6px;
+}
+
+.reconfigure-label 
+{
+  display: inline-block;
+  margin-left: 4px;
+  min-width: 17em;
+}
+
+.reconfigure-input {
+  margin-left: 4px; 
+  min-width: 30em;  
+}
