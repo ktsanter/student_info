@@ -1,56 +1,22 @@
 "use strict";
 //
 // TODO: add query params for deck data and layout
-// TODO: implement config callback
-// TODO: get layout via API
+// TODO: implement config and config callback
+// TODO: look at optimizing retrieval code in API app
 //
 
 const app = function () {
 	const page = {};
   
-  const TEMP_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';  // should get from either "config" or query param
+  const TEMP_STUDENTINO_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';  // should get from either "config" or query param
+  const TEMP_LAYOUTDEF_SPREADSHEET_ID = '1pBVYZdKv1U6FErHhiI1mTiGemFDOY5CVCcPCa31bY9g';  // should get from either "config" or query param
   const apiInfo = {
     studentinfo: {
       apibase: 'https://script.google.com/macros/s/AKfycbxpMfjVsVXjZuSdkI5FABJHFY5azMdbep7YfMI_OVndxtN_VwI/exec',
       apikey: 'MV_studeninfoAPI'
     }
   };
-   
-  const temp_layoutinfo = {
-    fieldtype: {
-      "fullname": 'dontrender',
-      "last": 'dontrender',	
-      "first": 'dontrender',
-      "course": 'label',
-      "preferred_name": 'text',
-      "email" : 'text',
-      "start_end": 'text',
-      "grade_level": 'badge_grade',	
-      "IEP": 'badge_iep',
-      "504": 'badge_504',	
-      "mentor": 'text',	
-      "mentor_email": 'text',
-      "early_grade": 'text',
-      "notes": 'notes'
-    },
-    fieldtitle: {
-      "fullname": '',
-      "last": '',	
-      "first": '',
-      "course": 'course',
-      "preferred_name": 'preferred name',
-      "email" : 'text',
-      "start_end": 'start/end',
-      "grade_level": '',	
-      "IEP": 'IEP',	
-      "504": '504',	
-      "mentor": 'mentor',	
-      "mentor_email": 'mentor email',
-      "early_grade": 'early grade',
-      "notes": 'Notes'
-    }
-  }
-      
+        
 	//---------------------------------------
 	// get things going
 	//----------------------------------------
@@ -64,25 +30,24 @@ const app = function () {
 
   async function _testInfoDeckClass() {
     _setNotice('initializing deck...');
-    var requestResult_students  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'allstudentinfo', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    if (!requestResult_students.success) return;
-    var requestResult_layout = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'layout', {spreadsheetid: TEMP_SPREADSHEET_ID}, _reportError);
-    if (!requestResult_layout.success) return;
-    
+
+    var requestResult  = await googleSheetWebAPI.webAppGet(apiInfo.studentinfo, 'all', {studentinfo_spreadsheetid: TEMP_STUDENTINO_SPREADSHEET_ID, layoutdefinitions_spreadsheetid: TEMP_LAYOUTDEF_SPREADSHEET_ID}, _reportError);
+    if (!requestResult.success) return;
+
     _setNotice('');
 
     var indexfield = 'fullname';
-    var studentdata = requestResult_students.data;
+    var studentdata = requestResult.data.studentinfo;
     var layoutinfo = {
-      fieldtype: _makeFieldTypeParams(requestResult_layout.data),
-      fieldtitle: temp_layoutinfo.fieldtitle
+      fieldtype: _makeFieldTypeParams(requestResult.data.layoutinfo),
+      badges: requestResult.data.layoutdefinitioninfo.badges
     };
     
     var deckParams = {
       title: 'Student info',
       indexlist: _makeIndexList(indexfield, studentdata),
       indexfield: indexfield,
-      layout: layoutinfo, //temp_layoutinfo,
+      layout: layoutinfo, 
       itemdetails: studentdata,
       callbacks: {
         config: _configCallback,
@@ -100,7 +65,8 @@ const app = function () {
       indexlistWithDupes.push(data[i][indexfield])
     }
     
-    return Array.from(new Set(indexlistWithDupes));
+    var indexList = Array.from(new Set(indexlistWithDupes));
+    return indexList.sort();
   }
   
   function _makeFieldTypeParams(layout) {
@@ -120,7 +86,7 @@ const app = function () {
     _setNotice('updating notes...');
 
     var postParams = {
-      spreadsheetid: TEMP_SPREADSHEET_ID,
+      spreadsheetid: TEMP_STUDENTINO_SPREADSHEET_ID,
       fullname: params.deckindexval,
       cardnumber: params.cardnumber,
       notes: params.notes

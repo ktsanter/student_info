@@ -3,7 +3,6 @@
 // TODO: handle consequences of configure callback (re-initialize, destroy and create?)
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
-// TODO: more general purpose badge approach?
 //
 
 class InfoDeck {
@@ -354,36 +353,48 @@ class InfoDeck {
   }
   
   _renderBadge(itemKey, itemValue) {
-    var badgeName = itemKey.slice(-1 * (itemKey.length - 6));
+    if (!(itemKey in this._layout.badges)) {
+      console.log('ERROR: unrecognized badge type "' + itemKey + '"');
+      return;
+    }  
+    var badgeInfo = this._layout.badges[itemKey];
     var elemContainer = this._getContainer('decklayout-badges');
+    var imageURL = null;
     
-    if (badgeName == 'grade') {
-      var arrImages = ['badge_grade09_transparent.png', 'badge_grade10_transparent.png', 'badge_grade11_transparent.png', 'badge_grade12_transparent.png'];
-      var imageindex = itemValue - 9;
-      if (imageindex >= 0 && imageindex < arrImages.length) {
-        elemContainer.appendChild( this._renderBadgeImage(arrImages[imageindex], 'grade ' + itemValue) );
+    for (var i = 0; i < badgeInfo.values.length && imageURL == null; i++) {
+      var matchValInfo = badgeInfo.values[i];
+
+      if (matchValInfo.value == '*' && itemValue != '') {
+        imageURL = matchValInfo.imageurl;
+        
+      } else if (matchValInfo.value == itemValue) {
+        imageURL = matchValInfo.imageurl;
+        
+      } else if (matchValInfo.value == '[else]') {
+        imageURL = matchValInfo.imageurl;
       }
+    }
+    
+    if (imageURL == null ) {
+      console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);
       
-    } else if (badgeName == '504') {
-      if (itemValue) {
-        elemContainer.appendChild( this._renderBadgeImage('badge_504_transparent.png', 'has 504 plan') );
-      }
-      
-    } else if (badgeName == 'iep') {
-      if (itemValue) {
-        elemContainer.appendChild( this._renderBadgeImage('badge_iep_transparent.png', 'has IEP') );
-      }
-      
-    } else {
-      console.log('ERROR: badge type (' + itemKey + ') not recognized');
+    } else if (imageURL != '[no image]') {
+      elemContainer.appendChild( this._renderBadgeImage(imageURL, badgeInfo.hovertext, itemValue) );
     }
   }
   
-  _renderBadgeImage(imgName, title) {
+  _renderBadgeImage(imgURL, title, value) {
     var elemImage = document.createElement('img');
     elemImage.classList.add('decklayout-badges-badge');
-    elemImage.src = './images/' + imgName;
-    elemImage.title = title;
+    elemImage.src = imgURL;
+    
+    var hoverText = title;
+    var splitTitle = hoverText.split('[value]');
+    if (splitTitle.length > 1) {
+      hoverText = splitTitle[0] + value + splitTitle[1];
+    }
+
+    elemImage.title = hoverText;
     
     return elemImage;
   }
