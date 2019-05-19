@@ -1,11 +1,14 @@
 "use strict";
 //
-// TODO: implement config and config callback
 // TODO: look at optimizing retrieval code in API app
 //
 
 const app = function () {
-	const page = { deck: null };
+	const page = { 
+    deck: null,
+    reconfigureUI: null
+  };
+  
   const settings = { deck: null };
   
   /*
@@ -145,12 +148,10 @@ const app = function () {
   }
   
   //-------------------------------------------------------------------------------------
-  // configuration functions
+  // callback functions
   //-------------------------------------------------------------------------------------
   function _configCallback() {
-    if (confirm("Reconfigure?")) {
-      _configureAndRenderDeck(settings.deck);
-    }
+    _renderReconfigureUI();
   }
   
   async function _notesCallback(params) {
@@ -182,6 +183,70 @@ const app = function () {
     return elemNotice;    
   }
  
+   function _renderReconfigureUI() {
+    settings.deck.hideDeck()
+    page.reconfigureUI = document.createElement('div');
+    page.reconfigureUI.classList.add('reconfigure');
+  
+    var elemContainer = document.createElement('div');
+    var elemLabel = document.createElement('span');
+    elemLabel.innerHTML = 'student info spreadsheet file ID';
+    elemContainer.appendChild(elemLabel);
+    
+    var elemInput = document.createElement('input');
+    elemInput.id = 'studentinfoSpreadsheetId';
+    elemInput.value = settings.studentfileid;
+    elemContainer.appendChild(elemInput);
+    page.reconfigureUI.appendChild(elemContainer);
+    
+    elemContainer = document.createElement('div');
+    elemLabel = document.createElement('span');
+    elemLabel.innerHTML = 'layout definitions spreadsheet file ID';
+    elemContainer.appendChild(elemLabel);
+
+    elemInput = document.createElement('input');
+    elemInput.id = 'layoutdefinitionSpreadsheetId';
+    elemInput.value = settings.layoutfileid;
+    elemContainer.appendChild(elemInput);
+    page.reconfigureUI.appendChild(elemContainer);
+    
+    elemContainer = document.createElement('div');
+    var elemButton = document.createElement('button');
+    elemButton.innerHTML = 'save';
+    elemButton.addEventListener('click', _completeReconfigure, false);
+    elemContainer.appendChild(elemButton);
+    
+    elemButton = document.createElement('button');
+    elemButton.innerHTML = 'cancel';
+    elemButton.addEventListener('click', _cancelReconfigure, false);
+    elemContainer.appendChild(elemButton);
+    page.reconfigureUI.appendChild(elemContainer);
+    
+    page.body.appendChild(page.reconfigureUI);    
+  }
+  
+  function _endReconfigure(saveNewConfiguration) {    
+    if (saveNewConfiguration) {
+      settings.studentfileid = document.getElementById('studentinfoSpreadsheetId').value;
+      settings.layoutfileid = document.getElementById('layoutdefinitionSpreadsheetId').value;
+      _configureAndRenderDeck(settings.deck);
+    }
+
+    page.body.removeChild(page.reconfigureUI);
+    settings.deck.showDeck();
+  }
+  
+	//------------------------------------------------------------------
+	// handlers
+	//------------------------------------------------------------------
+  function _completeReconfigure() {
+    _endReconfigure(true);
+  }
+  
+  function _cancelReconfigure() {
+    _endReconfigure(false);
+  }
+  
 	//-----------------------------------------------------------------------------
 	// control styling, visibility, and enabling
 	//-----------------------------------------------------------------------------    
@@ -194,10 +259,6 @@ const app = function () {
   function _hideElement(elem) {
     elem.classList.add('hide-me');
   }
-  
-	//------------------------------------------------------------------
-	// handlers
-	//------------------------------------------------------------------
   
 	//---------------------------------------
 	// utility functions

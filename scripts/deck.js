@@ -1,6 +1,5 @@
 "use strict";
 //
-// TODO: handle consequences of configure callback (re-initialize, destroy and create?)
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 //
@@ -22,6 +21,17 @@ class InfoDeck {
     this._elemDeckContainer = null;
     this._currentCardItems = null;
     this._currentCardNumber = 0;
+  }
+
+  //--------------------------------------------------------------------------------
+  // show/hide deck
+  //--------------------------------------------------------------------------------
+  hideDeck() {
+    this._elemDeckContainer.style.display = 'none';
+  }
+  
+  showDeck() {
+    this._elemDeckContainer.style.display = 'inline-block';
   }
   
   //--------------------------------------------------------------------------------
@@ -490,7 +500,7 @@ class InfoDeck {
       this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
     }
   }
-    
+      
   //--------------------------------------------------------------------------
   // handlers
   //--------------------------------------------------------------------------
