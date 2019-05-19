@@ -5,8 +5,8 @@
 //
 
 const app = function () {
-	const page = {};
-  const settings = {};
+	const page = { deck: null };
+  const settings = { deck: null };
   
   /*
   const TEMP_STUDENTINO_SPREADSHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';  // should get from either "config" or query param
@@ -30,7 +30,8 @@ const app = function () {
 		
 		_setNotice('initializing...');
 		if (_initializeSettings()) {
-      _displayStudentInfo();
+      settings.deck = new InfoDeck();
+      _configureAndRenderDeck(settings.deck);
     }
 	}
 
@@ -57,45 +58,71 @@ const app = function () {
     return result;
   }
   
-	//-------------------------------------------------------------------------------------
-	// use InfoDeck to display student info
-	//-------------------------------------------------------------------------------------
-  async function _displayStudentInfo() {
-    _setNotice('initializing deck...');
+  //-------------------------------------------------------------------------------------
+  // configuration functions
+  //-------------------------------------------------------------------------------------
+  async function _configureAndRenderDeck(deck) {
+    if (page.deck != null) {
+      page.body.removeChild(page.deck);
+    }
+
+    _setNotice('loading...');
+    var deckParams = await _makeDeckParams();
+    if (deckParams != null) {
+      _setNotice('');
+      deck.init(deckParams);
+      page.deck = deck.renderDeck();
+      page.body.appendChild(page.deck);
+    }
+  }
+  
+  function _getCurrentConfigurationParameters() {
+    return {
+        studentinfo_spreadsheetid: settings.studentfileid, 
+        layoutdefinitions_spreadsheetid: settings.layoutfileid
+    };
+  }
+  
+  async function _getStudentAndLayoutData() {
+    var result = null;
 
     var requestResult  = await googleSheetWebAPI.webAppGet(
       apiInfo.studentinfo, 'all', 
-      {
-        studentinfo_spreadsheetid: settings.studentfileid, 
-        layoutdefinitions_spreadsheetid: settings.layoutfileid
-      }, 
+      _getCurrentConfigurationParameters(), 
       _reportError
     );
-    if (!requestResult.success) return;
-
-    _setNotice('');
-
-    var indexfield = 'fullname';
-    var studentdata = requestResult.data.studentinfo;
-    var layoutinfo = {
-      fieldtype: _makeFieldTypeParams(requestResult.data.layoutinfo),
-      badges: requestResult.data.layoutdefinitioninfo.badges
-    };
     
-    var deckParams = {
-      title: 'Student info',
-      indexlist: _makeIndexList(indexfield, studentdata),
-      indexfield: indexfield,
-      layout: layoutinfo, 
-      itemdetails: studentdata,
-      callbacks: {
-        config: _configCallback,
-        notes: _notesCallback
-      }
-    };
+    if (requestResult.success) {
+      result = requestResult.data;
+    }
     
-    var deck = new InfoDeck(deckParams);
-    page.body.appendChild(deck.renderDeck());
+    return result;
+  }
+  
+  async function _makeDeckParams() {
+    var deckParams = null;
+    
+    var studentAndLayoutData = await _getStudentAndLayoutData();
+    if (studentAndLayoutData != null) {
+      var indexfield = 'fullname';
+      
+      deckParams = {
+        title: 'Student info',
+        indexlist: _makeIndexList(indexfield, studentAndLayoutData.studentinfo),
+        indexfield: indexfield,
+        layout: {
+          fieldtype: _makeFieldTypeParams(studentAndLayoutData.layoutinfo),
+          badges: studentAndLayoutData.layoutdefinitioninfo.badges
+        },
+        itemdetails: studentAndLayoutData.studentinfo,
+        callbacks: {
+          config: _configCallback,
+          notes: _notesCallback
+        }
+      };
+    }
+    
+    return deckParams;
   }
   
   function _makeIndexList(indexfield, data) {
@@ -117,8 +144,13 @@ const app = function () {
     return fieldtypes;
   }
   
+  //-------------------------------------------------------------------------------------
+  // configuration functions
+  //-------------------------------------------------------------------------------------
   function _configCallback() {
-    console.log('main.js: config callback');
+    if (confirm("Reconfigure?")) {
+      _configureAndRenderDeck(settings.deck);
+    }
   }
   
   async function _notesCallback(params) {

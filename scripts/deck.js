@@ -6,7 +6,12 @@
 //
 
 class InfoDeck {
-  constructor(deckParams) {
+  constructor() {}
+  
+  //--------------------------------------------------------------------------------
+  // initializing
+  //--------------------------------------------------------------------------------
+  init(deckParams) {
     this._title = deckParams.title;
     this._indexlist = deckParams.indexlist;
     this._indexfield = deckParams.indexfield;
