@@ -5,6 +5,7 @@
 
 const app = function () {
   const DEFAULT_LAYOUTDEFINITIONS_SHEET_ID = '1pBVYZdKv1U6FErHhiI1mTiGemFDOY5CVCcPCa31bY9g';
+  var TEMP_STUDENTINFO_SHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';
   
 	const page = { 
     deck: null,
@@ -36,25 +37,15 @@ const app = function () {
 	}
 
 	//-------------------------------------------------------------------------------------
-	// query params:
+	// retrieve params from storage
 	//-------------------------------------------------------------------------------------
 	function _initializeSettings() {
     var result = false;
 
-    var params = {};
-    var urlParams = new URLSearchParams(window.location.search);
-		params.studentfileid = urlParams.has('studentfileid') ? urlParams.get('studentfileid') : null;
-		params.layoutfileid = urlParams.has('layoutfileid') ? urlParams.get('layoutfileid') : null;
-
-    if (params.studentfileid != null) {
-      settings.studentfileid = params.studentfileid;
-      if (params.layoutfileid == null) {
-        settings.layoutfileid = DEFAULT_LAYOUTDEFINITIONS_SHEET_ID;
-      } else {
-        settings.layoutfileid = params.layoutfileid;
-      }
-      
-			result = true;
+    if (true) {
+      settings.studentfileid = TEMP_STUDENTINFO_SHEET_ID;
+      settings.layoutfileid = DEFAULT_LAYOUTDEFINITIONS_SHEET_ID;
+      result = true;
 
     } else {   
       _setNotice('failed to initialize: student file ID is missing or invalid');
@@ -158,7 +149,7 @@ const app = function () {
   }
   
   function _openInFullPageCallback() {
-    alert('The information is already being displayed from a full page');
+    alert('need to implement "open in full page"');
   }
   
   async function _notesCallback(params) {

@@ -74,16 +74,7 @@ body {
 }
 
 .reconfigure-item {
-  margin-top: 6px;
-  margin-bottom: 6px;
-  margin-right: 6px;
-}
-
-.reconfigure-label 
-{
-  display: inline-block;
-  margin-left: 4px;
-  min-width: 17em;
+  margin: 10px 8px;
 }
 
 .reconfigure-input {
