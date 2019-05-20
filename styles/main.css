@@ -36,6 +36,8 @@ body {
 .notice {
   font-style: italic;
   color: var(--notice-blue);
+  margin-bottom: 6px;
+  min-width: 20em;
 }
 
 .show-me {

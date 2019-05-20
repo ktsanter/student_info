@@ -1,18 +1,23 @@
 "use strict";
 //
+// TOOD: add chrome storage get/put for configuration
 // TODO: look at optimizing retrieval code in API app
+// TODO: add error handling for bad spreadsheet ID/wrong sheet name
 //
 
 const app = function () {
-  const DEFAULT_LAYOUTDEFINITIONS_SHEET_ID = '1pBVYZdKv1U6FErHhiI1mTiGemFDOY5CVCcPCa31bY9g';
   var TEMP_STUDENTINFO_SHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';
   
 	const page = { 
     deck: null,
+    deckinitialized: false,
     reconfigureUI: null
   };
   
-  const settings = { deck: null };
+  const settings = { 
+    deck: null,
+    usetimer: true
+  };
 
   const apiInfo = {
     studentinfo: {
@@ -44,7 +49,6 @@ const app = function () {
 
     if (true) {
       settings.studentfileid = TEMP_STUDENTINFO_SHEET_ID;
-      settings.layoutfileid = DEFAULT_LAYOUTDEFINITIONS_SHEET_ID;
       result = true;
 
     } else {   
@@ -57,42 +61,25 @@ const app = function () {
   //-------------------------------------------------------------------------------------
   // configuration functions
   //-------------------------------------------------------------------------------------
-  async function _configureAndRenderDeck(deck) {
-    if (page.deck != null) {
+  async function _configureAndRenderDeck(deck) {    
+    if (page.deck != null && settings.deckinitialized) {
       page.body.removeChild(page.deck);
     }
+    settings.deckinitialized = false;
 
     _setNotice('loading...');
     var deckParams = await _makeDeckParams();
     if (deckParams != null) {
-      _setNotice('');
+      if (!settings.usetimer) _setNotice('');
       deck.init(deckParams);
       page.deck = deck.renderDeck();
       page.body.appendChild(page.deck);
+      settings.deckinitialized = true;
+      
+    } else {
+      _setNotice('unable to load data from file');
+      _renderReconfigureUI();
     }
-  }
-  
-  function _getCurrentConfigurationParameters() {
-    return {
-        studentinfo_spreadsheetid: settings.studentfileid, 
-        layoutdefinitions_spreadsheetid: settings.layoutfileid
-    };
-  }
-  
-  async function _getStudentAndLayoutData() {
-    var result = null;
-
-    var requestResult  = await googleSheetWebAPI.webAppGet(
-      apiInfo.studentinfo, 'all', 
-      _getCurrentConfigurationParameters(), 
-      _reportError
-    );
-    
-    if (requestResult.success) {
-      result = requestResult.data;
-    }
-    
-    return result;
   }
   
   async function _makeDeckParams() {
@@ -120,6 +107,35 @@ const app = function () {
     }
     
     return deckParams;
+  }
+  
+  async function _getStudentAndLayoutData() {
+    var result = null;
+
+    if (settings.usetimer) var startTime = new Date();
+    var requestResult  = await googleSheetWebAPI.webAppGet(
+      apiInfo.studentinfo, 'all', 
+      _getCurrentConfigurationParameters()//, 
+      //_reportError
+    );
+    
+    if (requestResult.success) {
+      if (settings.usetimer) var elapsedTime = new Date() - startTime;
+      if (settings.usetimer) _setNotice(elapsedTime/1000.0);
+      result = requestResult.data;
+      
+    } else {
+      console.log('ERROR: in _getStudentAndLayoutData');
+      console.log(requestResult.details);
+    }
+    
+    return result;
+  }
+  
+  function _getCurrentConfigurationParameters() {
+    return {
+        studentinfo_spreadsheetid: settings.studentfileid
+    };
   }
   
   function _makeIndexList(indexfield, data) {
@@ -182,7 +198,7 @@ const app = function () {
   }
  
    function _renderReconfigureUI() {
-    settings.deck.hideDeck()
+    if (settings.deckinitialized) settings.deck.hideDeck()
     page.reconfigureUI = document.createElement('div');
     page.reconfigureUI.classList.add('reconfigure');
   
@@ -231,7 +247,7 @@ const app = function () {
     }
 
     page.body.removeChild(page.reconfigureUI);
-    settings.deck.showDeck();
+    if (settings.deckinitialized) settings.deck.showDeck();
   }
   
 	//------------------------------------------------------------------

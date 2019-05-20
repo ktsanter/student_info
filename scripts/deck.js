@@ -23,6 +23,7 @@ class InfoDeck {
     this._elemDeckContainer = null;
     this._currentCardItems = null;
     this._currentCardNumber = 0;
+    console.log(JSON.stringify(this._layout.badges));
   }
 
   //--------------------------------------------------------------------------------
