@@ -149,7 +149,8 @@ const app = function () {
         callbacks: {
           config: _configCallback,
           opensourcespreadsheet: _openSourceSpreadsheetCallback,
-          notes: _notesCallback
+          notes: _notesCallback,
+          isfuzzyequal: isFuzzyEqual
         }
       };
     } 
@@ -201,6 +202,14 @@ const app = function () {
     if (requestResult.success) {
       _setNotice('');
     }
+  }
+  
+  function isFuzzyEqual(fullindexVal, enteredVal) {
+    //match exactly to entered characters at beginning: return fullindexVal.substr(0, enteredVal.length).toUpperCase() == enteredVal.toUpperCase();
+    var splitName = fullindexVal.split(', ');
+    var cutFirstName = splitName[1].substr(0, enteredVal.length);
+    var cutLastName = splitName[0].substr(0, enteredVal.length);
+    return ( (cutFirstName.toUpperCase() == enteredVal.toUpperCase()) || (cutLastName.toUpperCase() == enteredVal.toUpperCase()) );
   }
   
 	//-----------------------------------------------------------------------------

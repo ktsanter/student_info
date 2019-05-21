@@ -1,3 +1,4 @@
+
 "use strict";
 //
 // TODO: adapt to work with Noah's config approach
@@ -49,7 +50,7 @@ class InfoDeck {
 
     var elemSelect = InfoDeck._renderSelect();
     this._elemSelectionInput = elemSelect.inputelement;
-    autocomplete(elemSelect.inputelement, this._indexlist, e => this._handleSelection(e));
+    autocomplete(elemSelect.inputelement, this._indexlist, this._callbacks.isfuzzyequal, e => this._handleSelection(e));
     this._elemDeckContainer.appendChild(elemSelect.container);
     
     this._elemDeckContainer.appendChild(this._renderAbout());
@@ -124,9 +125,14 @@ class InfoDeck {
     elemInput.type = 'text';
     elemInput.autocomplete = 'off';
     elemInputDiv.appendChild(elemInput);
-        
     elemContainer.appendChild(elemInputDiv);
     
+    var elemCopiedContainer = document.createElement('div');
+    elemCopiedContainer.classList.add('decklayout-select-copied');
+    elemCopiedContainer.id = 'copiedMessage';
+    elemCopiedContainer.innerHTML = '';
+    elemContainer.appendChild(elemCopiedContainer);
+        
     return {container: elemContainer, inputelement: elemInput};
   } 
 
@@ -235,7 +241,7 @@ class InfoDeck {
   _renderCardItem(item, key) {
     var fieldValue = item[key];
     var fieldType = this._layout.fieldtype[key];
-    var fieldTitle = key; //this._layout.fieldtitle[key];
+    var fieldTitle = key; 
     
     if (fieldType == 'dontrender' || fieldType == 'index') {
       // do nothing
@@ -527,8 +533,7 @@ class InfoDeck {
   }
   
   _deleteNote() {
-    var msg = 'This note will be permanently deleted';
-    msg += '\n\nPress OK to confirm';
+    var msg = 'This note will be permanently deleted\n\nPress OK to confirm';
     if (confirm(msg)) {
       var cardNumber = this._currentCardNumber;
       var arrOrigNotes = this._currentCardItems[cardNumber].notes.split('\n');
@@ -554,29 +559,35 @@ class InfoDeck {
   // handlers
   //--------------------------------------------------------------------------
   _handleSelection() {
+    InfoDeck._setCopiedMessage('');
     this._processSelection(this._elemSelectionInput.value);
   }
     
   _doConfigure() { 
+    InfoDeck._setCopiedMessage('');
     InfoDeck._toggleHamburgerMenu();
     this._callbacks.config();
   }  
   
   _doOpenSourceSpreadsheet() { 
+    InfoDeck._setCopiedMessage('');
     InfoDeck._toggleHamburgerMenu();
     this._callbacks.opensourcespreadsheet();
   }
   
   static _doAbout() { 
+    InfoDeck._setCopiedMessage('');
     document.getElementById('deckNavLinks').style.display = 'none';
     document.getElementById('infoDeckAbout').style.display = 'block';
   }
   
   _handleAboutCloseClick() {
+    InfoDeck._setCopiedMessage('');
     document.getElementById('infoDeckAbout').style.display = 'none';
   }
   
   static _toggleHamburgerMenu() {
+    InfoDeck._setCopiedMessage('');
     InfoDeck._toggleDisplay(document.getElementById("deckNavLinks"));
   }
   
@@ -589,11 +600,13 @@ class InfoDeck {
   }
 
   _handleAddNote() {
+    InfoDeck._setCopiedMessage('');
     if (document.getElementById('notesSelect').disabled) return;
     this._beginNotesEditing(document.getElementById('notesSelect').length, '');
   }
   
   _handleNoteDoubleClick(e) {
+    InfoDeck._setCopiedMessage('');
     if (document.getElementById('notesSelect').disabled) return;
     var elem = document.getElementById("notesSelect");
     if (elem.selectedIndex == -1) return;
@@ -602,14 +615,17 @@ class InfoDeck {
   }
 
   _handleEditingCheckClick() {
+    InfoDeck._setCopiedMessage('');
     this._endNotesEditing(true);
   }
   
   _handleEditingDiscardClick() {
+    InfoDeck._setCopiedMessage('');
     this._endNotesEditing(false);
   }
   
   _handleEditingTrashClick() {
+    InfoDeck._setCopiedMessage('');
     this._deleteNote();
   }
   
@@ -637,6 +653,7 @@ class InfoDeck {
 		document.execCommand("Copy");
 		clipboardElement.selectionEnd = clipboardElement.selectionStart;
 		clipboardElement.style.display = 'none';
+    InfoDeck._setCopiedMessage('copied');
 	}	
   
   static _renderClipboardCopyArea() {
@@ -644,6 +661,16 @@ class InfoDeck {
     elemClipboardArea.id = 'text_for_clipboard';
     elemClipboardArea.style.display = 'none';
     return elemClipboardArea;
+  }
+  
+  static _setCopiedMessage(msg) {
+    var elemCopiedMessage = document.getElementById('copiedMessage');
+    elemCopiedMessage.innerHTML = msg;
+    if (msg == '') {
+      elemCopiedMessage.style.display = 'none';
+    } else {
+      elemCopiedMessage.style.display = 'inline-block';
+    }
   }
   
   //---------------------------------------

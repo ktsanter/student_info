@@ -67,6 +67,13 @@
   width: 20em;
 }
 
+.decklayout-select-copied {
+  display: none;
+  margin-left: 8px;
+  font-style: italic;
+  color: blue;
+}
+
 .decklayout-picture {
   float: right;
 }

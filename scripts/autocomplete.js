@@ -1,6 +1,5 @@
-function autocomplete(inp, arr, choicecompleteCallback) {
-  /*the autocomplete function takes two arguments,
-  the text field element and an array of possible autocompleted values:*/
+function autocomplete(inp, arr, isFuzzyEqual_func, choicecompleteCallback) {
+  /*the autocomplete function takes two arguments, the text field element and an array of possible autocompleted values:*/
   var currentFocus;
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function(e) {
@@ -18,7 +17,12 @@ function autocomplete(inp, arr, choicecompleteCallback) {
       /*for each item in the array...*/
       for (i = 0; i < arr.length; i++) {
         /*check if the item starts with the same letters as the text field value:*/
-        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        
+//---- alterations --------------------------------------------------------------------        
+        //original: if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          if (isFuzzyEqual_func(arr[i], val)) {
+//---- end of alterations -------------------------------------------------------------        
+          
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
@@ -34,9 +38,9 @@ function autocomplete(inp, arr, choicecompleteCallback) {
               (or any other open lists of autocompleted values:*/
               closeAllLists();
               
-// **** alterations ****              
+//---- alterations --------------------------------------------------------------------        
               choicecompleteCallback();
-// **** end of alterations ****              
+//---- end of alterations -------------------------------------------------------------        
           });
           a.appendChild(b);
         }
