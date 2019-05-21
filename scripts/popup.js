@@ -3,11 +3,7 @@
 // TODO:
 //
 
-// $(cbData.versionId).html("v" + chrome.runtime.getManifest().version);  --- just in case I need it
-
 const app = function () {
-  var TEMP_STUDENTINFO_SHEET_ID = '17m8kxYjqTTGHsTFnD3VSTy7P4ztF9f9ggPJz4wTVdO4';
-  
 	const page = { 
     deck: null,
     deckinitialized: false,
@@ -262,7 +258,7 @@ const app = function () {
     var elemInput = document.createElement('input');
     elemInput.classList.add('reconfigure-input');
     elemInput.id = 'studentinfoSpreadsheetLink';
-    elemInput.value = settings.configparams.studentspreadsheetid;
+    elemInput.value = settings.configparams.studentspreadsheetlink;
     elemContainer.appendChild(elemInput);
     page.reconfigureUI.appendChild(elemContainer);
         

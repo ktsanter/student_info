@@ -53,6 +53,7 @@ class InfoDeck {
     this._elemDeckContainer.appendChild(elemSelect.container);
     
     this._elemDeckContainer.appendChild(this._renderAbout());
+    this._elemDeckContainer.appendChild(InfoDeck._renderClipboardCopyArea());
     
     var elemCardContainer = document.createElement('div');
     elemCardContainer.classList.add('decklayout-card');
@@ -131,8 +132,8 @@ class InfoDeck {
 
   _renderAbout() {
     var details = [
-      this._title + ' version: ' + this._outerappversion,
-      'InfoDeck version: ' + this._version, 
+      this._title + ': v' + this._outerappversion,
+      'InfoDeck: v' + this._version, 
       'author: Kevin Santer', 
       'contact: ktsanter@gmail.com'
     ];
@@ -409,6 +410,8 @@ class InfoDeck {
     elemValue.innerHTML = itemValue;
     elemItem.appendChild(elemValue);
     
+    elemValue.addEventListener('dblclick', e => this._handleGenericItemDoubleClick(e), false);
+    
     elemContainer.appendChild(elemItem);
   }
   
@@ -455,6 +458,7 @@ class InfoDeck {
     }
 
     elemImage.title = hoverText;
+    elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
     
     return elemImage;
   }
@@ -607,6 +611,39 @@ class InfoDeck {
   
   _handleEditingTrashClick() {
     this._deleteNote();
+  }
+  
+  _handleGenericItemDoubleClick(e) {
+    InfoDeck._copyToClipboard(e.target.innerHTML);
+    if (window.getSelection) {
+      window.getSelection().removeAllRanges();
+    } else if (document.selection) {
+      document.selection.empty();
+    }    
+  }
+  
+  _handleBadgeDoubleClick(e) {
+    InfoDeck._copyToClipboard(e.target.title);
+  }
+  
+  //---------------------------------------
+  // clipboard functions
+  //----------------------------------------
+  static _copyToClipboard(txt) {
+		var clipboardElement = document.getElementById('text_for_clipboard');//page.textforclipboard;
+		clipboardElement.value = txt;
+		clipboardElement.style.display = 'block';
+		clipboardElement.select();
+		document.execCommand("Copy");
+		clipboardElement.selectionEnd = clipboardElement.selectionStart;
+		clipboardElement.style.display = 'none';
+	}	
+  
+  static _renderClipboardCopyArea() {
+    var elemClipboardArea = document.createElement('textarea');
+    elemClipboardArea.id = 'text_for_clipboard';
+    elemClipboardArea.style.display = 'none';
+    return elemClipboardArea;
   }
   
   //---------------------------------------
