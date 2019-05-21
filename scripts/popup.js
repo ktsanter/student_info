@@ -142,6 +142,7 @@ const app = function () {
       
       deckParams = {
         title: 'Student info',
+        version: chrome.runtime.getManifest().version,
         indexlist: _makeIndexList(indexfield, settings.studentandlayoutdata.studentinfo),
         indexfield: indexfield,
         layout: {
@@ -194,7 +195,7 @@ const app = function () {
     _setNotice('updating notes...');
 
     var postParams = {
-      spreadsheetid: settings.studentfileid,
+      spreadsheetid: settings.configparams.studentspreadsheetid,
       fullname: params.deckindexval,
       cardnumber: params.cardnumber,
       notes: params.notes

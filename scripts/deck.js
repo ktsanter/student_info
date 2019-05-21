@@ -6,7 +6,7 @@
 
 class InfoDeck {
   constructor() {
-    this._version = '1.00.00';
+    this._version = '0.01.06';
   }
   
   //--------------------------------------------------------------------------------
@@ -19,6 +19,7 @@ class InfoDeck {
     this._layout = deckParams.layout;
     this._itemdetails = deckParams.itemdetails;
     this._callbacks = deckParams.callbacks;
+    this._outerappversion = deckParams.version;
     
     this._elemDeckContainer = null;
     this._currentCardItems = null;
@@ -51,7 +52,7 @@ class InfoDeck {
     autocomplete(elemSelect.inputelement, this._indexlist, e => this._handleSelection(e));
     this._elemDeckContainer.appendChild(elemSelect.container);
     
-    this._elemDeckContainer.appendChild(InfoDeck._renderAbout());
+    this._elemDeckContainer.appendChild(this._renderAbout());
     
     var elemCardContainer = document.createElement('div');
     elemCardContainer.classList.add('decklayout-card');
@@ -128,14 +129,19 @@ class InfoDeck {
     return {container: elemContainer, inputelement: elemInput};
   } 
 
-  static _renderAbout() {
-    var details = ['version: ' + this._version, 'author: Kevin Santer', 'contact: ktsanter@gmail.com'];
-    var elemContainer = this._renderContainer('infoDeckAbout', 'decklayout-about');
+  _renderAbout() {
+    var details = [
+      this._title + ' version: ' + this._outerappversion,
+      'InfoDeck version: ' + this._version, 
+      'author: Kevin Santer', 
+      'contact: ktsanter@gmail.com'
+    ];
+    var elemContainer = InfoDeck._renderContainer('infoDeckAbout', 'decklayout-about');
     
     var elemTitle = document.createElement('div');
     var elemLabel = document.createElement('div');
     elemLabel.classList.add('decklayout-about-label');
-    elemLabel.innerHTML = 'About <em>InfoDeck</em>';
+    elemLabel.innerHTML = 'About <em>' + this._title + '</em>';
     elemTitle.appendChild(elemLabel);
 
     var elemClose = document.createElement('i');
@@ -562,7 +568,7 @@ class InfoDeck {
     document.getElementById('infoDeckAbout').style.display = 'block';
   }
   
-  static _handleAboutCloseClick() {
+  _handleAboutCloseClick() {
     document.getElementById('infoDeckAbout').style.display = 'none';
   }
   
