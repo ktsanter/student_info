@@ -45,16 +45,24 @@ const app = function () {
   //-------------------------------------------------------------------------------------
   // use chrome.storage to get and set configuration parameters
   //-------------------------------------------------------------------------------------
-  function _getConfigurationParameters(callback) {
-    const keys = {
-      sheetid: 'studenInfoDeck_SpreadsheetFileId'
-    };
-        
-    chrome.storage.sync.get([keys.sheetid], function (result) {
-      var configParams = {studentspreadsheetid: ''};
-      if (typeof result[keys.sheetid] != 'undefined') {
-        configParams.studentspreadsheetid = result[keys.sheetid];
-      } 
+  const storageKeys = {
+    sheetid: 'sid_fileid',
+    sheeturl: 'sid_fileurl'
+  };
+    
+  function _getConfigurationParameters(callback) {        
+    chrome.storage.sync.get( [storageKeys.sheetid, storageKeys.sheeturl],  function (result) {
+      var configParams = {
+        studentspreadsheetid: '',
+        studentspreadsheetlink: ''
+      };
+      
+      if (typeof result[storageKeys.sheetid] != 'undefined') {
+        configParams.studentspreadsheetid = result[storageKeys.sheetid];
+      }
+      if (typeof result[storageKeys.sheeturl] != 'undefined') {
+        configParams.studentspreadsheetlink = result[storageKeys.sheeturl];
+      }        
       
       settings.configparams = configParams;
       callback();
@@ -62,11 +70,11 @@ const app = function () {
   }
   
   function _storeConfigurationParameters(callback) {
-    const keys = {
-      "studenInfoDeck_SpreadsheetFileId": settings.configparams.studentspreadsheetid
-    };
+    var savekeys = {};
+    savekeys[ storageKeys.sheetid ] = settings.configparams.studentspreadsheetid;
+    savekeys[ storageKeys.sheeturl ] = settings.configparams.studentspreadsheetlink
     
-    chrome.storage.sync.set(keys, function() {
+    chrome.storage.sync.set(savekeys, function() {
       if (callback != null) callback;
     });
   }
@@ -118,7 +126,7 @@ const app = function () {
         result = requestResult.data;
         
       } else {
-        console.log('ERROR: in _getStudentAndLayoutData');
+        console.log('ERROR: in _getStudentAndLayoutData' );
         console.log(requestResult.details);
       }
     }
@@ -179,8 +187,7 @@ const app = function () {
   }
   
   function _openSourceSpreadsheetCallback() {
-    window.open(settings.studentspreadsheetlink, '_blank');
-    //alert('need to implement "open source spreadsheet"\n' + settings.studentspreadsheetlink);
+    window.open(settings.configparams.studentspreadsheetlink, '_blank');
   }
   
   async function _notesCallback(params) {
@@ -271,7 +278,7 @@ const app = function () {
         sID = sID[0].slice(4);
       }
 
-      settings.studentspreadsheetlink = userEntry;
+      settings.configparams.studentspreadsheetlink = userEntry;
       settings.configparams.studentspreadsheetid = sID;
       _storeConfigurationParameters(null);
       _configureAndRenderDeck(settings.deck);
