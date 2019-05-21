@@ -1,7 +1,6 @@
 "use strict";
 //
-// TODO: look at using full spreadsheet link rather than ID
-// TODO; change "open full page" to "open source spreadsheet"
+// TODO:
 //
 
 // $(cbData.versionId).html("v" + chrome.runtime.getManifest().version);  --- just in case I need it
@@ -144,7 +143,7 @@ const app = function () {
         itemdetails: settings.studentandlayoutdata.studentinfo,
         callbacks: {
           config: _configCallback,
-          fullpage: _openInFullPageCallback,
+          opensourcespreadsheet: _openSourceSpreadsheetCallback,
           notes: _notesCallback
         }
       };
@@ -179,8 +178,9 @@ const app = function () {
     _renderReconfigureUI();
   }
   
-  function _openInFullPageCallback() {
-    alert('need to implement "open in full page"');
+  function _openSourceSpreadsheetCallback() {
+    window.open(settings.studentspreadsheetlink, '_blank');
+    //alert('need to implement "open source spreadsheet"\n' + settings.studentspreadsheetlink);
   }
   
   async function _notesCallback(params) {
@@ -227,7 +227,7 @@ const app = function () {
     elemContainer.classList.add('reconfigure-title');
     var elemTitle = document.createElement('div');
     elemTitle.classList.add('reconfigure-title-label');
-    elemTitle.innerHTML = 'student information spreadsheet file ID';
+    elemTitle.innerHTML = 'student information spreadsheet URL';
     elemContainer.appendChild(elemTitle);
     
     var elemCheck = document.createElement('i');
@@ -253,7 +253,7 @@ const app = function () {
     elemContainer.classList.add('reconfigure-item');    
     var elemInput = document.createElement('input');
     elemInput.classList.add('reconfigure-input');
-    elemInput.id = 'studentinfoSpreadsheetId';
+    elemInput.id = 'studentinfoSpreadsheetLink';
     elemInput.value = settings.configparams.studentspreadsheetid;
     elemContainer.appendChild(elemInput);
     page.reconfigureUI.appendChild(elemContainer);
@@ -263,9 +263,19 @@ const app = function () {
   
   function _endReconfigure(saveNewConfiguration) {    
     if (saveNewConfiguration) {
-      settings.configparams.studentspreadsheetid = document.getElementById('studentinfoSpreadsheetId').value;
+      var userEntry = document.getElementById('studentinfoSpreadsheetLink').value;
+      var sID = userEntry.match(/\?id=([a-zA-Z0-9-_]+)/);
+      if (sID == null) {
+        sID = '';
+      } else {
+        sID = sID[0].slice(4);
+      }
+
+      settings.studentspreadsheetlink = userEntry;
+      settings.configparams.studentspreadsheetid = sID;
       _storeConfigurationParameters(null);
       _configureAndRenderDeck(settings.deck);
+      
     } else if (settings.configparams.studentspreadsheetid == '') {
       _configureAndRenderDeck();
     }

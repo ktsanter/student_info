@@ -70,7 +70,7 @@ class InfoDeck {
   _renderNavigation(title) {
     var navLinks = [
       {id: 'menuConfigure', label: 'configure'},
-      {id: 'menuFullPage',  label: 'open in full page'},
+      {id: 'menuOpenSourceSpreadsheet',  label: 'open source spreadsheet'},
       {id: 'menuAbout', label: 'about'}
     ];
     var elemContainer = document.createElement('div');
@@ -90,7 +90,7 @@ class InfoDeck {
       elemLink.id = navLinks[i].id;
       elemLink.innerHTML = navLinks[i].label;
       if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
-      else if (i == 1) { elemLink.addEventListener('click', e => this._doFullPage(e), false); }
+      else if (i == 1) { elemLink.addEventListener('click', e => this._doOpenSourceSpreadsheet(e), false); }
       else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
       elemSubLinksContainer.appendChild(elemLink);
     }
@@ -552,9 +552,9 @@ class InfoDeck {
     this._callbacks.config();
   }  
   
-  _doFullPage() { 
+  _doOpenSourceSpreadsheet() { 
     InfoDeck._toggleHamburgerMenu();
-    this._callbacks.fullpage();
+    this._callbacks.opensourcespreadsheet();
   }
   
   static _doAbout() { 
