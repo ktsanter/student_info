@@ -1,8 +1,5 @@
 "use strict";
 //
-// TOOD: add chrome storage get/put for configuration
-// TODO: look at optimizing retrieval code in API app
-// TODO: add error handling for bad spreadsheet ID/wrong sheet name
 // TODO: look at using full spreadsheet link rather than ID
 // TODO; change "open full page" to "open source spreadsheet"
 //
@@ -38,23 +35,26 @@ const app = function () {
 		page.body = document.getElementsByTagName('body')[0];
     
     page.body.appendChild(_renderNoticeElement());
-    _getCurrentConfigurationParameters(_continue_init);
+    _getConfigurationParameters(_continue_init);
   }
   
   async function _continue_init() {
-    console.log('_continue_init: configparams=' + JSON.stringify(settings.configparams));
     settings.deck = new InfoDeck();
     _configureAndRenderDeck(settings.deck);
 	}
 
-  function _getCurrentConfigurationParameters(callback) {
-    const storagefieldSheetId = 'studenInfoDeck_SpreadsheetFileId';
+  //-------------------------------------------------------------------------------------
+  // use chrome.storage to get and set configuration parameters
+  //-------------------------------------------------------------------------------------
+  function _getConfigurationParameters(callback) {
+    const keys = {
+      sheetid: 'studenInfoDeck_SpreadsheetFileId'
+    };
         
-    chrome.storage.sync.get([storagefieldSheetId], function (result) {
+    chrome.storage.sync.get([keys.sheetid], function (result) {
       var configParams = {studentspreadsheetid: ''};
-      if (typeof result.studenInfoDeck_SpreadsheetFileId != 'undefined') {
-        configParams = {};
-        configParams.studentspreadsheetid = result.studenInfoDeck_SpreadsheetFileId;
+      if (typeof result[keys.sheetid] != 'undefined') {
+        configParams.studentspreadsheetid = result[keys.sheetid];
       } 
       
       settings.configparams = configParams;
@@ -62,19 +62,26 @@ const app = function () {
     });
   }
   
+  function _storeConfigurationParameters(callback) {
+    const keys = {
+      "studenInfoDeck_SpreadsheetFileId": settings.configparams.studentspreadsheetid
+    };
+    
+    chrome.storage.sync.set(keys, function() {
+      if (callback != null) callback;
+    });
+  }
+
   //-------------------------------------------------------------------------------------
-  // configuration functions
+  // deck configuration functions
   //-------------------------------------------------------------------------------------
   async function _configureAndRenderDeck(deck) {   
-    console.log('_configureAndRenderDeck: deck=' + deck + ' configparams=' + JSON.stringify(settings.configparams));
     if (settings.configparams == null || settings.configparams.studentspreadsheetid == '') {
       _renderReconfigureUI();
       
     } else {
       _setNotice('loading...');
       settings.studentandlayoutdata = await _getStudentAndLayoutData();
-      console.log('_configureAndRenderDeck: studentandlayoutdata=' + settings.studentandlayoutdata);
-    
    
       if (page.deck != null && settings.deckinitialized) {
         page.body.removeChild(page.deck);
@@ -97,7 +104,6 @@ const app = function () {
   }
   
   async function _getStudentAndLayoutData() {
-    console.log('getStudentAndLayoutData: configparams=' + JSON.stringify(settings.configparams));
     var result = null;
     
     if (settings.configparams != null) {
@@ -146,64 +152,6 @@ const app = function () {
     
     return deckParams;
   }
-    
-  
-  
-  
-/*
-function retrieveSettings(callback)
-{
-	chrome.storage.sync.get(['cbSpreadsheetFileId', 'cbBBSelector', 'cbSearch', 'cbTags', 'cbCommentIndex'], function(result) {
-		var fileIdString = '';
-		var bbSelector = true;
-		var searchString = '';
-		var tagString = '';
-		var commentIndex = -1;
-
-		if (typeof result.cbSpreadsheetFileId != 'undefined') {
-			fileIdString = result.cbSpreadsheetFileId;
-		}
-		if (typeof result.cbBBSelector != 'undefined') {
-			bbSelector = result.cbBBSelector;
-		}
-		if (typeof result.cbSearch != 'undefined') {
-			searchString = result.cbSearch;
-		}
-		if (typeof result.cbTags != 'undefined') {
-			tagString = result.cbTags;
-		}
-		if (typeof result.cbCommentIndex != 'undefined') {
-			commentIndex = result.cbCommentIndex;
-		}
-		
-		cbData.spreadsheetFileId = fileIdString;
-		//document.getElementById(cbData.bbSelectorId.substring(1)).checked = bbSelector;
-		cbData.commentIndex = commentIndex;
-		$(cbData.urlInputId).val(fileIdString);
-		$(cbData.commentSearchInputId).val(searchString);
-		$(cbData.tagSearchInputId).val(tagString);
-
-		callback();
-  });
-}
-
-function storeSettings(callback)
-{	
-	var keys = {
-		"cbSpreadsheetFileId": $(cbData.urlInputId).val(),
-		"cbBBSelector": true, //document.getElementById(cbData.bbSelectorId.substring(1)).checked,
-		"cbSearch": $(cbData.commentSearchInputId).val(), 
-		"cbTags": $(cbData.tagSearchInputId).val(),
-		"cbCommentIndex": cbData.commentIndex
-	};
-	
-	chrome.storage.sync.set(keys, function() {
-		if (callback != null) {
-			callback();
-		}
-	});
-}
-*/  
 
   function _makeIndexList(indexfield, data) {
     var indexlistWithDupes = [];
@@ -316,6 +264,7 @@ function storeSettings(callback)
   function _endReconfigure(saveNewConfiguration) {    
     if (saveNewConfiguration) {
       settings.configparams.studentspreadsheetid = document.getElementById('studentinfoSpreadsheetId').value;
+      _storeConfigurationParameters(null);
       _configureAndRenderDeck(settings.deck);
     } else if (settings.configparams.studentspreadsheetid == '') {
       _configureAndRenderDeck();
