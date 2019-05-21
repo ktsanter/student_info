@@ -1,4 +1,4 @@
-function autocomplete(inp, arr, isFuzzyEqual_func, choicecompleteCallback) {
+function autocomplete(inp, arr, fuzzyEqual_func, choicecompleteCallback) {
   /*the autocomplete function takes two arguments, the text field element and an array of possible autocompleted values:*/
   var currentFocus;
   /*execute a function when someone writes in the text field:*/
@@ -20,14 +20,22 @@ function autocomplete(inp, arr, isFuzzyEqual_func, choicecompleteCallback) {
         
 //---- alterations --------------------------------------------------------------------        
         //original: if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-          if (isFuzzyEqual_func(arr[i], val)) {
+          var fuzzyEqual = fuzzyEqual_func(arr[i], val);
+          if (fuzzyEqual.isEqual) {
 //---- end of alterations -------------------------------------------------------------        
           
           /*create a DIV element for each matching element:*/
           b = document.createElement("DIV");
           /*make the matching letters bold:*/
-          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-          b.innerHTML += arr[i].substr(val.length);
+          
+          
+//---- alterations --------------------------------------------------------------------        
+          //original: b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          //          b.innerHTML += arr[i].substr(val.length);
+          b.innerHTML = fuzzyEqual.markedEqualText;
+//---- end of alterations -------------------------------------------------------------        
+          
+          
           /*insert a input field that will hold the current array item's value:*/
           b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/

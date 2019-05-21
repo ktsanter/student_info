@@ -205,11 +205,29 @@ const app = function () {
   }
   
   function isFuzzyEqual(fullindexVal, enteredVal) {
-    //match exactly to entered characters at beginning: return fullindexVal.substr(0, enteredVal.length).toUpperCase() == enteredVal.toUpperCase();
+    var result = {
+      isEqual: false,
+      markedEqualText: ''
+    };
+    
     var splitName = fullindexVal.split(', ');
-    var cutFirstName = splitName[1].substr(0, enteredVal.length);
-    var cutLastName = splitName[0].substr(0, enteredVal.length);
-    return ( (cutFirstName.toUpperCase() == enteredVal.toUpperCase()) || (cutLastName.toUpperCase() == enteredVal.toUpperCase()) );
+    var firstName = splitName[1];
+    var lastName = splitName[0];
+    var cutFirstName = firstName.substr(0, enteredVal.length);
+    var cutLastName = lastName.substr(0, enteredVal.length);
+    var remainderFirstName = firstName.slice(cutFirstName.length);
+    var remainderLastName = lastName.slice(cutLastName.length);
+    
+    if (cutLastName.toUpperCase() == enteredVal.toUpperCase()) {
+      result.markedEqualText = '<strong>' + cutLastName + '</strong>' + remainderLastName + ', ' + firstName;
+      
+    } else if (cutFirstName.toUpperCase() == enteredVal.toUpperCase()) {
+      result.markedEqualText = lastName + ', ' + '<strong>' + cutFirstName + '</strong>' + remainderFirstName;
+    }
+    
+    result.isEqual = (result.markedEqualText != '');
+    
+    return result;
   }
   
 	//-----------------------------------------------------------------------------
