@@ -412,7 +412,8 @@ class InfoDeck {
     elemLabel.innerHTML = title;
     elemItem.appendChild(elemLabel);
     
-    var elemValue = document.createElement('span');
+    var elemValue = document.createElement('div');
+    elemValue.classList.add('decklayout-genericitemvalue');
     elemValue.innerHTML = itemValue;
     elemItem.appendChild(elemValue);
     

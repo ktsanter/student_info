@@ -94,6 +94,10 @@
   font-size: 0.9em;
 }
 
+.decklayout-genericitemvalue {
+  display: inline-block;
+}
+
 .decklayout-badges {
   margin-top: 8px;
 }
