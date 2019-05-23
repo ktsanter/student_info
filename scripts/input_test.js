@@ -82,5 +82,3 @@ const app = function () {
 		init: init
  	};
 }();
-
-document.addEventListener('DOMContentLoaded', app.init());

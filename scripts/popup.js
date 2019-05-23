@@ -28,6 +28,7 @@ const app = function () {
 	//----------------------------------------
   function init() {
 		page.body = document.getElementsByTagName('body')[0];
+    page.body.classList.add('colorscheme');
     
     page.body.appendChild(_renderNoticeElement());
     _getConfigurationParameters(_continue_init);
@@ -363,5 +364,3 @@ const app = function () {
 		init: init
  	};
 }();
-
-document.addEventListener('DOMContentLoaded', app.init());
