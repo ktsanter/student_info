@@ -1,0 +1,33 @@
+/*----------------------------------------------------------*/
+/* style settings for FuzzyControlInput                     */
+/*----------------------------------------------------------*/
+
+/* the input control */
+.fuzzyinputcontrol {}
+
+/* list of matching items */
+.fuzzyinputcontrol-items {
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-top: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* individual matching items */
+.fuzzyinputcontrol-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* when hovering over an item */
+.fuzzyinputcontrol-item:hover {
+  background-color: #ddd;
+}
+
+/* when navigating through the items using the arrow keys */
+/* note hover takes precedence */
+.fuzzyinputcontrol-active {
+  background-color: #1e90ff;
+  color: white;
+}

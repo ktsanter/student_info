@@ -7,7 +7,7 @@
   
   "description": "Track student information",
   
-  "version": "0.01.12",
+  "version": "0.01.13",
   
   "browser_action": {
     "default_icon": "sid_16_rounded.png",
@@ -17,13 +17,14 @@
   
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "clipboardWrite"
   ],
     
   "icons": {
      "16": "sid_16_rounded.png",
 	 "128": "sid_128_rounded.png"
    },
-   
+     
    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
