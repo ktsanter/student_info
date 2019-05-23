@@ -150,7 +150,7 @@ const app = function () {
           config: _configCallback,
           opensourcespreadsheet: _openSourceSpreadsheetCallback,
           notes: _notesCallback,
-          isfuzzyequal: isFuzzyEqual
+          isfuzzyequal: _isFuzzyEqual
         }
       };
     } 
@@ -204,7 +204,7 @@ const app = function () {
     }
   }
   
-  function isFuzzyEqual(fullindexVal, enteredVal) {
+  function _isFuzzyEqual(fullindexVal, enteredVal) {
     var result = {
       isEqual: false,
       markedEqualText: ''

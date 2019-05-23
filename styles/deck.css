@@ -58,13 +58,13 @@
 
 .decklayout-card {}
 
-.decklayout-select {
+.decklayout-select-container {
   margin-top: 6px;
   margin-bottom: 6px;
 }
 
 .decklayout-select-control {
-  width: 20em;
+  display: inline-block;
 }
 
 .decklayout-select-copied {
@@ -167,7 +167,7 @@
   border: 1px solid black;
   border-radius: 8px;
   background-color: #ccc;
-  padding: 6px 4px;
+  padding: 8px 4px;
   margin-bottom: 6px;
 }
 

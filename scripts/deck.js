@@ -1,7 +1,6 @@
 
 "use strict";
 //
-// TODO: use FuzzyInputControl class
 // TODO: adapt to work with Noah's config approach
 // TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
 //
@@ -49,10 +48,7 @@ class InfoDeck {
     var elemNav = this._renderNavigation(this._title);
     this._elemDeckContainer.appendChild(elemNav);
 
-    var elemSelect = InfoDeck._renderSelect();
-    this._elemSelectionInput = elemSelect.inputelement;
-    autocomplete(elemSelect.inputelement, this._indexlist, this._callbacks.isfuzzyequal, e => this._handleSelection(e));
-    this._elemDeckContainer.appendChild(elemSelect.container);
+    this._elemDeckContainer.appendChild(this._renderSelect());
     
     this._elemDeckContainer.appendChild(this._renderAbout());
     this._elemDeckContainer.appendChild(InfoDeck._renderClipboardCopyArea());
@@ -114,42 +110,42 @@ class InfoDeck {
     return elemContainer;     
   }
   
-  static _renderSelect() {
+  _renderSelect() {
     var elemContainer = document.createElement('div');
-    elemContainer.classList.add('decklayout-select');
-    
-    var elemInputDiv = document.createElement('div');
-    elemInputDiv.classList.add('autocomplete');
-    
-    var elemInput = document.createElement('input');
-    elemInput.classList.add('decklayout-select-control');
-    elemInput.type = 'text';
-    elemInput.autocomplete = 'off';
-    elemInputDiv.appendChild(elemInput);
-    elemContainer.appendChild(elemInputDiv);
+    elemContainer.classList.add('decklayout-select-container');
+
+    var fuzzySelect = new FuzzyInputControl(
+      this._indexlist, 
+      e => this._handleSelection(e), 
+      this._callbacks.isfuzzyequal
+    );
+    this._fuzzyInputControl = fuzzySelect;
+    var elemFuzzySelect = fuzzySelect.render();
+    elemFuzzySelect.classList.add('decklayout-select-control');
+    elemContainer.appendChild(elemFuzzySelect);
     
     var elemCopiedContainer = document.createElement('div');
     elemCopiedContainer.classList.add('decklayout-select-copied');
     elemCopiedContainer.id = 'copiedMessage';
     elemCopiedContainer.innerHTML = '';
-    elemContainer.appendChild(elemCopiedContainer);
-        
-    return {container: elemContainer, inputelement: elemInput};
+    elemContainer.appendChild(elemCopiedContainer);    
+
+    return elemContainer;
   } 
 
   _renderAbout() {
     var details = [
-      this._title + ': v' + this._outerappversion,
-      'InfoDeck: v' + this._version, 
       'author: Kevin Santer', 
-      'contact: ktsanter@gmail.com'
+      'contact: ktsanter@gmail.com',
+      'InfoDeck: v' + this._version, 
+      'FuzzyInputControl: v' + this._fuzzyInputControl.version()
     ];
     var elemContainer = InfoDeck._renderContainer('infoDeckAbout', 'decklayout-about');
     
     var elemTitle = document.createElement('div');
     var elemLabel = document.createElement('div');
     elemLabel.classList.add('decklayout-about-label');
-    elemLabel.innerHTML = 'About <em>' + this._title + '</em>';
+    elemLabel.innerHTML = 'About <em>' + this._title + '</em> (v' + this._outerappversion + ')';
     elemTitle.appendChild(elemLabel);
 
     var elemClose = document.createElement('i');
@@ -560,9 +556,9 @@ class InfoDeck {
   //--------------------------------------------------------------------------
   // handlers
   //--------------------------------------------------------------------------
-  _handleSelection() {
+  _handleSelection(selectedValue) {
     InfoDeck._setCopiedMessage('');
-    this._processSelection(this._elemSelectionInput.value);
+    this._processSelection(selectedValue);
   }
     
   _doConfigure() { 

@@ -30,7 +30,7 @@ const app = function () {
     elemContainer.style.display = 'inline-block'; 
     
     var indexList = [ "aaaaa", "bbbb", "cccc", "ccdd", "ccee", "cddd", "cddf", "ceee" ];
-    var fuzzyInput = new FuzzyControlInput(indexList, _handleSelection, null); //_isFuzzyEqual);
+    var fuzzyInput = new FuzzyInputControl(indexList, _handleSelection, null); //_isFuzzyEqual);
     var elemFuzzyInput = fuzzyInput.render();
     elemFuzzyInput.id = 'fuzzySelect';
     elemContainer.appendChild(elemFuzzyInput);

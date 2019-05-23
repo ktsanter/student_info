@@ -1,13 +1,13 @@
 "use strict";
 //-----------------------------------------------------------------------
-// FuzzyControlInput
+// FuzzyInputControl
 //    class providing an input box which makes fuzzy 
 //    matches agains an array of strings
 //-----------------------------------------------------------------------
 // TODO: 
 //-----------------------------------------------------------------------
 
-class FuzzyControlInput {
+class FuzzyInputControl {
   
   // indexList:  array of string values in which to search for matches
   // handleSelection: callback for when selection is completed
@@ -25,6 +25,10 @@ class FuzzyControlInput {
   
   setIndexList(indexlist) {
     this._indexlist = indexlist;
+  }
+  
+  version() {
+    return this._version;
   }
   
   //----------------------------------------------------------------------
