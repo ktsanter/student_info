@@ -36,9 +36,14 @@ const app = function () {
   
   async function _continue_init() {
     settings.deck = new InfoDeck();
-    _configureAndRenderDeck(settings.deck);
-	}
 
+    if (settings.configparams.hasOwnProperty('studentspreadsheetid') && settings.configparams.studentspreadsheetid != '') {
+      _configureAndRenderDeck(settings.deck);
+    } else {
+      _renderReconfigureUI();
+    }
+	}
+  
   //-------------------------------------------------------------------------------------
   // use chrome.storage to get and set configuration parameters
   //-------------------------------------------------------------------------------------
@@ -79,32 +84,21 @@ const app = function () {
   //-------------------------------------------------------------------------------------
   // deck configuration functions
   //-------------------------------------------------------------------------------------
-  async function _configureAndRenderDeck(deck) {   
-    if (settings.configparams == null || settings.configparams.studentspreadsheetid == '') {
-      _renderReconfigureUI();
-      
-    } else {
-      _setNotice('loading...');
-      settings.studentandlayoutdata = await _getStudentAndLayoutData();
-   
-      if (page.deck != null && settings.deckinitialized) {
-        page.body.removeChild(page.deck);
-      }
-      settings.deckinitialized = false;
-
-      var deckParams = await _makeDeckParams();
-      if (deckParams != null) {
-        if (!settings.usetimer) _setNotice('');
-        deck.init(deckParams);
-        page.deck = deck.renderDeck();
-        page.body.appendChild(page.deck);
-        settings.deckinitialized = true;
-        
-      } else {
-        _setNotice('unable to load data from file');
-        _renderReconfigureUI();
-      }
+  async function _configureAndRenderDeck(deck) { 
+    _setNotice('loading...');
+    settings.studentandlayoutdata = await _getStudentAndLayoutData();
+ 
+    if (page.deck != null && settings.deckinitialized) {
+      page.body.removeChild(page.deck);
     }
+    settings.deckinitialized = false;
+
+    var deckParams = await _makeDeckParams();
+    if (!settings.usetimer) _setNotice('');
+    deck.init(deckParams);
+    page.deck = deck.renderDeck();
+    page.body.appendChild(page.deck);
+    settings.deckinitialized = true;
   }
   
   async function _getStudentAndLayoutData() {
@@ -245,14 +239,10 @@ const app = function () {
   }
  
    function _renderReconfigureUI() {
-    if (page.reconfigureUI != null) {
-      page.body.removeChild(page.reconfigureUI);
-      page.reconfigureUI = null;
-    }
-    
     if (settings.deckinitialized) settings.deck.hideDeck()
     
     page.reconfigureUI = document.createElement('div');
+    page.reconfigureUI.id = 'reconfigureUI';
     page.reconfigureUI.classList.add('reconfigure');
   
     elemContainer = document.createElement('div');
@@ -271,14 +261,16 @@ const app = function () {
     elemCheck.addEventListener('click', _completeReconfigure, false);
     elemContainer.appendChild(elemCheck);
     
-    var elemDiscard = document.createElement('i');
-    elemDiscard.classList.add('fa');
-    elemDiscard.classList.add('fa-close');
-    elemDiscard.classList.add('fa-lg');
-    elemDiscard.classList.add('reconfigure-icon');
-    elemDiscard.title = 'discard changes';
-    elemDiscard.addEventListener('click', _cancelReconfigure, false);
-    elemContainer.appendChild(elemDiscard);        
+    if (settings.deckinitialized) {
+      var elemDiscard = document.createElement('i');
+      elemDiscard.classList.add('fa');
+      elemDiscard.classList.add('fa-close');
+      elemDiscard.classList.add('fa-lg');
+      elemDiscard.classList.add('reconfigure-icon');
+      elemDiscard.title = 'discard changes';
+      elemDiscard.addEventListener('click', _cancelReconfigure, false);
+      elemContainer.appendChild(elemDiscard);        
+    }
     page.reconfigureUI.appendChild(elemContainer);
 
     var elemContainer = document.createElement('div');
@@ -290,12 +282,13 @@ const app = function () {
     elemContainer.appendChild(elemInput);
     page.reconfigureUI.appendChild(elemContainer);
         
-    page.body.appendChild(page.reconfigureUI);    
+    page.body.appendChild(page.reconfigureUI);  
   }
   
-  function _endReconfigure(saveNewConfiguration) {    
+  async function _endReconfigure(saveNewConfiguration) { 
     if (saveNewConfiguration) {
       var userEntry = document.getElementById('studentinfoSpreadsheetLink').value;
+
       var sID = userEntry.match(/\?id=([a-zA-Z0-9-_]+)/);
       if (sID == null) {
         sID = '';
@@ -303,18 +296,39 @@ const app = function () {
         sID = sID[0].slice(4);
       }
 
-      settings.configparams.studentspreadsheetlink = userEntry;
-      settings.configparams.studentspreadsheetid = sID;
-      _storeConfigurationParameters(null);
-      _configureAndRenderDeck(settings.deck);
+      var dataSourceIsValid = await _validateDataSource(sID);
+      if (dataSourceIsValid) {
+        settings.configparams.studentspreadsheetlink = userEntry;
+        settings.configparams.studentspreadsheetid = sID;
+        _storeConfigurationParameters(null);
+        _configureAndRenderDeck(settings.deck);
+        page.body.removeChild(page.reconfigureUI);
+        page.reconfigureUI = null;
+      } 
       
-    } else if (settings.configparams.studentspreadsheetid == '') {
-      _configureAndRenderDeck();
+    } else {
+      page.body.removeChild(page.reconfigureUI);
+      page.reconfigureUI = null;
+      if (settings.deckinitialized) settings.deck.showDeck();
     }
-
-    page.reconfigureUI.style.display = 'none';
-    if (settings.deckinitialized) settings.deck.showDeck();
   }
+  
+  async function _validateDataSource(spreadsheetid) {
+    _setNotice('validating data source...');
+    var requestResult  = await googleSheetWebAPI.webAppGet(
+      apiInfo.studentinfo, 'validate', 
+      {studentinfo_spreadsheetid: spreadsheetid}
+    );
+    
+    if (requestResult.sucess) {
+      _setNotice('');
+    } else {
+      _setNotice(requestResult.details);
+    }
+      
+    return requestResult.success;
+  }
+
   
 	//------------------------------------------------------------------
 	// handlers
