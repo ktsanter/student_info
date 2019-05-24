@@ -1,4 +1,8 @@
-.colorscheme {
+/*-------------------------------------------------------------------
+ * styling for Student Info chrome extension help page
+ *-------------------------------------------------------------------/
+ 
+ .colorscheme {
   --MV-white: #ffffff;
   --MV-black: #000000;
   --MV-light-teal: #2f8d98;
