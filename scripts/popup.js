@@ -16,7 +16,7 @@ const app = function () {
     helpURL: 'https://ktsanter.github.io/student_info/popup_help.html',
     configparams: null,
     deck: null,
-    usetimer: false
+    usetimer: true
   };
 
   const apiInfo = {
@@ -111,13 +111,17 @@ const app = function () {
       if (settings.usetimer) var startTime = new Date();
       var requestResult  = await googleSheetWebAPI.webAppGet(
         apiInfo.studentinfo, 'all', 
-        {studentinfo_spreadsheetid: settings.configparams.studentspreadsheetid}
+        {
+          studentinfo_spreadsheetid: settings.configparams.studentspreadsheetid,
+          supplementarybadgeurl: 'https://drive.google.com/uc?id=1OdD1xRFX08CUSvxyGUQKKDH252CpCGuY'
+        }
       );
       
       if (requestResult.success) {
         if (settings.usetimer) var elapsedTime = new Date() - startTime;
         if (settings.usetimer) _setNotice(elapsedTime/1000.0);
         result = requestResult.data;
+        console.log(result);
         
       } else {
         console.log('ERROR: in _getStudentAndLayoutData' );

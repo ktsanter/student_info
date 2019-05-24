@@ -9,12 +9,12 @@
     <div class="title"> Help for "Student info" Chrome extension</div>
     
     <div id="general" class="topic"> general </div>
-    <div class="topic-contents">
-      <div class="topic-subcontents">
+    <div class="topic-row">
+      <div class="topic-col topic-col0">
         <img src="https://drive.google.com/uc?id=1FoLuIrIMeib9uKQzE6702fNbHd7m-Dm1">
       </div>
 
-      <div class="topic-subcontents">
+      <div class="topic-col topic-col1">
         <ol>
           <li> 
             <span class="item-label">select student</span>
@@ -48,13 +48,14 @@
     </div>
     
     <hr class="topic-break">
+    
     <div id="configuration" class="topic"> configuration </div>
-    <div class="topic-contents">
-      <div class="topic-subcontents">
+    <div class="topic-row">
+      <div class="topic-col topic-col0">
         <img id='spreadsheetSnapshot' src="https://drive.google.com/uc?id=1TLOgOdn6tQW4Tvt4Scor4QtB4mhSbFq6">
       </div>
     
-      <div class="topic-subcontents">
+      <div class="topic-col topic-col1">
         The source of the student information must be a Google Sheet
         and you are welcome to get started by copying 
         <a href="https://drive.google.com/open?id=1emPTrguoN1EaUYcZ1c4aqz4udAcUpqvFdh0RghxXhHA">this one</a>.<br>
@@ -73,19 +74,21 @@
           <li>All remaining rows contain data for a student</li>
         </ul>
         
-        These fields are required: <span class="item-label">fullname</span> (formatted as "last, first"), 
-        <span class="item-label">first</span>, 
-        <span class="item-label">last </span>, 
-        <span class="item-label">course</span>.
+        Thes fields  
+        <span class="item-label">fullname</span> (formatted as "last, first"), and 
+        <span class="item-label">course</span> are required.
         <br>
-        The type for each should be "dontrender" except for the <span class="item-label">course</span> field which should have the type "label".
-      </div>
-      
-      <div class="topic-subcontents topic-subcontents-break">
+        The type for <span class='item-label'>fullname</span> should be <em>dontrender</em>
+        and the type for <span class="item-label">course</span> must be <em>label</em>.
+      </div>      
+    </div>
+
+    <div class="topic-row">
+      <div class="topic-col topic-col0">
         <img id='configureSnapshot' src="https://drive.google.com/uc?id=1KlQeNNbCa4CCLamK8ub8EX3-tY_P2bWJ">
       </div>
 
-      <div class="topic-subcontents topic-subcontents-break">
+      <div class="topic-col topic-col1">
         When you open the extension for the first time or when you choose "Configure" from the menu,<br>
         you will be prompted to enter the URL for the Google Sheet.
         Important:
@@ -98,8 +101,8 @@
     
     <hr class="topic-break">
     <div id="badges" class="topic"> badges </div>
-    <div class="topic-contents">
-      <div class="topic-subcontents">
+    <div class="topic-row">
+      <div class="topic-col topic-col0">
         There are a number of badge types available
         <ul>
           <li> <span class="item-label"> badge_grade </span>

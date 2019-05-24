@@ -1,26 +1,10 @@
-/*-------------------------------------------------------------------
- * styling for Student Info chrome extension help page
- *-------------------------------------------------------------------/
- 
- .colorscheme {
-  --MV-white: #ffffff;
-  --MV-black: #000000;
-  --MV-light-teal: #2f8d98;
-  --MV-dark-teal: #115e63;
-  --MV-deep-teal: #093c44;
-  --MV-green: #b5cd34;
-  --MV-orange: #f7941e;
-  --MV-light-gray: #6d6e71;
-  --MV-dark-gray: #414042;
-  --notice-blue: blue;
-  --light-gray2: #f2f2f2;
-  --very-light-gray: #dddddd;
-  --very-very-light-gray: #eeeeee;
-}
+/*-------------------------------------------------------------------*/
+ /* styling for Student Info chrome extension help page              */
+ /*------------------------------------------------------------------*/
 
 body {
-	color: var(--MV-black);
-	background-color: var(--very-very-light-gray);
+	color: black;
+	background-color: #ddd;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 13px;
 	margin-left: 12px;
@@ -28,46 +12,39 @@ body {
 }
 
 .title {
-  color: var(--MV-white);
-  background-color: var(--MV-dark-teal);
+  color: #fff;
+  background-color: #115e63;
   font-size: 14px;
-  border: 1px solid var(--MV-black);
+  border: 1px solid black;
   border-radius: 6px;
   padding: 2px 2px;
-  margin-bottom: 8px;
 }
 
 .topic {
-  color: var(--MV-dark-teal);
-  background-color: var(--MV-white);
+  color: #115e63;
+  background-color: white;
   font-size: 14px;
-  border: 1px solid var(--MV-black);
+  border: 1px solid black;
   border-radius: 6px;
   padding: 2px 2px;
-  margin-bottom: 8px;
   max-width: 40%;
+  margin-top: 10px;
 }
+
+.topic-row {
+  display: flex;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.topic-col {}
+
+.topic-col0 {}
+
+.topic-col1 {}
 
 .topic-break {
   margin-top: 20px;
-}
-
-.topic-contents {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-	color: var(--MV-black);
-	background-color: var(--very-very-light-gray);
-  margin-left: 20px;
-  margin-bottom: 8px;
-}
-
-.topic-subcontents-break {
-  margin-top: 30px
-}
-  
-.topic-subcontents li:not(:last-child) {
-  padding-bottom: 8px;
 }
 
 .item-label {
