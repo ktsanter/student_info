@@ -212,8 +212,11 @@ const app = function () {
     var cutLastName = lastName.substr(0, enteredVal.length);
     var remainderFirstName = firstName.slice(cutFirstName.length);
     var remainderLastName = lastName.slice(cutLastName.length);
-    
-    if (cutLastName.toUpperCase() == enteredVal.toUpperCase()) {
+       
+    if (enteredVal.includes(',') && (fullindexVal.substr(0, enteredVal.length).toUpperCase() == enteredVal.toUpperCase())) {
+      result.markedEqualText = '<strong>' + fullindexVal.substr(0, enteredVal.length) + '</strong>' + fullindexVal.substr(enteredVal.length);
+      
+    } else if (cutLastName.toUpperCase() == enteredVal.toUpperCase()) {
       result.markedEqualText = '<strong>' + cutLastName + '</strong>' + remainderLastName + ', ' + firstName;
       
     } else if (cutFirstName.toUpperCase() == enteredVal.toUpperCase()) {
@@ -310,6 +313,7 @@ const app = function () {
       page.body.removeChild(page.reconfigureUI);
       page.reconfigureUI = null;
       if (settings.deckinitialized) settings.deck.showDeck();
+      _setNotice('');
     }
   }
   
