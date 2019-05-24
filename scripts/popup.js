@@ -13,7 +13,7 @@ const app = function () {
   };
   
   const settings = {
-    helpURL: '',
+    helpURL: 'https://ktsanter.github.io/student_info/popup_help.html',
     configparams: null,
     deck: null,
     usetimer: false
@@ -233,7 +233,7 @@ const app = function () {
   }
   
   function _showHelp() {
-    console.log(window.location);
+    window.open(settings.helpURL, '_blank');
   }
   
 	//-----------------------------------------------------------------------------

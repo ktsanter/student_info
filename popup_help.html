@@ -5,7 +5,152 @@
     <link href="styles/popup_help.css" rel="stylesheet" type="text/css">
   </head>
   
-  <body>  
-    <div> popup help </div>
+  <body class='colorscheme'>  
+    <div class="title"> Help for "Student info" Chrome extension</div>
+    
+    <div id="general" class="topic"> general </div>
+    <div class="topic-contents">
+      <div class="topic-subcontents">
+        <img src="https://drive.google.com/uc?id=1FoLuIrIMeib9uKQzE6702fNbHd7m-Dm1">
+      </div>
+
+      <div class="topic-subcontents">
+        <ol>
+          <li> 
+            <span class="item-label">select student</span>
+            <div> enter the beginning of a student's first or last name to filter the selection list</div>
+          </li>
+          <li> 
+            <span class="item-label">student info</span>
+            <div> all the information from the data source for the student except for badge items</div>
+          </li>
+          <li> 
+            <span class="item-label">badges</span>
+            <div> 
+              information items can be described by badges for specific items.  
+              For details, see the <a href="#badges">badges</a> section below
+            </div>
+          </li>
+          <li> 
+            <span class="item-label">notes</span>
+            <div>add, edit, and delete time-stamped notes</div>
+          </li>
+          <li> 
+            <span class="item-label">course</span>
+            <div>the course in which the student is enrolled</div>
+          </li>
+          <li> 
+            <span class="item-label">course navigation </span>
+            <div> icons are present when a student is in multiple courses.</div>
+          </li>
+        </ol>
+      </div>
+    </div>
+    
+    <hr class="topic-break">
+    <div id="configuration" class="topic"> configuration </div>
+    <div class="topic-contents">
+      <div class="topic-subcontents">
+        <img id='spreadsheetSnapshot' src="https://drive.google.com/uc?id=1TLOgOdn6tQW4Tvt4Scor4QtB4mhSbFq6">
+      </div>
+    
+      <div class="topic-subcontents">
+        The source of the student information must be a Google Sheet
+        and you are welcome to get started by copying 
+        <a href="https://drive.google.com/open?id=1emPTrguoN1EaUYcZ1c4aqz4udAcUpqvFdh0RghxXhHA">this one</a>.<br>
+        The spreadsheet must follow these guidelines:
+        <ul>
+          <li>The first row contains the names of each data field</li>
+          <li>The second row describes the type of data in the field.
+            <ul>
+              <li><span class="item-label">text</span> - values will display in the "student info" section</li>
+              <li><span class="item-label">dontrender</span> - values will not be displayed</li>
+              <li><span class="item-label">notes</span> - values will be used in the "notes" section</li>
+              <li><span class="item-label">badge_XXX</span> - values will be shown as <a href="#badges">badges</a></li>
+              <li><span class="item-label">label</span> - the label used at the bottom "course" section</li>
+            </ul>
+          </li>
+          <li>All remaining rows contain data for a student</li>
+        </ul>
+        
+        These fields are required: <span class="item-label">fullname</span> (formatted as "last, first"), 
+        <span class="item-label">first</span>, 
+        <span class="item-label">last </span>, 
+        <span class="item-label">course</span>.
+        <br>
+        The type for each should be "dontrender" except for the <span class="item-label">course</span> field which should have the type "label".
+      </div>
+      
+      <div class="topic-subcontents topic-subcontents-break">
+        <img id='configureSnapshot' src="https://drive.google.com/uc?id=1KlQeNNbCa4CCLamK8ub8EX3-tY_P2bWJ">
+      </div>
+
+      <div class="topic-subcontents topic-subcontents-break">
+        When you open the extension for the first time or when you choose "Configure" from the menu,<br>
+        you will be prompted to enter the URL for the Google Sheet.
+        Important:
+        <ul>
+          <li>the permissions must be set to "<em>Anyone with the link can <strong>edit</strong></em>"</li>
+          <li> use the "<em>Get shareable link</em>" option in Drive to get the URL</li>
+        </ul>
+      </div>
+    </div>
+    
+    <hr class="topic-break">
+    <div id="badges" class="topic"> badges </div>
+    <div class="topic-contents">
+      <div class="topic-subcontents">
+        There are a number of badge types available
+        <ul>
+          <li> <span class="item-label"> badge_grade </span>
+            - for values of 9, 10, 11, and 12 these badges will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=1O2Rw7absj3gD5VJkawDFVHiuq73BJgcd" title="grade 9">
+              <img src="https://drive.google.com/uc?id=11h0m8nc2L5n2govt-p33_-7W4V7qe_dz" title="grade 10">
+              <img src="https://drive.google.com/uc?id=1xTxYNltbSoeWXHxVlR35mipfbsZHuGPB" title="grade 11">
+              <img src="https://drive.google.com/uc?id=1nusYot6b8NM34UgE4u_eWpuFlCTNnffj" title="grade 12">
+              <br> and the hover text will show the grade level
+            </div>
+
+          </li>
+          <li> <span class="item-label"> badge_iep</span>
+            - if the value is TRUE this badge will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=14xQrchhgevZg4dVQ9s3eel7zk0UVwQso" title="has IEP">
+              <br> and the hover text will say "has IEP"
+            </div>
+          </li>
+          <li> <span class="item-label"> badge_504</span>
+            - if the value is TRUE this badge will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=1jTYvMJxBDBqJJEppYe4B-xf1-zw_eaxp" title="has 504">
+              <br> and the hover text will say "has 504"          
+            </div>
+          </li>
+          <li> <span class="item-label"> badge_earlygrade</span>
+             - if there is a (non-blank) value this badge will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=1XiKmXzIWQwO9r__L6jg9Wqc4jLrZZbMZ" title="5/20/2019">
+              <br> and the hover text will show whatever the data value is          
+            </div>
+         </li>
+          <li> <span class="item-label"> badge_nowelcomeletter</span>
+            - if the value is TRUE this badge will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=1xN8ObHPHEakMUSjb-yOqSfcCk5MOlbLO" title="welcome letter not sent yet">
+              <br> and the hover text will say "welcome letter not sent yet"          
+            </div>
+          </li>
+          <li> <span class="item-label"> adge_multiplementors</span>
+            - if the value is TRUE this badge will be shown:
+            <div class="badge-images">
+              <img src="https://drive.google.com/uc?id=1oCdZctdsDdhY1vqLVoFy5UJYDL3JnrA0" title="multiple mentors">
+              <br> and the hover text will say "multiple mentors"          
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </body>
 </html>
