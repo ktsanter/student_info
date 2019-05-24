@@ -1,17 +1,35 @@
 
 "use strict";
-//
+//-----------------------------------------------------------------------------------
+// InfoDeck class
+//-----------------------------------------------------------------------------------
 // TODO: adapt to work with Noah's config approach
-// TODO: take a look at https://listjs.com/docs/fuzzysearch/ for fuzzy search
-//
+//-----------------------------------------------------------------------------------
 
 class InfoDeck {
   constructor() {
-    this._version = '0.01.06';
+    this._version = '0.01.07';
   }
   
   //--------------------------------------------------------------------------------
   // initializing
+  //    expected values in deckParams object:
+  //    {
+  //      title: string,
+  //      version: string
+  //      indexlist: array of strings, used to select cards from deck
+  //      indexfield: name of field used for indexing cards
+  //      layout {
+  //        fieldtype: { fieldname: fieldtype, ... },
+  //        badges: {badgename: {hovertext: string, values: [{value: string, imageurl: url, ...]}, ...}
+  //      itemdetails: [ {fieldname: fieldval}, ...]
+  //      callbacks: {
+  //         config: func - callback for "configuration" menu option
+  //         opendatasource: (optional) callback for "open data source" menu option
+  //         notes: (optional, required if notes field type is used) callback for changes to notes type field
+  //         isfuzzyequal: (optional) callback to compare two strings (indexlist value and entered value)
+  //         help: (optional) callback for "help" menu option
+  //    }
   //--------------------------------------------------------------------------------
   init(deckParams) {
     this._title = deckParams.title;
@@ -70,8 +88,9 @@ class InfoDeck {
   _renderNavigation(title) {
     var navLinks = [
       {id: 'menuConfigure', label: 'configure'},
-      {id: 'menuOpenSourceSpreadsheet',  label: 'open source spreadsheet'},
-      {id: 'menuAbout', label: 'about'}
+      {id: 'menuOpenDataSource',  label: 'open data source', depends: this._callbacks.opendatasource},
+      {id: 'menuAbout', label: 'about'},
+      {id: 'menuHelp', label: 'help', depends: this._callbacks.help}
     ];
     var elemContainer = document.createElement('div');
     elemContainer.classList.add('decklayout-topnav');    
@@ -85,13 +104,22 @@ class InfoDeck {
     var elemSubLinksContainer = document.createElement('div');
     elemSubLinksContainer.id = 'deckNavLinks';
     for (var i = 0; i < navLinks.length; i++) {
-      elemLink = document.createElement('a');
-      elemLink.classList.add('decklayout-navlink');
-      elemLink.id = navLinks[i].id;
-      elemLink.innerHTML = navLinks[i].label;
-      if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
-      else if (i == 1) { elemLink.addEventListener('click', e => this._doOpenSourceSpreadsheet(e), false); }
-      else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
+      var dependencySatisfied = true;
+      if (navLinks[i].hasOwnProperty('depends') && !navLinks[i].depends) {
+        dependencySatisfied = false;
+      }
+
+      if (dependencySatisfied) {
+        elemLink = document.createElement('a');
+        elemLink.classList.add('decklayout-navlink');
+        elemLink.id = navLinks[i].id;
+        elemLink.innerHTML = navLinks[i].label;
+      
+        if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
+        else if (i == 1) { elemLink.addEventListener('click', e => this._doOpenDataSource(e), false); }
+        else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
+        else if (i == 3) { elemLink.addEventListener('click', e => this._doHelp(e), false); }
+      }
       elemSubLinksContainer.appendChild(elemLink);
     }
     elemContainer.appendChild(elemSubLinksContainer);
@@ -567,16 +595,22 @@ class InfoDeck {
     this._callbacks.config();
   }  
   
-  _doOpenSourceSpreadsheet() { 
+  _doOpenDataSource() { 
     InfoDeck._setCopiedMessage('');
     InfoDeck._toggleHamburgerMenu();
-    this._callbacks.opensourcespreadsheet();
+    this._callbacks.opendatasource();
   }
   
   static _doAbout() { 
     InfoDeck._setCopiedMessage('');
     document.getElementById('deckNavLinks').style.display = 'none';
     document.getElementById('infoDeckAbout').style.display = 'block';
+  }
+  
+  _doHelp() { 
+    InfoDeck._setCopiedMessage('');
+    InfoDeck._toggleHamburgerMenu();
+    this._callbacks.help();
   }
   
   _handleAboutCloseClick() {

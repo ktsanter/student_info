@@ -1,7 +1,9 @@
 "use strict";
-//
+//-----------------------------------------------------------------------------------
+// Student info Chrome extension
+//-----------------------------------------------------------------------------------
 // TODO:
-//
+//-----------------------------------------------------------------------------------
 
 const app = function () {
 	const page = { 
@@ -10,7 +12,8 @@ const app = function () {
     reconfigureUI: null
   };
   
-  const settings = { 
+  const settings = {
+    helpURL: '',
     configparams: null,
     deck: null,
     usetimer: false
@@ -143,9 +146,10 @@ const app = function () {
         itemdetails: settings.studentandlayoutdata.studentinfo,
         callbacks: {
           config: _configCallback,
-          opensourcespreadsheet: _openSourceSpreadsheetCallback,
+          opendatasource: _openSourceSpreadsheetCallback,
           notes: _notesCallback,
-          isfuzzyequal: _isFuzzyEqual
+          isfuzzyequal: _isFuzzyEqual,
+          help: _showHelp
         }
       };
     } 
@@ -226,6 +230,10 @@ const app = function () {
     result.isEqual = (result.markedEqualText != '');
     
     return result;
+  }
+  
+  function _showHelp() {
+    console.log(window.location);
   }
   
 	//-----------------------------------------------------------------------------
