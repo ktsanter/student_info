@@ -40,7 +40,8 @@ body {
 }
 
 .topic-col {}
-.topic-col li:not(:last-child) {
+.
+topic-col li:not(:last-child) {
   margin-bottom: 6px;
 }
 
@@ -48,7 +49,12 @@ body {
   margin-top: 2px;
 }
 
+.topic-col li {
+  clear: left;
+}
+
 .topic-col0 {}
+
 .topic-col1 {}
 
 .topic-break {
@@ -60,8 +66,18 @@ body {
   font-style: italic;
 }
 
+.badge-group {
+  margin-bottom: 20px;
+}
+
 .badge-images {
   margin-left: 10px;
+  margin-right: 8px;
+  float: left;
+}
+
+.after-images {
+  margin-top: 10px;
 }
 
 #spreadsheetSnapshot {
