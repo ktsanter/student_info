@@ -102,6 +102,7 @@ const app = function () {
     page.deck = deck.renderDeck();
     page.body.appendChild(page.deck);
     settings.deckinitialized = true;
+    document.getElementById('selectControl').focus(); // this should probably be generalized
   }
   
   async function _getStudentAndLayoutData() {
