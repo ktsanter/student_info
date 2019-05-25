@@ -21,17 +21,18 @@ set mytime=%time%
 echo time is %mydate% %mytime% > makerelease.log
 
 :: get version string for package from manifest.json
-
 FOR /F "tokens=1,2 delims=:" %%i IN ('find "version" manifest.json') DO (
-  set MYTEMPVAR=
-  call makerelease_support01 %%i
-  if [!MYTEMPVAR!] == ["version"] (
-    set MYTEMPVAR=
-    call makerelease_support01 %%j
-    set PACKAGE_VERSION=!MYTEMPVAR:~1,-1!  
+  set MYTEMPKEY=
+  set MYTEMPKEY=%%i
+  set MYTEMPKEY=!MYTEMPKEY:~2!
+  if [!MYTEMPKEY!] == ["version"] (
+    set MYTEMPVAL=%%j
+    set PACKAGE_VERSION=!MYTEMPVAL:~2,-2!
   )
 )
-set MYTEMPVAR=
+set MYTEMPKEY=
+set MYTEMPVAL=
+echo final version [%PACKAGE_VERSION%]
 
 if not defined PACKAGE_VERSION (
   echo failed to parse version from manifest.json
@@ -40,7 +41,7 @@ if not defined PACKAGE_VERSION (
 )
 
 :: fail if release package already exists
-set PACKAGE_RELEASEFILE=%PACKAGE_RELEASEFILE_PREFIX%%PACKAGE_VERSION:~0,-2%.zip
+set PACKAGE_RELEASEFILE=%PACKAGE_RELEASEFILE_PREFIX%%PACKAGE_VERSION%.zip
 if not EXIST %PACKAGE_RELEASEFILE% goto continue01
 echo %PACKAGE_RELEASEFILE% already exists
 echo %PACKAGE_RELEASEFILE% already exists >> makerelease.log 2>&1
