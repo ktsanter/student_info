@@ -4,7 +4,7 @@
 
 body {
 	color: black;
-	background-color: #ddd;
+	background-color: #eee;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 13px;
 	margin-left: 12px;
@@ -27,7 +27,8 @@ body {
   border: 1px solid black;
   border-radius: 6px;
   padding: 2px 2px;
-  max-width: 40%;
+  display: inline-block;
+  min-width: 60%;
   margin-top: 10px;
 }
 
