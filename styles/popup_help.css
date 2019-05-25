@@ -38,9 +38,15 @@ body {
 }
 
 .topic-col {}
+.topic-col li:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.topic-col ul {
+  margin-top: 2px;
+}
 
 .topic-col0 {}
-
 .topic-col1 {}
 
 .topic-break {
