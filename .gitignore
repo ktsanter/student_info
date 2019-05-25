@@ -1,0 +1,7 @@
+# release files and release staging folder
+*.zip
+release_staging/
+
+# Honor .ignore
+*.ignore
+*.ignore.*
