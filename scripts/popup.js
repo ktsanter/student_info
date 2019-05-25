@@ -112,8 +112,7 @@ const app = function () {
       var requestResult  = await googleSheetWebAPI.webAppGet(
         apiInfo.studentinfo, 'all', 
         {
-          studentinfo_spreadsheetid: settings.configparams.studentspreadsheetid//,
-          //supplementarybadgeurl: 'https://drive.google.com/uc?id=1OdD1xRFX08CUSvxyGUQKKDH252CpCGuY'
+          studentinfo_spreadsheetid: settings.configparams.studentspreadsheetid
         }
       );
       
