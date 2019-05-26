@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------------
 // InfoDeck class
 //-----------------------------------------------------------------------------------
-// TODO: add font color support for badges using Font Awesome icons
+// TODO: add emoji support for badges
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
@@ -419,82 +419,79 @@ class InfoDeck {
     }  
     var badgeInfo = this._layout.badges[itemKey];
     var elemContainer = this._getContainer('decklayout-badges');
-    var imageURL = null;
-    var badgeicon = null;
+    var badgeDisplayInfo = null;
     
-    for (var i = 0; i < badgeInfo.values.length && imageURL == null && badgeicon == null; i++) {
+    for (var i = 0; i < badgeInfo.values.length && badgeDisplayInfo == null; i++) {
       var matchValInfo = badgeInfo.values[i];
 
       if (matchValInfo.value == '*' && itemValue != '') {
-        imageURL = matchValInfo.imageurl;
-        badgeicon = matchValInfo.badgeicon;
+        badgeDisplayInfo = matchValInfo.display;
         
       } else if (matchValInfo.value == itemValue) {
-        imageURL = matchValInfo.imageurl;
-        badgeicon = matchValInfo.badgeicon;
+        badgeDisplayInfo = matchValInfo.display;
         
       } else if (matchValInfo.value == '[else]') {
-        imageURL = matchValInfo.imageurl;
-        badgeicon = matchValInfo.badgeicon;
+        badgeDisplayInfo = matchValInfo.display;
       }
     }
     
-    var validBadge = (imageURL != null || badgeicon != null);
-    if (!validBadge) {
+    if (badgeDisplayInfo == null) {
       console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);  
       
-    } else {
-      var elemImage = null;
-      var ignoreImageURL = this._ignoreBadgeImage(imageURL);
-      var ignoreBadgeIcon = this._ignoreBadgeImage(badgeicon);
-
-      if (!(ignoreImageURL && ignoreBadgeIcon)) {
-        var elemImage = null;      
-        if (!ignoreImageURL) {
-          elemImage = this._renderBadgeImage('image', imageURL, badgeInfo.hovertext, itemValue);
-          
-        } else if (!ignoreBadgeIcon) {
-          elemImage = this._renderBadgeImage('icon', badgeicon, badgeInfo.hovertext, itemValue);
-        }
-
-        if (elemImage == null) {
-          console.log('ERROR: unable to render image for badge type "' + itemKey + '" value=' + itemValue);
-        } else {
-          elemContainer.appendChild( elemImage );
-        }
+    } else if (!this._ignoreBadgeImage(badgeDisplayInfo.type)) {
+      var elemImage = null;      
+      var elemImage = this._renderBadgeImage(badgeDisplayInfo.type, badgeDisplayInfo.data, badgeInfo.hovertext, itemValue, badgeDisplayInfo.color);
+        
+      if (elemImage == null) {
+        console.log('ERROR: unable to render image for badge type "' + itemKey + '" value=' + itemValue);
+      } else {
+        elemContainer.appendChild( elemImage );
       }
     }
   }
   
-  _renderBadgeImage(badgetype, badgeinfo, title, value) {
+  _renderBadgeImage(badgetype, badgeinfo, title, value, badgecolor) {
     var elemImageContainer = document.createElement('div');
-    
+    console.log(badgetype, badgeinfo);
+
     var hoverText = title;
     var splitTitle = hoverText.split('[value]');
     if (splitTitle.length > 1) {
       hoverText = splitTitle[0] + value + splitTitle[1];
     }
+    elemImageContainer.title = hoverText;
 
     if (badgetype == 'image') {
       elemImageContainer.classList.add('decklayout-badges-badgeimage');
       var elemImage = document.createElement('img');
       elemImage.src = badgeinfo;
-      elemImage.title = hoverText;
+      //elemImage.title = hoverText;
       elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
       elemImageContainer.appendChild(elemImage);
     
     } else if (badgetype == 'icon') {
       elemImageContainer.classList.add('decklayout-badges-badgeicon');
       var classList = 'fa-lg ' + badgeinfo;
-      elemImageContainer.appendChild(this._renderIcon(null, classList, hoverText));
+      elemImageContainer.appendChild(this._renderIcon(null, classList, null)); //hoverText));
       
-    } else {
-      console.log('  _renderBadgeImage: nothing to render');
+    } else if (badgetype == 'unicode') {
+      console.log(badgeinfo);
+      elemImageContainer.classList.add('decklayout-badges-badgetext');
+      elemImageContainer.innerHTML = String.fromCodePoint(...badgeinfo);
     }
+
+    if (badgecolor && badgecolor != null && badgecolor != '') {
+      elemImageContainer.style.color = badgecolor;
+    }
+    
     
     return elemImageContainer;
   }
-    
+      
+  _ignoreBadgeImage(badgeinfo) {
+    return (badgeinfo.slice(0,1) == '[' && badgeinfo.slice(-1) == ']');
+  }
+
   _renderIcon(id, classList, title) {
     var elemIcon = document.createElement('i');
     if (id != null && id != '') elemIcon.id = id;
@@ -506,11 +503,7 @@ class InfoDeck {
     
     return elemIcon;
   }
-  
-  _ignoreBadgeImage(badgeinfo) {
-    return (badgeinfo.slice(0,1) == '[' && badgeinfo.slice(-1) == ']');
-  }
-  
+    
   //--------------------------------------------------------------------------
   // notes editing
   //--------------------------------------------------------------------------

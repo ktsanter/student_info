@@ -111,10 +111,21 @@
   margin-right: 0.2em;
 }
 
+.decklayout-badges-badgeimage img{
+  width: 33px;
+  height: auto;
+}
+
 .decklayout-badges-badgeicon {
   display: inline-block;
   margin-right: 0.2em;
-  font-size: 1.7em;
+  font-size: 33px;
+  vertical-align: super;
+}
+
+.decklayout-badges-badgetext {
+  display: inline-block;
+  font-size: 33px;
   vertical-align: super;
 }
 
