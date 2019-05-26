@@ -3,12 +3,13 @@
 //-----------------------------------------------------------------------------------
 // InfoDeck class
 //-----------------------------------------------------------------------------------
+// TODO: add font color support for badges using Font Awesome icons
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
 class InfoDeck {
   constructor() {
-    this._version = '0.01.07';
+    this._version = '0.09';
   }
   
   //--------------------------------------------------------------------------------
@@ -29,6 +30,7 @@ class InfoDeck {
   //         notes: (optional, required if notes field type is used) callback for changes to notes type field
   //         isfuzzyequal: (optional) callback to compare two strings (indexlist value and entered value)
   //         help: (optional) callback for "help" menu option
+  //      }
   //    }
   //--------------------------------------------------------------------------------
   init(deckParams) {
@@ -41,8 +43,8 @@ class InfoDeck {
     this._outerappversion = deckParams.version;
     
     this._elemDeckContainer = null;
-    this._currentCardItems = null;
-    this._currentCardNumber = 0;
+    this._currentSubCardItems = null;
+    this._currentSubCardNumber = 0;
   }
 
   //--------------------------------------------------------------------------------
@@ -129,10 +131,7 @@ class InfoDeck {
     elemLink.href = "#";
     elemLink.id = 'hamburger';
     elemLink.addEventListener('click', e => InfoDeck._toggleHamburgerMenu(), false);
-    var elemIcon = document.createElement('i');
-    elemIcon.classList.add('fa');
-    elemIcon.classList.add('fa-bars');
-    elemLink.appendChild(elemIcon);
+    elemLink.appendChild( this._renderIcon(null, 'fa fa-bars', null) );
     elemContainer.appendChild(elemLink);
     
     return elemContainer;     
@@ -162,26 +161,23 @@ class InfoDeck {
   } 
 
   _renderAbout() {
+    var sOuterAppVersion = '<span class="decklayout-about-version">' + '(v' + this._outerappversion + ')</span>';
+    var sinfoDeckVersion = '<span class="decklayout-about-version">' + 'v' + this._version + '</span>';
+    var sFuzzyInputControlVersion = '<span class="decklayout-about-version">' + 'v' + this._fuzzyInputControl.version() + '</span>';
     var details = [
       'author: Kevin Santer', 
       'contact: ktsanter@gmail.com',
-      'InfoDeck: v' + this._version, 
-      'FuzzyInputControl: v' + this._fuzzyInputControl.version()
+      'uses: ' + 'InfoDeck ' + sinfoDeckVersion + ', ' + 'FuzzyInputControl ' + sFuzzyInputControlVersion
     ];
     var elemContainer = InfoDeck._renderContainer('infoDeckAbout', 'decklayout-about');
     
     var elemTitle = document.createElement('div');
     var elemLabel = document.createElement('div');
     elemLabel.classList.add('decklayout-about-label');
-    elemLabel.innerHTML = 'About <em>' + this._title + '</em> (v' + this._outerappversion + ')';
+    elemLabel.innerHTML = 'About <em>' + this._title + '</em> ' + sOuterAppVersion;
     elemTitle.appendChild(elemLabel);
 
-    var elemClose = document.createElement('i');
-    elemClose.classList.add('fa');
-    elemClose.classList.add('fa-close');
-    elemClose.classList.add('fa-lg');
-    elemClose.classList.add('decklayout-about-close');
-    elemClose.title = 'close "About"';
+    var elemClose = this._renderIcon(null, 'fa fa-close fa-lg decklayout-about-close', 'close "about"');
     elemClose.addEventListener('click', e => this._handleAboutCloseClick(e), false);
     elemTitle.appendChild(elemClose);
     elemContainer.appendChild(elemTitle);
@@ -212,13 +208,13 @@ class InfoDeck {
   // render card info
   //--------------------------------------------------------------------------
   _processSelection(indexvalue) {
-    this._currentCardItems = this._getMatchingItems(indexvalue);
-    if (this._currentCardItems.length == 0) {
+    this._currentSubCardItems = this._getMatchingItems(indexvalue);
+    if (this._currentSubCardItems.length == 0) {
       console.log('Error: internal error - failed to find item details for ' + indexvalue);
       return;
     }
         
-    this._currentCardNumber = 0;
+    this._currentSubCardNumber = 0;
     this._renderCardInfo();
   }
  
@@ -236,16 +232,16 @@ class InfoDeck {
     return matchingItems;
   }
 
-  _renderPreviousCardInfo() {
-    if (this._currentCardNumber > 0) {
-      this._currentCardNumber--;
+  _renderPreviousSubCardInfo() {
+    if (this._currentSubCardNumber > 0) {
+      this._currentSubCardNumber--;
       this._renderCardInfo();
     }
   }
   
-  _renderNextCardInfo() {
-    if (this._currentCardNumber < this._currentCardItems.length - 1) {
-      this._currentCardNumber++;
+  _rnderNextSubCardInfo() {
+    if (this._currentSubCardNumber < this._currentSubCardItems.length - 1) {
+      this._currentSubCardNumber++;
       this._renderCardInfo();
     }
   }
@@ -257,7 +253,7 @@ class InfoDeck {
     this._getContainer('decklayout-cardlabel').innerHTML = '';
     this._getContainer('decklayout-badges').style.minHeight = '3em';
     
-    var item = this._currentCardItems[this._currentCardNumber];
+    var item = this._currentSubCardItems[this._currentSubCardNumber];
     for (var key in item) {
       this._renderCardItem(item, key);
     }
@@ -312,12 +308,7 @@ class InfoDeck {
     elemLabel.innerHTML = title;
     elemLabelContainer.appendChild(elemLabel);
     
-    var elemIcon = document.createElement('i');
-    elemIcon.classList.add('fa');
-    elemIcon.classList.add('fa-plus');
-    elemIcon.classList.add('decklayout-notes-plus');
-    elemIcon.id = 'addTitle';
-    elemIcon.title = 'add note';
+    var elemIcon = this._renderIcon('addTitle', 'fa fa-plus decklayout-notes-plus', 'add note');
     elemIcon.addEventListener('click', e => this._handleAddNote(e), false);
     elemLabelContainer.appendChild(elemIcon);
     
@@ -358,31 +349,15 @@ class InfoDeck {
     elemDate.innerHTML = '02/14/2019';
     elemContainer.appendChild(elemDate);
     
-    var elemCheck = document.createElement('i');
-    elemCheck.classList.add('fa');
-    elemCheck.classList.add('fa-check');
-    elemCheck.classList.add('fa-lg');
-    elemCheck.classList.add('decklayout-notes-editing-icon');
-    elemCheck.title = 'save changes';
+    var elemCheck = this._renderIcon(null, 'fa fa-check fa-lg decklayout-notes-editing-icon', 'save changes');
     elemCheck.addEventListener('click', e => this._handleEditingCheckClick(e), false);
     elemContainer.appendChild(elemCheck);
 
-    var elemDiscard = document.createElement('i');
-    elemDiscard.classList.add('fa');
-    elemDiscard.classList.add('fa-close');
-    elemDiscard.classList.add('fa-lg');
-    elemDiscard.classList.add('decklayout-notes-editing-icon');
-    elemDiscard.title = 'discard changes';
+    var elemDiscard = this._renderIcon(null, 'fa fa-close fa-lg decklayout-notes-editing-icon', 'discard changes');
     elemDiscard.addEventListener('click', e => this._handleEditingDiscardClick(e), false);
     elemContainer.appendChild(elemDiscard);
     
-    var elemTrash = document.createElement('i');
-    elemTrash.classList.add('fa');
-    elemTrash.classList.add('fa-trash');
-    elemTrash.classList.add('fa-lg');
-    elemTrash.classList.add('decklayout-notes-editing-icon');
-    elemTrash.title = 'delete note';
-    elemTrash.id = 'deleteNoteIcon';
+    var elemTrash = this._renderIcon('deleteNoteIcon', 'fa fa-trash fa-lg decklayout-notes-editing-icon', 'delete note');
     elemTrash.addEventListener('click', e => this._handleEditingTrashClick(e), false);
     elemContainer.appendChild(elemTrash);
 
@@ -398,16 +373,11 @@ class InfoDeck {
   
   _renderLabel(label) {
     var elemContainer = this._getContainer('decklayout-cardlabel');
-    var numCards = this._currentCardItems.length;
+    var numCards = this._currentSubCardItems.length;
 
-    if (numCards > 0 && this._currentCardNumber > 0) {
-      var elemPrev = document.createElement('i');
-      elemPrev.classList.add('decklayout-label-control-left');
-      elemPrev.classList.add('fa');
-      elemPrev.classList.add('fa-angle-double-left');
-      elemPrev.classList.add('fa-lg');
-      elemPrev.title = 'previous card';    
-      elemPrev.addEventListener('click', e => this._renderPreviousCardInfo(e), false);
+    if (numCards > 0 && this._currentSubCardNumber > 0) {
+      var elemPrev = this._renderIcon(null, 'fa fa-angle-double-left fa-lg decklayout-label-control-left', 'previous card');      
+      elemPrev.addEventListener('click', e => this._renderPreviousSubCardInfo(e), false);
       elemContainer.appendChild(elemPrev);
     }
     
@@ -415,14 +385,9 @@ class InfoDeck {
     elemLabel.innerHTML = label;
     elemContainer.appendChild(elemLabel);
     
-    if (numCards > 0 && this._currentCardNumber < numCards - 1) {
-      var elemNext = document.createElement('i');
-      elemNext.classList.add('decklayout-label-control-right');
-      elemNext.classList.add('fa');
-      elemNext.classList.add('fa-angle-double-right');
-      elemNext.classList.add('fa-lg');
-      elemNext.title = 'next card';
-      elemNext.addEventListener('click', e => this._renderNextCardInfo(e), false);
+    if (numCards > 0 && this._currentSubCardNumber < numCards - 1) {
+      var elemNext = this._renderIcon(null, 'fa fa-angle-double-right fa-lg decklayout-label-control-right', 'next card');
+      elemNext.addEventListener('click', e => this._rnderNextSubCardInfo(e), false);
       elemContainer.appendChild(elemNext);
     }
   }
@@ -455,33 +420,54 @@ class InfoDeck {
     var badgeInfo = this._layout.badges[itemKey];
     var elemContainer = this._getContainer('decklayout-badges');
     var imageURL = null;
+    var badgeicon = null;
     
-    for (var i = 0; i < badgeInfo.values.length && imageURL == null; i++) {
+    for (var i = 0; i < badgeInfo.values.length && imageURL == null && badgeicon == null; i++) {
       var matchValInfo = badgeInfo.values[i];
 
       if (matchValInfo.value == '*' && itemValue != '') {
         imageURL = matchValInfo.imageurl;
+        badgeicon = matchValInfo.badgeicon;
         
       } else if (matchValInfo.value == itemValue) {
         imageURL = matchValInfo.imageurl;
+        badgeicon = matchValInfo.badgeicon;
         
       } else if (matchValInfo.value == '[else]') {
         imageURL = matchValInfo.imageurl;
+        badgeicon = matchValInfo.badgeicon;
       }
     }
     
-    if (imageURL == null ) {
-      console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);
+    var validBadge = (imageURL != null || badgeicon != null);
+    if (!validBadge) {
+      console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);  
       
-    } else if (imageURL != '[no image]') {
-      elemContainer.appendChild( this._renderBadgeImage(imageURL, badgeInfo.hovertext, itemValue) );
+    } else {
+      var elemImage = null;
+      var ignoreImageURL = this._ignoreBadgeImage(imageURL);
+      var ignoreBadgeIcon = this._ignoreBadgeImage(badgeicon);
+
+      if (!(ignoreImageURL && ignoreBadgeIcon)) {
+        var elemImage = null;      
+        if (!ignoreImageURL) {
+          elemImage = this._renderBadgeImage('image', imageURL, badgeInfo.hovertext, itemValue);
+          
+        } else if (!ignoreBadgeIcon) {
+          elemImage = this._renderBadgeImage('icon', badgeicon, badgeInfo.hovertext, itemValue);
+        }
+
+        if (elemImage == null) {
+          console.log('ERROR: unable to render image for badge type "' + itemKey + '" value=' + itemValue);
+        } else {
+          elemContainer.appendChild( elemImage );
+        }
+      }
     }
   }
   
-  _renderBadgeImage(imgURL, title, value) {
-    var elemImage = document.createElement('img');
-    elemImage.classList.add('decklayout-badges-badge');
-    elemImage.src = imgURL;
+  _renderBadgeImage(badgetype, badgeinfo, title, value) {
+    var elemImageContainer = document.createElement('div');
     
     var hoverText = title;
     var splitTitle = hoverText.split('[value]');
@@ -489,10 +475,40 @@ class InfoDeck {
       hoverText = splitTitle[0] + value + splitTitle[1];
     }
 
-    elemImage.title = hoverText;
-    elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
+    if (badgetype == 'image') {
+      elemImageContainer.classList.add('decklayout-badges-badgeimage');
+      var elemImage = document.createElement('img');
+      elemImage.src = badgeinfo;
+      elemImage.title = hoverText;
+      elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
+      elemImageContainer.appendChild(elemImage);
     
-    return elemImage;
+    } else if (badgetype == 'icon') {
+      elemImageContainer.classList.add('decklayout-badges-badgeicon');
+      var classList = 'fa-lg ' + badgeinfo;
+      elemImageContainer.appendChild(this._renderIcon(null, classList, hoverText));
+      
+    } else {
+      console.log('  _renderBadgeImage: nothing to render');
+    }
+    
+    return elemImageContainer;
+  }
+    
+  _renderIcon(id, classList, title) {
+    var elemIcon = document.createElement('i');
+    if (id != null && id != '') elemIcon.id = id;
+    var arrClasses = classList.split(' ');
+    for (var i = 0; i < arrClasses.length; i++) {
+      elemIcon.classList.add(arrClasses[i]);
+    }
+    if (title != null && title != '') elemIcon.title = title;
+    
+    return elemIcon;
+  }
+  
+  _ignoreBadgeImage(badgeinfo) {
+    return (badgeinfo.slice(0,1) == '[' && badgeinfo.slice(-1) == ']');
   }
   
   //--------------------------------------------------------------------------
@@ -538,17 +554,17 @@ class InfoDeck {
       var fullNoteText = noteDate + '|' + noteText;
       
       var newNotes = this._modifyNotes(fullNoteText, noteIndex);
-      this._currentCardItems[this._currentCardNumber].notes = newNotes;
+      this._currentSubCardItems[this._currentSubCardNumber].notes = newNotes;
       
-      var cardNumber = this._currentCardNumber;
-      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
+      var cardNumber = this._currentSubCardNumber;
+      var deckIndexVal = this._currentSubCardItems[cardNumber][this._indexfield];
       this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
       this._renderCardInfo();
     }
   }
   
   _modifyNotes(noteText, noteIndex) {
-     var origNotes = this._currentCardItems[this._currentCardNumber].notes;
+     var origNotes = this._currentSubCardItems[this._currentSubCardNumber].notes;
      var arrNotes = origNotes.split('\n');
      if (noteIndex < arrNotes.length) {
        arrNotes[noteIndex] = noteText;
@@ -561,22 +577,22 @@ class InfoDeck {
   _deleteNote() {
     var msg = 'This note will be permanently deleted\n\nPress OK to confirm';
     if (confirm(msg)) {
-      var cardNumber = this._currentCardNumber;
-      var arrOrigNotes = this._currentCardItems[cardNumber].notes.split('\n');
+      var cardNumber = this._currentSubCardNumber;
+      var arrOrigNotes = this._currentSubCardItems[cardNumber].notes.split('\n');
       var noteIndex = document.getElementById('notesEditingWorkingIndex').innerHTML;      
       var arrNewNotes = [];
       for (var i = 0; i < arrOrigNotes.length; i++) {
         if (i != noteIndex ) arrNewNotes = arrNewNotes.concat([arrOrigNotes[i]]);
       }
       var newNotes = arrNewNotes.join('\n');
-      this._currentCardItems[cardNumber].notes = newNotes;
+      this._currentSubCardItems[cardNumber].notes = newNotes;
       
       document.getElementById('notesSelect').disabled = false;
       document.getElementById('notesEditing').style.display = 'none';
 
       this._renderCardInfo();
       
-      var deckIndexVal = this._currentCardItems[cardNumber][this._indexfield];
+      var deckIndexVal = this._currentSubCardItems[cardNumber][this._indexfield];
       this._callbacks.notes({deckindexval: deckIndexVal, cardnumber: cardNumber, notes: newNotes});
     }
   }

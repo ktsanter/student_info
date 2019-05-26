@@ -1,6 +1,6 @@
 "use strict";
 //-----------------------------------------------------------------------------------
-// Student info Chrome extension
+// Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
 // TODO: 
 //-----------------------------------------------------------------------------------
@@ -13,6 +13,7 @@ const app = function () {
   };
   
   const settings = {
+    appName: 'Student infoDeck',
     helpURL: 'https://ktsanter.github.io/student_info/popup_help.html',
     configparams: null,
     deck: null,
@@ -138,7 +139,7 @@ const app = function () {
       var indexfield = 'fullname';
       
       deckParams = {
-        title: 'Student info',
+        title: settings.appName,
         version: chrome.runtime.getManifest().version,
         indexlist: _makeIndexList(indexfield, settings.studentandlayoutdata.studentinfo),
         indexfield: indexfield,

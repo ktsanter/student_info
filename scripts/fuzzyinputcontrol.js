@@ -14,7 +14,7 @@ class FuzzyInputControl {
   // isFuzzyEqual: (optional) callback for fuzzy comparison between 2 strings
   
   constructor (indexList, handleSelection, isFuzzyEqual) {
-    this._version = '0.01.01';
+    this._version = '0.02';
     this._indexList = indexList;
     this._handleSelectionCallback = handleSelection;
     this._isFuzzyEqualCallback = isFuzzyEqual;

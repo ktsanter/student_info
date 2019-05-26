@@ -32,7 +32,7 @@ FOR /F "tokens=1,2 delims=:" %%i IN ('find "version" manifest.json') DO (
 )
 set MYTEMPKEY=
 set MYTEMPVAL=
-echo final version [%PACKAGE_VERSION%]
+::echo final version [%PACKAGE_VERSION%]
 
 if not defined PACKAGE_VERSION (
   echo failed to parse version from manifest.json
