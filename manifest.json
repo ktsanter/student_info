@@ -12,7 +12,7 @@
   "browser_action": {
     "default_icon": "sid_16_rounded.png",
     "default_popup": "popup.html",
-    "default_title": "Track student information"
+    "default_title": "Student infoDeck"
   },
   
   "permissions": [
