@@ -112,21 +112,22 @@
 }
 
 .decklayout-badges-badgeimage img{
-  width: 33px;
+  width: 30px;
   height: auto;
+  vertical-align: middle;
 }
 
 .decklayout-badges-badgeicon {
   display: inline-block;
   margin-right: 0.2em;
-  font-size: 33px;
-  vertical-align: super;
+  font-size: 18px;
+  vertical-align: middle;
 }
 
-.decklayout-badges-badgetext {
+.decklayout-badges-badgeunicode {
   display: inline-block;
-  font-size: 33px;
-  vertical-align: super;
+  font-size: 24px;
+  vertical-align: middle;
 }
 
 .decklayout-notes {
@@ -160,7 +161,7 @@
 
 .decklayout-notes-editing-icon {
   float: right;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 .decklayout-notes-editing-input {

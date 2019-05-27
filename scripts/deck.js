@@ -177,7 +177,7 @@ class InfoDeck {
     elemLabel.innerHTML = 'About <em>' + this._title + '</em> ' + sOuterAppVersion;
     elemTitle.appendChild(elemLabel);
 
-    var elemClose = this._renderIcon(null, 'fa fa-close fa-lg decklayout-about-close', 'close "about"');
+    var elemClose = this._renderIcon(null, 'fas fa-times fa-lg decklayout-about-close', 'close "about"');
     elemClose.addEventListener('click', e => this._handleAboutCloseClick(e), false);
     elemTitle.appendChild(elemClose);
     elemContainer.appendChild(elemTitle);
@@ -210,7 +210,7 @@ class InfoDeck {
   _processSelection(indexvalue) {
     this._currentSubCardItems = this._getMatchingItems(indexvalue);
     if (this._currentSubCardItems.length == 0) {
-      console.log('Error: internal error - failed to find item details for ' + indexvalue);
+      console.log('ERROR: internal error - failed to find item details for ' + indexvalue);
       return;
     }
         
@@ -353,7 +353,7 @@ class InfoDeck {
     elemCheck.addEventListener('click', e => this._handleEditingCheckClick(e), false);
     elemContainer.appendChild(elemCheck);
 
-    var elemDiscard = this._renderIcon(null, 'fa fa-close fa-lg decklayout-notes-editing-icon', 'discard changes');
+    var elemDiscard = this._renderIcon(null, 'fas fa-times fa-lg decklayout-notes-editing-icon', 'discard changes');
     elemDiscard.addEventListener('click', e => this._handleEditingDiscardClick(e), false);
     elemContainer.appendChild(elemDiscard);
     
@@ -452,7 +452,6 @@ class InfoDeck {
   
   _renderBadgeImage(badgetype, badgeinfo, title, value, badgecolor) {
     var elemImageContainer = document.createElement('div');
-    console.log(badgetype, badgeinfo);
 
     var hoverText = title;
     var splitTitle = hoverText.split('[value]');
@@ -465,19 +464,22 @@ class InfoDeck {
       elemImageContainer.classList.add('decklayout-badges-badgeimage');
       var elemImage = document.createElement('img');
       elemImage.src = badgeinfo;
-      //elemImage.title = hoverText;
       elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
       elemImageContainer.appendChild(elemImage);
     
     } else if (badgetype == 'icon') {
       elemImageContainer.classList.add('decklayout-badges-badgeicon');
       var classList = 'fa-lg ' + badgeinfo;
-      elemImageContainer.appendChild(this._renderIcon(null, classList, null)); //hoverText));
+      var elemIcon = this._renderIcon(null, classList, null);
+      elemIcon.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
+      elemImageContainer.appendChild(elemIcon);
       
     } else if (badgetype == 'unicode') {
-      console.log(badgeinfo);
-      elemImageContainer.classList.add('decklayout-badges-badgetext');
-      elemImageContainer.innerHTML = String.fromCodePoint(...badgeinfo);
+      elemImageContainer.classList.add('decklayout-badges-badgeunicode');
+      var elemUni = document.createElement('div');
+      elemUni.innerHTML = String.fromCodePoint(...badgeinfo);
+      elemUni.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
+      elemImageContainer.appendChild(elemUni);
     }
 
     if (badgecolor && badgecolor != null && badgecolor != '') {
@@ -680,7 +682,7 @@ class InfoDeck {
   }
   
   _handleBadgeDoubleClick(e) {
-    InfoDeck._copyToClipboard(e.target.title);
+    InfoDeck._copyToClipboard(e.target.parentNode.title);
   }
   
   //---------------------------------------
