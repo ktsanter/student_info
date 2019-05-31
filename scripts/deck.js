@@ -1,15 +1,13 @@
-
 "use strict";
 //-----------------------------------------------------------------------------------
 // InfoDeck class
 //-----------------------------------------------------------------------------------
-// TODO: add emoji support for badges
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
 class InfoDeck {
   constructor() {
-    this._version = '0.09';
+    this._version = '0.13';
   }
   
   //--------------------------------------------------------------------------------
@@ -277,7 +275,7 @@ class InfoDeck {
       this._renderGenericItem(fieldTitle, fieldValue);
       
     } else if (fieldType.slice(0, 6) == 'badge_') {
-      this._renderBadge(fieldType, fieldValue);
+      this._renderBadge(fieldType, fieldValue, key);
       
     } else if (fieldType == 'date') {
       this._renderGenericItem(fieldTitle, InfoDeck._formatDate(fieldValue));
@@ -412,7 +410,13 @@ class InfoDeck {
     elemContainer.appendChild(elemItem);
   }
   
-  _renderBadge(itemKey, itemValue) {
+  _renderBadge(itemKey, itemValue, fieldName) {
+    var itemKeyParam = itemKey.match(/\(*.\)/);
+    if (itemKeyParam != null) {
+      itemKey = itemKey.replace(itemKeyParam[0], '');
+      itemKeyParam = itemKeyParam[0].slice(1, -1);
+    }
+
     if (!(itemKey in this._layout.badges)) {
       console.log('ERROR: unrecognized badge type "' + itemKey + '"');
       return;
@@ -420,13 +424,39 @@ class InfoDeck {
     var badgeInfo = this._layout.badges[itemKey];
     var elemContainer = this._getContainer('decklayout-badges');
     var badgeDisplayInfo = null;
-    
+
     for (var i = 0; i < badgeInfo.values.length && badgeDisplayInfo == null; i++) {
       var matchValInfo = badgeInfo.values[i];
 
       if (matchValInfo.value == '*' && itemValue != '') {
         badgeDisplayInfo = matchValInfo.display;
         
+      } else if (matchValInfo.value == '[late>]') {
+        if (InfoDeck._isValidDate(itemValue)) {
+          console.log('checking late...');
+          if (InfoDeck._compareDateToNow(itemValue) < 0) {
+            badgeDisplayInfo = matchValInfo.display;
+            badgeInfo.hovertext = fieldName + ' is late (due [date])';
+          }
+        } 
+        
+      } else if (matchValInfo.value == '[late=]') {
+        if (InfoDeck._isValidDate(itemValue)) {
+          if (InfoDeck._compareDateToNow(itemValue) == 0) {
+            badgeDisplayInfo = matchValInfo.display;
+            badgeInfo.hovertext = fieldName + ' is due today: [date]';
+          }
+        } 
+
+      } else if (matchValInfo.value == '[window]') {
+        if (InfoDeck._isValidDate(itemValue)) {
+          console.log('checking window...');
+          if (InfoDeck._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
+            badgeDisplayInfo = matchValInfo.display;
+            badgeInfo.hovertext = fieldName + ' is due soon: [date]';
+          }
+        } 
+
       } else if (matchValInfo.value == itemValue) {
         badgeDisplayInfo = matchValInfo.display;
         
@@ -434,7 +464,7 @@ class InfoDeck {
         badgeDisplayInfo = matchValInfo.display;
       }
     }
-    
+        
     if (badgeDisplayInfo == null) {
       console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);  
       
@@ -454,10 +484,9 @@ class InfoDeck {
     var elemImageContainer = document.createElement('div');
 
     var hoverText = title;
-    var splitTitle = hoverText.split('[value]');
-    if (splitTitle.length > 1) {
-      hoverText = splitTitle[0] + value + splitTitle[1];
-    }
+    hoverText = hoverText.replace(/\[value\]/g, value);
+    hoverText = hoverText.replace(/\[date\]/g, InfoDeck._formatDate(value));
+    
     elemImageContainer.title = hoverText;
 
     if (badgetype == 'image') {
@@ -485,7 +514,6 @@ class InfoDeck {
     if (badgecolor && badgecolor != null && badgecolor != '') {
       elemImageContainer.style.color = badgecolor;
     }
-    
     
     return elemImageContainer;
   }
@@ -689,7 +717,7 @@ class InfoDeck {
   // clipboard functions
   //----------------------------------------
   static _copyToClipboard(txt) {
-		var clipboardElement = document.getElementById('text_for_clipboard');//page.textforclipboard;
+		var clipboardElement = document.getElementById('text_for_clipboard');
 		clipboardElement.value = txt;
 		clipboardElement.style.display = 'block';
 		clipboardElement.select();
@@ -719,17 +747,49 @@ class InfoDeck {
   //---------------------------------------
   // utility functions
   //----------------------------------------
+  static _isValidDate(str) {
+    var d = new Date(str);
+    return !isNaN(d);
+  }
+  
   static _formatDate(theDate) {
-    var formattedDate = '';
+    var formattedDate = theDate;
     
-    if (theDate != null & theDate != '') {
-      var objDate = new Date(theDate);
-      var day = ("00" + objDate.getDate()).slice(-2);
-      var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
-      var year = (objDate.getFullYear() + '').slice(-2);
-      formattedDate = month + "/" + day + "/" + year;
+    if (InfoDeck._isValidDate(theDate)) {
+      formattedDate = '';
+      if (theDate != null & theDate != '') {
+        var objDate = new Date(theDate);
+        var day = ("00" + objDate.getDate()).slice(-2);
+        var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
+        var year = (objDate.getFullYear() + '').slice(-2);
+        formattedDate = month + "/" + day + "/" + year;
+      }
     }
     
     return formattedDate;
-  }    
+  }
+  
+  static _compareDateToNow(date, daysInWindow) {
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    var parsedDate = new Date(Date.parse(date));
+    var now = new Date();
+    
+    var utc1 = Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+    var utc2 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+    var daysLate = Math.floor((utc2 - utc1) / _MS_PER_DAY);
+    if (!daysInWindow || daysInWindow < 0) daysInWindow = 0;
+    
+    var result = 1;
+    if (daysLate > 0) {
+      result = -1;
+    } else if ((daysLate + daysInWindow) >= 0) {
+      result = 0;
+    }
+    
+    console.log('  ' + parsedDate + ' ' + now + ' window=' + daysInWindow + ' daysLate=' + daysLate + 'w+l=' + (daysLate + daysInWindow) + ' result=' + result);
+    
+    return result;
+  }
 }

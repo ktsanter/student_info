@@ -76,6 +76,12 @@ topic-col li:not(:last-child) {
   float: left;
 }
 
+.badge-images img {
+  width: 33px;
+  height: auto;
+  vertical-align: middle;
+}
+
 .after-images {
   margin-top: 10px;
 }

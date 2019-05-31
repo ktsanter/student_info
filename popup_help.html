@@ -58,7 +58,7 @@
       <div class="topic-col topic-col1">
         The source of the student information must be a Google Sheet
         and you are welcome to get started by copying 
-        <a href="https://drive.google.com/open?id=1emPTrguoN1EaUYcZ1c4aqz4udAcUpqvFdh0RghxXhHA">this one</a>.
+        <a href="https://drive.google.com/uc?id=1emPTrguoN1EaUYcZ1c4aqz4udAcUpqvFdh0RghxXhHA">this one</a>.
         <br><br>
         The spreadsheet must follow these guidelines:
         <ul>
@@ -109,42 +109,11 @@
         <ul>
           <li> 
             <div class="badge-group">
-              <div><span class="item-label"> badge_grade </span> - for values of 9, 10, 11, and 12 these badges will be shown:</div>
+              <div><span class="item-label"> badge_info, badge_caution, badge_danger</span> - if there is a non-blank value the corresponding badge will be shown:</div>
               <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1O2Rw7absj3gD5VJkawDFVHiuq73BJgcd" title="grade 9">
-                <img src="https://drive.google.com/uc?id=11h0m8nc2L5n2govt-p33_-7W4V7qe_dz" title="grade 10">
-                <img src="https://drive.google.com/uc?id=1xTxYNltbSoeWXHxVlR35mipfbsZHuGPB" title="grade 11">
-                <img src="https://drive.google.com/uc?id=1nusYot6b8NM34UgE4u_eWpuFlCTNnffj" title="grade 12">
-              </div>
-              <div class="after-images">and the hover text will show the grade level</div>
-            </div>
-          </li>
-          
-          <li> 
-            <div class="badge-group">
-              <div><span class="item-label"> badge_iep</span> - if the value is TRUE this badge will be shown:</div>
-              <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=14xQrchhgevZg4dVQ9s3eel7zk0UVwQso" title="has IEP">
-              </div>
-              <div class="after-images">and the hover text will say "has IEP"</div>
-            </div>
-          </li>
-          
-          <li> 
-            <div class="badge-group">
-              <div><span class="item-label"> badge_504</span> - if the value is TRUE this badge will be shown:</div>
-              <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1jTYvMJxBDBqJJEppYe4B-xf1-zw_eaxp" title="has 504">
-              </div>
-              <div class="after-images"> and the hover text will say "has 504"</div>
-            </div>
-          </li>
-          
-          <li> 
-            <div class="badge-group">
-              <div><span class="item-label"> badge_earlygrade</span> - if there is a non-blank value this badge will be shown: </div>
-              <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1XiKmXzIWQwO9r__L6jg9Wqc4jLrZZbMZ" title="5/20/2019">
+                <img src="https://drive.google.com/uc?id=1W3r-2wOJ3SXHGh5h-lmXtrrsCF9vEvNt" title="5/20/2019">
+                <img src="https://drive.google.com/uc?id=1ACFVgswmVhIjAbbUmUn0mcizXviChncd" title="5/20/2019">
+                <img src="https://drive.google.com/uc?id=1l3BFjLP7TqGYa5WcO5K-wLDOtv2HVx2d" title="5/20/2019">
               </div>
               <div class="after-images"> and the hover text will show whatever the data value is</div>
             </div>
@@ -152,9 +121,57 @@
          
           <li> 
             <div class="badge-group">
-              <div><span class="item-label"> badge_nowelcomeletter</span> - if the value is TRUE this badge will be shown:</div>
+              <div>
+                <span class="item-label"> badge_latedanger, badge_latecaution</span> 
+                  - the value must be a date.  If the date is later than the current date (or equal for <span class="item-label"> badge_latecaution</span>) the corresponding badge will be shown:
+                </div>
               <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1vDofR1JZrIqRdpjcgX_Yrj2zNx-2Xerw" title="welcome letter not sent yet">
+                <img src="https://drive.google.com/uc?id=1ACFVgswmVhIjAbbUmUn0mcizXviChncd" title="5/20/2019">
+                <img src="https://drive.google.com/uc?id=1l3BFjLP7TqGYa5WcO5K-wLDOtv2HVx2d" title="5/20/2019">
+              </div>
+              <div class="after-images"> and the hover text will show either "XXX is late (due nn/nn/nnnn)" or "XXX is due today : nn/nn/nnnn" where XXX is the column title</div>
+            </div>
+         </li>
+         
+          <li> 
+            <div class="badge-group">
+              <div><span class="item-label"> badge_grade </span> - for values of 9, 10, 11, and 12 these badges will be shown:</div>
+              <div class="badge-images">
+                <img src="https://drive.google.com/uc?id=1aMz_lmJhUUKdo0UwXFGO7NlNxmTMbkMt" title="grade 9">
+                <img src="https://drive.google.com/uc?id=19i7HxgFkWhdS3nWx9EqKVHJR-rAynavF" title="grade 10">
+                <img src="https://drive.google.com/uc?id=1qUFgGFMtfFJ4ggh1lZDge61143pwDJ2W" title="grade 11">
+                <img src="https://drive.google.com/uc?id=1NL67t2m0ty-BdfB2OD_1hpNr5GfCuaTs" title="grade 12">
+              </div>
+              <div class="after-images">and the hover text will show the grade level</div>
+            </div>
+          </li>
+          
+          <li> 
+            <div class="badge-group">
+              <div><span class="item-label"> badge_iep, badge_504 </span> - if the value is TRUE the relevant badge will be shown:</div>
+              <div class="badge-images">
+                <img src="https://drive.google.com/uc?id=1JFc8Z0aOnNRQSg6YhtacqWVT8mu3t9hD" title="has IEP">
+                <img src="https://drive.google.com/uc?id=1FaidNWPk67edZfeDEuQgEAHFRB54svC2" title="has 504">
+              </div>
+              <div class="after-images">and the hover text will say "has IEP" or "has 504"</div>
+            </div>
+          </li>
+                    
+          <li> 
+            <div class="badge-group">
+              <div><span class="item-label"> badge_earlygrade</span> - if there is a non-blank value this badge will be shown: </div>
+              <div class="badge-images">
+                <img src="https://drive.google.com/uc?id=1YDeklZiAMcBYk6j0hrb9xnr3J1mRA8Ac" title="5/20/2019">
+              </div>
+              <div class="after-images"> and the hover text will show whatever the data value is</div>
+            </div>
+         </li>
+         
+          <li> 
+            <div class="badge-group">
+              <div><span class="item-label"> badge_nowelcomeletter</span> - if there is a non-blank value this badge will be shown:</div>
+              <div class="badge-images">
+                <img src="https://drive.google.com/uc?id=1yLF_Pd4mhus153Tyb3n2tMAlTBA6Kd38" title="welcome letter not sent yet">
               </div>
               <div class="after-images"> and the hover text will say "welcome letter not sent yet"</div>
             </div>
@@ -164,31 +181,11 @@
             <div class="badge-group">
               <div><span class="item-label"> badge_multiplementors</span> - if the value is TRUE this badge will be shown:</div>
               <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1rgIJaWF6QZmgbFa4VXPZ3Oos_HXA87fM" title="multiple mentors">
+                <img src="https://drive.google.com/uc?id=1AYxysiMTt-qBap_BFHAcbYFZ8-Cldg22" title="multiple mentors">
               </div>
               <div class="after-images"> and the hover text will say "multiple mentors"</div>
             </div>
           </li>
-          
-          <li> 
-            <div class="badge-group">
-              <div><span class="item-label"> badge_info</span> - if there is a non-blank value this badge will be shown:</div>
-              <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1oCdZctdsDdhY1vqLVoFy5UJYDL3JnrA0" title="5/20/2019">
-              </div>
-              <div class="after-images"> and the hover text will show whatever the data value is</div>
-            </div>
-         </li>
-         
-          <li> 
-            <div class="badge-group">
-              <div><span class="item-label"> badge_alert</span> - if there is a non-blank value this badge will be shown:</div>
-              <div class="badge-images">
-                <img src="https://drive.google.com/uc?id=1xN8ObHPHEakMUSjb-yOqSfcCk5MOlbLO" title="5/20/2019">
-              </div>
-              <div class="after-images"> and the hover text will show whatever the data value is</div>
-            </div>
-         </li>
         </ul>
       </div>
     </div>
