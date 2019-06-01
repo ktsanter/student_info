@@ -2,6 +2,11 @@
 //-----------------------------------------------------------------------------------
 // InfoDeck class
 //-----------------------------------------------------------------------------------
+// TODO: figure out badge ordering
+// TODO: add progress check badges, like early grade with windowed dates
+// TODO: custom callbacks for addional menu options ?
+// TODO: menu spacer options ?
+// TODO: new date window images ala https://drive.google.com/open?id=1_vgLe_kj7AgpmOJh0sH0mzzIMga8GueW
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
@@ -433,7 +438,6 @@ class InfoDeck {
         
       } else if (matchValInfo.value == '[late>]') {
         if (InfoDeck._isValidDate(itemValue)) {
-          console.log('checking late...');
           if (InfoDeck._compareDateToNow(itemValue) < 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is late (due [date])';
@@ -450,7 +454,7 @@ class InfoDeck {
 
       } else if (matchValInfo.value == '[window]') {
         if (InfoDeck._isValidDate(itemValue)) {
-          console.log('checking window...');
+          console.log(itemKeyParam);
           if (InfoDeck._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due soon: [date]';
@@ -787,9 +791,7 @@ class InfoDeck {
     } else if ((daysLate + daysInWindow) >= 0) {
       result = 0;
     }
-    
-    console.log('  ' + parsedDate + ' ' + now + ' window=' + daysInWindow + ' daysLate=' + daysLate + 'w+l=' + (daysLate + daysInWindow) + ' result=' + result);
-    
+       
     return result;
   }
 }
