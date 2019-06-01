@@ -1,6 +1,6 @@
 define(function (require) {
-  require('fuzzyinputcontrol');
-  require('input_test');
-  
+  require('report');
+  require('google_webapp_interface');
+
   document.addEventListener('DOMContentLoaded', app.init());
 });

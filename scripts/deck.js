@@ -12,7 +12,7 @@
 
 class InfoDeck {
   constructor() {
-    this._version = '0.13';
+    this._version = '0.14';
   }
   
   //--------------------------------------------------------------------------------
@@ -28,11 +28,9 @@ class InfoDeck {
   //        badges: {badgename: {hovertext: string, values: [{value: string, imageurl: url, ...]}, ...}
   //      itemdetails: [ {fieldname: fieldval}, ...]
   //      callbacks: {
-  //         config: func - callback for "configuration" menu option
-  //         opendatasource: (optional) callback for "open data source" menu option
+  //         menu: array of menu options e.g. [{label: 'configure', callback: callbackfunc}, ...]
   //         notes: (optional, required if notes field type is used) callback for changes to notes type field
-  //         isfuzzyequal: (optional) callback to compare two strings (indexlist value and entered value)
-  //         help: (optional) callback for "help" menu option
+  //         isfuzzyequal: (optional) callback to compare two strings - indexlist value and entered value
   //      }
   //    }
   //--------------------------------------------------------------------------------
@@ -47,7 +45,7 @@ class InfoDeck {
     
     this._elemDeckContainer = null;
     this._currentSubCardItems = null;
-    this._currentSubCardNumber = 0;
+    this._currentSubCardNumber = 0;   
   }
 
   //--------------------------------------------------------------------------------
@@ -91,12 +89,6 @@ class InfoDeck {
   }
   
   _renderNavigation(title) {
-    var navLinks = [
-      {id: 'menuConfigure', label: 'configure'},
-      {id: 'menuOpenDataSource',  label: 'open data source', depends: this._callbacks.opendatasource},
-      {id: 'menuAbout', label: 'about'},
-      {id: 'menuHelp', label: 'help', depends: this._callbacks.help}
-    ];
     var elemContainer = document.createElement('div');
     elemContainer.classList.add('decklayout-topnav');    
     
@@ -108,25 +100,25 @@ class InfoDeck {
     
     var elemSubLinksContainer = document.createElement('div');
     elemSubLinksContainer.id = 'deckNavLinks';
-    for (var i = 0; i < navLinks.length; i++) {
-      var dependencySatisfied = true;
-      if (navLinks[i].hasOwnProperty('depends') && !navLinks[i].depends) {
-        dependencySatisfied = false;
-      }
 
-      if (dependencySatisfied) {
-        elemLink = document.createElement('a');
-        elemLink.classList.add('decklayout-navlink');
-        elemLink.id = navLinks[i].id;
-        elemLink.innerHTML = navLinks[i].label;
-      
-        if (i == 0) { elemLink.addEventListener('click', e => this._doConfigure(e), false); }
-        else if (i == 1) { elemLink.addEventListener('click', e => this._doOpenDataSource(e), false); }
-        else if (i == 2) { elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false); }
-        else if (i == 3) { elemLink.addEventListener('click', e => this._doHelp(e), false); }
-      }
+    var menuOptions = this._callbacks.menu;
+    for (var i = 0; i < menuOptions.length; i++) {
+      elemLink = document.createElement('a');
+      elemLink.classList.add('decklayout-navlink');
+      elemLink.innerHTML = menuOptions[i].label;
+      elemLink.addEventListener('click', function (me, f) { return function(e) {
+        me._doMenuOption(f);
+      }} (this, menuOptions[i].callback), false);
       elemSubLinksContainer.appendChild(elemLink);
     }
+    
+    elemSubLinksContainer.appendChild(document.createElement('hr'));
+    elemLink = document.createElement('a');
+    elemLink.classList.add('decklayout-navigation');
+    elemLink.innerHTML = 'about';
+    elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false);
+    elemSubLinksContainer.appendChild(elemLink);
+
     elemContainer.appendChild(elemSubLinksContainer);
     
     elemLink = document.createElement('a');
@@ -632,28 +624,16 @@ class InfoDeck {
     this._processSelection(selectedValue);
   }
     
-  _doConfigure() { 
-    InfoDeck._setCopiedMessage('');
-    InfoDeck._toggleHamburgerMenu();
-    this._callbacks.config();
-  }  
-  
-  _doOpenDataSource() { 
-    InfoDeck._setCopiedMessage('');
-    InfoDeck._toggleHamburgerMenu();
-    this._callbacks.opendatasource();
-  }
-  
   static _doAbout() { 
     InfoDeck._setCopiedMessage('');
     document.getElementById('deckNavLinks').style.display = 'none';
     document.getElementById('infoDeckAbout').style.display = 'block';
   }
-  
-  _doHelp() { 
+
+  _doMenuOption(callback) {
     InfoDeck._setCopiedMessage('');
     InfoDeck._toggleHamburgerMenu();
-    this._callbacks.help();
+    callback();
   }
   
   _handleAboutCloseClick() {

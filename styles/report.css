@@ -1,0 +1,39 @@
+/*-------------------------------------------------------------------*/
+ /* styling for Student Info reporting page                          */
+ /*------------------------------------------------------------------*/
+
+body {
+	color: black;
+	background-color: #eee;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
+.notice {
+  font-style: italic;
+  color: blue;
+  margin-bottom: 6px;
+  min-width: 20em;
+}
+
+.title {
+  color: #fff;
+  background-color: #115e63;
+  font-size: 14px;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding: 2px 2px;
+  margin-bottom: 0.8em;
+}
+
+.selection {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 6px;
+  display: inline-block;
+  vertical-align: top;
+  padding: 0.2em 0.3em;
+}
+

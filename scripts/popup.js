@@ -14,7 +14,8 @@ const app = function () {
   
   const settings = {
     appName: 'Student infoDeck',
-    helpURL: 'https://ktsanter.github.io/student_info/popup_help.html',
+    helpURL: 'popup_help.html',
+    reportingURL: 'report.html',
     configparams: null,
     deck: null,
     usetimer: false
@@ -149,11 +150,14 @@ const app = function () {
         },
         itemdetails: settings.studentandlayoutdata.studentinfo,
         callbacks: {
-          config: _configCallback,
-          opendatasource: _openSourceSpreadsheetCallback,
           notes: _notesCallback,
           isfuzzyequal: _isFuzzyEqual,
-          help: _showHelp
+          menu: [
+            {label: 'configure', callback: _configCallback},
+            {label: 'open data source', callback: _openSourceSpreadsheetCallback},
+            {label: 'report', callback: _showReporting},
+            {label: 'help', callback: _showHelp}
+          ]
         }
       };
     } 
@@ -240,6 +244,11 @@ const app = function () {
     window.open(settings.helpURL, '_blank');
   }
   
+  function _showReporting() {
+    var url = settings.reportingURL + '?ssid=' + settings.configparams.studentspreadsheetid;
+    window.open(url, '_blank');
+  }
+  
 	//-----------------------------------------------------------------------------
 	// page rendering
 	//-----------------------------------------------------------------------------  
@@ -278,8 +287,8 @@ const app = function () {
     
     if (settings.deckinitialized) {
       var elemDiscard = document.createElement('i');
-      elemDiscard.classList.add('fa');
-      elemDiscard.classList.add('fa-close');
+      elemDiscard.classList.add('fas');
+      elemDiscard.classList.add('fa-times');
       elemDiscard.classList.add('fa-lg');
       elemDiscard.classList.add('reconfigure-icon');
       elemDiscard.title = 'discard changes';
