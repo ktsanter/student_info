@@ -2,11 +2,12 @@
 //-----------------------------------------------------------------------------------
 // Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
-// TODO: switch from using 'fullname' to index type
-// TODO: switch from using 'course' to label type
+// TODO: ordering for badges
 //-----------------------------------------------------------------------------------
 
 const app = function () {
+  const apptitle = 'Student infoDeck reporting';
+  const appversion = '1.02';
 	const page = {};
   const settings = {};
   
@@ -67,6 +68,7 @@ const app = function () {
   
   function _renderPage() {
     console.log(settings.studentdata);
+    _identifyIndexAndCourseFields();
     page.contents = _createDiv(null, 'contents');
     page.body.appendChild(page.contents);
     page.selecteddata = null;
@@ -79,11 +81,17 @@ const app = function () {
   } 
   
   function _renderTitle() {
-    return _createDiv(null, 'title', 'Student infoDeck reporting');
+    var container = _createDiv(null, 'title');
+    
+    container.appendChild(_createDiv(null, 'title-label', apptitle));
+    container.appendChild(_createDiv(null, 'title-version', 'v' + appversion));
+    
+    return container;
   }
   
   function _renderCourseSelection() {
-    var container = _createDiv(null, 'selection', 'Courses');
+    var container = _createDiv(null, 'selection');    
+    container.appendChild(_createDiv(null, 'selection-title', 'courses'));
     
     var courseList = _getSortedCourseList();
 
@@ -101,7 +109,8 @@ const app = function () {
   }
    
   function _renderFilterSelection() {
-    var container = _createDiv(null, 'selection', 'Filters');
+    var container = _createDiv(null, 'selection');
+    container.appendChild(_createDiv(null, 'selection-title', 'filters'));
     
     var filterList = _getFilterList();
 
@@ -138,8 +147,8 @@ const app = function () {
       var student = selectedData[i].student;
       var display = selectedData[i].display;
       
-      container.appendChild(_createDiv(null, 'student-name', student.fullname));
-      container.appendChild(_createDiv(null, 'student-course', student.course));
+      container.appendChild(_createDiv(null, 'student-name', student[settings.indexfieldkey]));
+      container.appendChild(_createDiv(null, 'student-course', student[settings.coursefieldkey]));
 
       var containerItems = _createDiv(null, 'student-items');
       for (var j = 0; j < display.length; j++) {
@@ -196,12 +205,26 @@ const app = function () {
 	//------------------------------------------------------------------
 	// data processing
 	//------------------------------------------------------------------  
+  function _identifyIndexAndCourseFields() {
+    var fields = settings.studentdata.layoutinfo.fields;
+    console.log(fields);
+    settings.indexfieldkey = null;
+    settings.coursefieldkey = null;
+    
+    for (var key in fields) {
+      var field = fields[key];
+      if (field.fieldtype == 'index') settings.indexfieldkey = key;
+      if (field.fieldtype == 'label') settings.coursefieldkey = key;
+    }
+    console.log(settings.indexfieldkey + ' ' + settings.coursefieldkey);
+  }
+  
   function _getSortedCourseList() {
     var studentinfo = settings.studentdata.studentinfo;
     
     var courseSet = new Set();
     for (var i = 0; i < studentinfo.length; i++) {
-      courseSet.add(studentinfo[i].course);
+      courseSet.add(studentinfo[i][settings.coursefieldkey]);
     }
     
     return Array.from(courseSet).sort();
@@ -282,7 +305,7 @@ const app = function () {
   function _displayForStudent(student, courseSet, filters) {
     var displayForStudent  = [];
     
-    if (courseSet.has(student.course)) {
+    if (courseSet.has(student[settings.coursefieldkey])) {
       for (var i = 0; i < filters.length; i++) {
         var displayForStudentWithFilter = _displayForStudentWithFilter(student, filters[i]);
         if (displayForStudentWithFilter != null) {
