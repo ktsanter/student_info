@@ -3,6 +3,7 @@
 // Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
 // TODO: ordering for badges
+// TODO: click on column title to sort results (by index or label)
 //-----------------------------------------------------------------------------------
 
 const app = function () {

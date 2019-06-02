@@ -409,7 +409,7 @@ class InfoDeck {
     if (itemKeyParam != null) {
       itemKey = itemKey.replace(itemKeyParam[0], '');
       itemKeyParam = itemKeyParam[0].slice(1, -1);
-    }
+    } 
 
     if (!(itemKey in this._layout.badges)) {
       console.log('ERROR: unrecognized badge type "' + itemKey + '"');
@@ -443,7 +443,6 @@ class InfoDeck {
 
       } else if (matchValInfo.value == '[window]') {
         if (InfoDeck._isValidDate(itemValue)) {
-          console.log(itemKeyParam);
           if (InfoDeck._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due soon: [date]';
@@ -752,9 +751,9 @@ class InfoDeck {
   
   static _compareDateToNow(date, daysInWindow) {
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-
     var parsedDate = new Date(Date.parse(date));
     var now = new Date();
+    if (!daysInWindow || daysInWindow == null) daysInWindow = 0;
     
     var utc1 = Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
     var utc2 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -768,7 +767,7 @@ class InfoDeck {
     } else if ((daysLate + daysInWindow) >= 0) {
       result = 0;
     }
-       
+
     return result;
   }
 }
