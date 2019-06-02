@@ -2,7 +2,8 @@
 //-----------------------------------------------------------------------------------
 // Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
-// TODO: 
+// TODO: switch from using 'fullname' to index type
+// TODO: switch from using 'course' to label type
 //-----------------------------------------------------------------------------------
 
 const app = function () {
@@ -88,6 +89,7 @@ const app = function () {
 
     container.appendChild(document.createElement('br'));
     container.appendChild(_createButton(null, null, 'all', 'select all courses', _handleSelectAllCourses));
+    container.appendChild(_createButton(null, null, 'clear', 'clear all courses', _handleDeSelectAllCourses));
 
     for (var i = 0; i < courseList.length; i++) {
       var elem = _createDiv(null, null, courseList[i]);
@@ -105,6 +107,7 @@ const app = function () {
 
     container.appendChild(document.createElement('br'));
     container.appendChild(_createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
+    container.appendChild(_createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
 
     for (var i = 0; i < filterList.length; i++) {
       var elem = _createDiv(null, null, filterList[i]);
@@ -121,23 +124,63 @@ const app = function () {
     }
     
     var selectedData = _getSelectedData();
-   // console.log(selectedData);
     
     page.selecteddata = _createDiv(null, 'selecteddata');
+    
+    var container = _createDiv(null, 'tabletitle');
+    container.appendChild(_createDiv(null, 'tabletitle-name', 'name'));
+    container.appendChild(_createDiv(null, 'tabletitle-course', 'course'));
+    container.appendChild(_createDiv(null, 'tabletitle-items', 'items'));
+    page.selecteddata.appendChild(container);
+    
     for (var i = 0; i < selectedData.length; i++) {
+      container = _createDiv(null, 'student');
       var student = selectedData[i].student;
       var display = selectedData[i].display;
-      page.selecteddata.appendChild(_createDiv(null, null, student.fullname + ' - ' + student.course));
-      page.selecteddata.appendChild(_createDiv(null, null, JSON.stringify(display)));
+      
+      container.appendChild(_createDiv(null, 'student-name', student.fullname));
+      container.appendChild(_createDiv(null, 'student-course', student.course));
+
+      var containerItems = _createDiv(null, 'student-items');
+      for (var j = 0; j < display.length; j++) {
+        var filterDisplay = display[j].filterdisplay;
+        containerItems.appendChild(_renderFilterDisplay(filterDisplay));
+      }
+      container.appendChild(containerItems);
+      
+      page.selecteddata.appendChild(container);
     }
     
     page.body.appendChild(page.selecteddata);
   }
   
-  function _checkAllBoxesByName(checkboxName) {
+  function _renderFilterDisplay(filterDisplay) {
+    var container = _createDiv(null, 'student-item');
+    
+    var displayType = filterDisplay.display.type;
+    var displayData = filterDisplay.display.data;
+    var hoverText = filterDisplay.hovertext;
+    var studentValue = filterDisplay.studentvalue;
+    
+    hoverText = hoverText.replace(/\[value\]/g, studentValue);
+    hoverText = hoverText.replace(/\[date\]/g, _formatDate(studentValue));      
+    
+    if (displayType == '[image]' || displayType == 'image') {
+      _addClassList(container, 'student-item-image');
+      container.appendChild(_createImage(null, null, displayData, hoverText));
+      
+    } else {
+      console.log('display type not implemented: ' + displayType);
+      container.innerHTML = '???';
+    }  
+    
+    return container;
+  }
+  
+  function _checkAllBoxesByName(checkboxName, check) {
     var elemList = document.getElementsByName(checkboxName);
     for (var i = 0; i < elemList.length; i++) {
-      elemList[i].checked = true;
+      elemList[i].checked = check;
     }
   }
 
@@ -178,7 +221,10 @@ const app = function () {
       var field = fieldinfo[key];
       var trimmedFieldType = field.fieldtype.replace(/\(*.\)/, '');
       if (reportingSet.has(trimmedFieldType)) {
-        filterList.push({fieldkey: key, fieldtype: field.fieldtype, definition: badgeinfo[trimmedFieldType]});
+        filterList.push({
+          fieldkey: key, 
+          fieldtype: field.fieldtype, 
+          definition: badgeinfo[trimmedFieldType]});
       }
     }
 
@@ -254,51 +300,48 @@ const app = function () {
     var filterFieldTypeParam = filter.fieldtype.match(/\(*.\)/);
     if (filterFieldTypeParam != null) {
       filterFieldTypeParam = filterFieldTypeParam[0].slice(1, -1);
-      console.log('filterFieldTypeParam=' + filterFieldTypeParam);
     }
-    
-    //console.log('check: ' + student.fullname + ' (' + student.course + ') against ' + filter.fieldtype + ' (' + student[filter.fieldkey] + ')');
-    
+   
     var definition = filter.definition;
     var studentValue = student[filter.fieldkey];
     
     for (var i = 0; i < definition.values.length && result == null; i++) {
       var filterRule = definition.values[i];
-      console.log(filterRule);
+      var hoverText = definition.hovertext;
+
       if (filterRule.value == '*' && studentValue != '') {
-          result = filterRule.display;
+        result = {display: filterRule.display, hovertext: hoverText, studentvalue: studentValue};
       
       } else if (filterRule.value == '[late>]') {
         if (_isValidDate(studentValue)) {
           if (_compareDateToNow(studentValue) < 0) {
-            result = filterRule.display;
+            result = {display: filterRule.display, hovertext: filter.fieldkey + ' is late (due [date])', studentvalue: studentValue};
           }
         }
         
       } else if (filterRule.value == '[late=]') {
         if (_isValidDate(studentValue)) {
           if (_compareDateToNow(studentValue) == 0) {
-            result = filterRule.display;
+            result = {display: filterRule.display, hovertext: filter.fieldkey + ' is due today: [date]', studentvalue: studentValue};
           }
         }
         
       } else if (filterRule.value == '[window]') {
         if (_isValidDate(studentValue)) {
           if (_compareDateToNow(studentValue, parseInt(filterFieldTypeParam)) == 0) {
-            result = filterRule.display;
+            result = {display: filterRule.display, hovertext: filter.fieldkey + ' is due soon: [date]', studentvalue: studentValue};
           }
         }
         
       } else if (filterRule.value == studentValue) {
-          result = filterRule.display;
+            result = {display: filterRule.display, hovertext: hoverText, studentvalue: studentValue};
         
       } else if (filterRule.value == '[else]') {
-          result = filterRule.display;
-      
-      } 
+            result = {display: filterRule.display, hovertext: hoverText, studentvalue: studentValue};
+      }
     }
     
-    if (result.type == '[none]') result = null;
+    if (result.display.type == '[none]') result = null;
     
     return result;
   }
@@ -307,7 +350,22 @@ const app = function () {
 	// handlers
 	//------------------------------------------------------------------    
   function _handleSelectAllCourses(e) {
-    _checkAllBoxesByName('course');
+    _checkAllBoxesByName('course', true);
+    _renderSelectedData();
+  }
+
+  function _handleSelectAllFilters(e) {
+    _checkAllBoxesByName('filter', true);
+    _renderSelectedData();
+  }
+
+  function _handleDeSelectAllCourses(e) {
+    _checkAllBoxesByName('course', false);
+    _renderSelectedData();
+  }
+
+  function _handleDeSelectAllFilters(e) {
+    _checkAllBoxesByName('filter', false);
     _renderSelectedData();
   }
 
@@ -315,11 +373,6 @@ const app = function () {
     _renderSelectedData();
   }
   
-  function _handleSelectAllFilters(e) {
-    _checkAllBoxesByName('filter');
-    _renderSelectedData();
-  }
-
   function _handleFilterSelection(e) {
     _renderSelectedData();
   }
@@ -335,7 +388,7 @@ const app = function () {
   function _formatDate(theDate) {
     var formattedDate = theDate;
     
-    if (InfoDeck._isValidDate(theDate)) {
+    if (_isValidDate(theDate)) {
       formattedDate = '';
       if (theDate != null & theDate != '') {
         var objDate = new Date(theDate);
@@ -402,6 +455,16 @@ const app = function () {
     if (id && id != '') elem.id = id;
     _addClassList(elem, classList);
     if (html != null) elem.innerHTML = html;
+    
+    return elem;
+  }
+  
+  function _createImage(id, classList, src, title) {
+    var elem = document.createElement('img');
+    if (id && id != '') elem.id = id;
+    _addClassList(elem, classList);
+    if (src != null) elem.src = src;
+    if (title) elem.title = title;
     
     return elem;
   }

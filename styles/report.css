@@ -37,3 +37,89 @@ body {
   padding: 0.2em 0.3em;
 }
 
+.selecteddata {
+  margin-top: 2em;
+}
+
+.tabletitle {
+  background-color: white;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+
+.tabletitle-name, .tabletitle-course  {
+  display: inline-block;
+  width: 15%;
+  border-right: 1px solid #ccc;
+}
+
+.tabletitle-items {
+  display: inline-block;
+}
+
+.student {
+  border-style: solid;
+  border-color: #ccc;
+  border-width: 0px 1px 1px 1px;
+}
+
+.student:hover {
+  background-color: #86aeef;
+}
+
+.student-name, .student-course {
+  display: inline-block;
+  vertical-align: top;
+  min-height: 3.5em;
+  width: 15%;
+  border-left: 1px solid #ccc;
+}
+
+.student-items {
+  display: inline-block;
+  border-left: 1px solid #ccc;
+  min-height: 2.8em;
+}
+
+.student-item {
+  display: inline-block;
+}
+
+.student-item-image {
+  display: inline-block;
+  margin-right: 0.2em;
+  min-height: 2.8em;
+}
+
+.student-item-image img {
+  width: 30px;
+  height: auto;
+  vertical-align: middle
+}
+
+/*
+.decklayout-badges-badgeimage {
+  display: inline-block;
+  margin-right: 0.2em;
+}
+
+.decklayout-badges-badgeimage img{
+  width: 30px;
+  height: auto;
+  vertical-align: middle;
+}
+
+.decklayout-badges-badgeicon {
+  display: inline-block;
+  margin-right: 0.2em;
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.decklayout-badges-badgeunicode {
+  display: inline-block;
+  font-size: 24px;
+  vertical-align: middle;
+}
+
+
