@@ -137,7 +137,7 @@ const app = function () {
     var deckParams = null;
         
     if (settings.studentandlayoutdata != null) { 
-      var indexfield = 'fullname';
+      var indexfield = _findIndexField(settings.studentandlayoutdata);
       
       deckParams = {
         title: settings.appName,
@@ -164,7 +164,19 @@ const app = function () {
     
     return deckParams;
   }
-
+  
+  function _findIndexField(data) {
+    var fields = data.layoutinfo.fields;
+    var indexFieldKey = null;
+    
+    for (var key in fields) {
+      var field = fields[key];
+      if (field.fieldtype == 'index') indexFieldKey = key;
+    }
+    
+    return indexFieldKey;    
+  }
+  
   function _makeIndexList(indexfield, data) {
     var indexlistWithDupes = [];
     for (var i = 0; i < data.length; i++) {

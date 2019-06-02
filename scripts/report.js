@@ -91,13 +91,13 @@ const app = function () {
   
   function _renderCourseSelection() {
     var container = _createDiv(null, 'selection');    
-    container.appendChild(_createDiv(null, 'selection-title', 'courses'));
+    container.appendChild(_createDiv(null, 'selection-title', settings.coursefieldkey));
     
     var courseList = _getSortedCourseList();
 
     container.appendChild(document.createElement('br'));
-    container.appendChild(_createButton(null, null, 'all', 'select all courses', _handleSelectAllCourses));
-    container.appendChild(_createButton(null, null, 'clear', 'clear all courses', _handleDeSelectAllCourses));
+    container.appendChild(_createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
+    container.appendChild(_createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
 
     for (var i = 0; i < courseList.length; i++) {
       var elem = _createDiv(null, null, courseList[i]);
@@ -137,8 +137,8 @@ const app = function () {
     page.selecteddata = _createDiv(null, 'selecteddata');
     
     var container = _createDiv(null, 'tabletitle');
-    container.appendChild(_createDiv(null, 'tabletitle-name', 'name'));
-    container.appendChild(_createDiv(null, 'tabletitle-course', 'course'));
+    container.appendChild(_createDiv(null, 'tabletitle-name', settings.indexfieldkey));
+    container.appendChild(_createDiv(null, 'tabletitle-course', settings.coursefieldkey));
     container.appendChild(_createDiv(null, 'tabletitle-items', 'items'));
     page.selecteddata.appendChild(container);
     
@@ -207,7 +207,6 @@ const app = function () {
 	//------------------------------------------------------------------  
   function _identifyIndexAndCourseFields() {
     var fields = settings.studentdata.layoutinfo.fields;
-    console.log(fields);
     settings.indexfieldkey = null;
     settings.coursefieldkey = null;
     
@@ -216,7 +215,6 @@ const app = function () {
       if (field.fieldtype == 'index') settings.indexfieldkey = key;
       if (field.fieldtype == 'label') settings.coursefieldkey = key;
     }
-    console.log(settings.indexfieldkey + ' ' + settings.coursefieldkey);
   }
   
   function _getSortedCourseList() {
