@@ -4,15 +4,12 @@
 //-----------------------------------------------------------------------------------
 // TODO: figure out badge ordering
 // TODO: add progress check badges, like early grade with windowed dates
-// TODO: custom callbacks for addional menu options ?
-// TODO: menu spacer options ?
-// TODO: new date window images ala https://drive.google.com/open?id=1_vgLe_kj7AgpmOJh0sH0mzzIMga8GueW
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
 class InfoDeck {
   constructor() {
-    this._version = '0.14';
+    this._version = '0.15';
   }
   
   //--------------------------------------------------------------------------------

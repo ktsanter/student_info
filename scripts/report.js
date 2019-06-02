@@ -7,7 +7,7 @@
 
 const app = function () {
   const apptitle = 'Student infoDeck reporting';
-  const appversion = '1.02';
+  const appversion = '1.03';
 	const page = {};
   const settings = {};
   
