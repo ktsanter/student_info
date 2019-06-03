@@ -14,8 +14,8 @@ const app = function () {
   
   const settings = {
     appName: 'Student infoDeck',
-    helpURL: 'popup_help.html',
-    reportingURL: 'report.html',
+    helpURL: 'https://ktsanter.github.io/student_info/popup_help.html',
+    reportingURL: 'https://ktsanter.github.io/student_info/report.html',
     configparams: null,
     deck: null,
     usetimer: false
@@ -212,7 +212,7 @@ const app = function () {
 
     var postParams = {
       spreadsheetid: settings.configparams.studentspreadsheetid,
-      fullname: params.deckindexval,
+      indexval: params.deckindexval,
       cardnumber: params.cardnumber,
       notes: params.notes
     }

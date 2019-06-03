@@ -32,6 +32,10 @@ body {
   display: inline-block;
 }
 
+.title-icon {
+  margin-left: 0.8em;
+}
+
 .title-version {
   display: inline-block;
   float: right;

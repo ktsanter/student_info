@@ -7,7 +7,7 @@
 
 class InfoDeck {
   constructor() {
-    this._version = '0.16';
+    this._version = '0.17';
   }
   
   //--------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class InfoDeck {
     
     this._elemDeckContainer = null;
     this._currentSubCardItems = null;
-    this._currentSubCardNumber = 0;   
+    this._currentSubCardNumber = 0;    
   }
 
   //--------------------------------------------------------------------------------
@@ -58,8 +58,7 @@ class InfoDeck {
   // rendering
   //--------------------------------------------------------------------------------
   renderDeck() {
-    this._elemDeckContainer = document.createElement('div');
-    this._elemDeckContainer.classList.add('decklayout-main');
+    this._elemDeckContainer = CreateElement._createDiv(null, 'decklayout-main');
     
     var elemNav = this._renderNavigation(this._title);
     this._elemDeckContainer.appendChild(elemNav);
@@ -67,16 +66,15 @@ class InfoDeck {
     this._elemDeckContainer.appendChild(this._renderSelect());
     
     this._elemDeckContainer.appendChild(this._renderAbout());
-    this._elemDeckContainer.appendChild(InfoDeck._renderClipboardCopyArea());
-    
-    var elemCardContainer = document.createElement('div');
-    elemCardContainer.classList.add('decklayout-card');
+    //this._elemDeckContainer.appendChild(InfoDeck._renderClipboardCopyArea());
 
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerPicture', 'decklayout-picture'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerGenericItems', 'decklayout-genericitems'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerBadges', 'decklayout-badges'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerNotes', 'decklayout-notes'));  
-    elemCardContainer.appendChild(InfoDeck._renderContainer('containerCardLabel', 'decklayout-cardlabel'));
+    var elemCardContainer = CreateElement._createDiv(null, 'decklayout-card');
+
+    elemCardContainer.appendChild(CreateElement._createDiv('containerPicture', 'decklayout-picture'));  
+    elemCardContainer.appendChild(CreateElement._createDiv('containerGenericItems', 'decklayout-genericitems'));  
+    elemCardContainer.appendChild(CreateElement._createDiv('containerBadges', 'decklayout-badges'));  
+    elemCardContainer.appendChild(CreateElement._createDiv('containerNotes', 'decklayout-notes'));  
+    elemCardContainer.appendChild(CreateElement._createDiv('containerCardLabel', 'decklayout-cardlabel'));
     
     this._elemDeckContainer.appendChild(elemCardContainer);
 
@@ -84,52 +82,33 @@ class InfoDeck {
   }
   
   _renderNavigation(title) {
-    var elemContainer = document.createElement('div');
-    elemContainer.classList.add('decklayout-topnav');    
+    var elemContainer = CreateElement._createDiv(null, 'decklayout-topnav');
     
-    var elemLink = document.createElement('a');
-    elemLink.classList.add('decklayout-title');
-    elemLink.href = '#';
-    elemLink.innerHTML = title;
+    var elemLink = CreateElement._createLink(null, 'decklayout-title', title, '');
     elemContainer.appendChild(elemLink);
     
-    var elemSubLinksContainer = document.createElement('div');
-    elemSubLinksContainer.id = 'deckNavLinks';
-
+    var elemSubLinksContainer = CreateElement._createDiv('deckNavLinks', null);
+    
     var menuOptions = this._callbacks.menu;
     for (var i = 0; i < menuOptions.length; i++) {
-      elemLink = document.createElement('a');
-      elemLink.classList.add('decklayout-navlink');
-      elemLink.innerHTML = menuOptions[i].label;
-      elemLink.addEventListener('click', function (me, f) { return function(e) {
-        me._doMenuOption(f);
-      }} (this, menuOptions[i].callback), false);
+      var handler = function (me, f) { return function(e) {me._doMenuOption(f);}} (this, menuOptions[i].callback);
+      elemLink = CreateElement._createLink(null, 'decklayout-navlink', menuOptions[i].label, null, handler); 
       elemSubLinksContainer.appendChild(elemLink);
     }
     
-    elemSubLinksContainer.appendChild(document.createElement('hr'));
-    elemLink = document.createElement('a');
-    elemLink.classList.add('decklayout-navigation');
-    elemLink.innerHTML = 'about';
-    elemLink.addEventListener('click', e => InfoDeck._doAbout(e), false);
-    elemSubLinksContainer.appendChild(elemLink);
-
+    elemSubLinksContainer.appendChild(CreateElement._createHR(null, null));
+    elemSubLinksContainer.appendChild(CreateElement._createLink(null, 'decklayout-navigation', 'about', null, e => InfoDeck._doAbout(e)));
     elemContainer.appendChild(elemSubLinksContainer);
     
-    elemLink = document.createElement('a');
-    elemLink.classList.add('icon');
-    elemLink.href = "#";
-    elemLink.id = 'hamburger';
-    elemLink.addEventListener('click', e => InfoDeck._toggleHamburgerMenu(), false);
-    elemLink.appendChild( this._renderIcon(null, 'fa fa-bars', null) );
+    elemLink = CreateElement._createLink('hamburger', 'icon', null, null, e => InfoDeck._toggleHamburgerMenu());
+    elemLink.appendChild(CreateElement._createIcon(null, 'fa fa-bars'));
     elemContainer.appendChild(elemLink);
     
     return elemContainer;     
   }
   
   _renderSelect() {
-    var elemContainer = document.createElement('div');
-    elemContainer.classList.add('decklayout-select-container');
+    var elemContainer = CreateElement._createDiv(null, 'decklayout-select-container');
 
     var fuzzySelect = new FuzzyInputControl(
       this._indexlist, 
@@ -140,13 +119,9 @@ class InfoDeck {
     var elemFuzzySelect = fuzzySelect.render();
     elemFuzzySelect.classList.add('decklayout-select-control');
     elemContainer.appendChild(elemFuzzySelect);
-    
-    var elemCopiedContainer = document.createElement('div');
-    elemCopiedContainer.classList.add('decklayout-select-copied');
-    elemCopiedContainer.id = 'copiedMessage';
-    elemCopiedContainer.innerHTML = '';
-    elemContainer.appendChild(elemCopiedContainer);    
 
+    elemContainer.appendChild(CreateElement._createDiv('copiedMessage', 'decklayout-select-copied'));
+    
     return elemContainer;
   } 
 
@@ -159,22 +134,16 @@ class InfoDeck {
       'contact: ktsanter@gmail.com',
       'uses: ' + 'InfoDeck ' + sinfoDeckVersion + ', ' + 'FuzzyInputControl ' + sFuzzyInputControlVersion
     ];
-    var elemContainer = InfoDeck._renderContainer('infoDeckAbout', 'decklayout-about');
+    var elemContainer = CreateElement._createDiv('infoDeckAbout', 'decklayout-about');
     
-    var elemTitle = document.createElement('div');
-    var elemLabel = document.createElement('div');
-    elemLabel.classList.add('decklayout-about-label');
-    elemLabel.innerHTML = 'About <em>' + this._title + '</em> ' + sOuterAppVersion;
-    elemTitle.appendChild(elemLabel);
-
-    var elemClose = this._renderIcon(null, 'fas fa-times fa-lg decklayout-about-close', 'close "about"');
-    elemClose.addEventListener('click', e => this._handleAboutCloseClick(e), false);
-    elemTitle.appendChild(elemClose);
+    var elemTitle = CreateElement._createDiv(null, null);
+    elemTitle.appendChild(CreateElement._createDiv(null, 'decklayout-about-label', 'About <em>' + this._title + '</em> ' + sOuterAppVersion));
+    elemTitle.appendChild(CreateElement._createIcon(null, 'fas fa-times fa-lg decklayout-about-close', 'close "about"', e => this._handleAboutCloseClick(e)));
     elemContainer.appendChild(elemTitle);
     
-    var elemDetailContainer = document.createElement('div');
+    var elemDetailContainer = CreateElement._createDiv(null, null);
     for (var i = 0; i < details.length; i++) {
-      var elemDetail = InfoDeck._renderContainer('', 'deck-layout-about-detail');
+      var elemDetail = CreateElement._createDiv('', 'deck-layout-about-detail', details[i]);
       elemDetail.innerHTML = details[i];
       elemDetailContainer.appendChild(elemDetail);      
     }
@@ -182,17 +151,6 @@ class InfoDeck {
         
     return elemContainer;
   }
-
-  
-  static _renderContainer(id, className) {
-    var elemContainer = document.createElement('div');
-    elemContainer.id = id;
-    if (className != '') {
-      elemContainer.classList.add(className);
-    }
-    return elemContainer;
-  }
-  
     
   //--------------------------------------------------------------------------
   // render card info
@@ -290,7 +248,7 @@ class InfoDeck {
       this._renderBadge(fieldType, fieldValue, key);
       
     } else if (fieldType == 'date') {
-      this._renderGenericItem(fieldTitle, InfoDeck._formatDate(fieldValue));
+      this._renderGenericItem(fieldTitle, MyDateTime._formatDate(fieldValue));
       
     } else {
       console.log('ERROR: unrecognized field type (' + fieldType + ') for field key = ' + key);
@@ -311,71 +269,41 @@ class InfoDeck {
     var arrNotes = notes.split('\n');
     var elemContainer = this._getContainer('decklayout-notes');
     
-    var elemLabelContainer = document.createElement('div');
-    elemLabelContainer.classList.add('decklayout-noteslabel');
-    
-    var elemLabel = document.createElement('span');
-    elemLabel.innerHTML = title;
-    elemLabelContainer.appendChild(elemLabel);
-    
-    var elemIcon = this._renderIcon('addTitle', 'fa fa-plus decklayout-notes-plus', 'add note');
-    elemIcon.addEventListener('click', e => this._handleAddNote(e), false);
-    elemLabelContainer.appendChild(elemIcon);
-    
+    var elemLabelContainer = CreateElement._createDiv(null, 'decklayout-noteslabel');
+    elemLabelContainer.appendChild(CreateElement._createSpan(null, null, title));
+    elemLabelContainer.appendChild(CreateElement._createIcon('addTitle', 'fa fa-plus decklayout-notes-plus', 'add note', e => this._handleAddNote(e)));
     elemContainer.appendChild(elemLabelContainer);
-    
-    var elemSelect = document.createElement('select');
-    elemSelect.classList.add('decklayout-notecontrol');
-    elemSelect.id = 'notesSelect';
+  
+    var elemSelect = CreateElement._createSelect('notesSelect', 'decklayout-notecontrol');  
     elemSelect.size = 5;
     for (var i = 0; i < arrNotes.length; i++) {
       var note = arrNotes[i];
       if (note != '') {
-        var elemOption = document.createElement('option');
-        elemOption.value = i;
-        elemOption.innerHTML = note.replace('|', ': ');
-        elemSelect.appendChild(elemOption);
+        elemSelect.appendChild(CreateElement._createOption(null, null, i, note.replace('|', ': ')));
       }
     }
     elemSelect.addEventListener('dblclick', e => this._handleNoteDoubleClick(e), false);
     elemContainer.appendChild(elemSelect);
+    
     elemContainer.appendChild(this._renderNotesEditingSection());
   }
 
   _renderNotesEditingSection() {
-    var elemContainer = document.createElement('div');
-    elemContainer.classList.add('decklayout-notes-editing');
-    elemContainer.id = 'notesEditing';
-   
-    var elemWorkingNoteIndex = document.createElement('div');
+    var elemContainer = CreateElement._createDiv('notesEditing', 'decklayout-notes-editing');
+    
+    var elemWorkingNoteIndex = CreateElement._createDiv('notesEditingWorkingIndex', null, '-1');
     elemWorkingNoteIndex.style.display = 'none';
-    elemWorkingNoteIndex.id = 'notesEditingWorkingIndex';
-    elemWorkingNoteIndex.innerHTML = '-1';
     elemContainer.appendChild(elemWorkingNoteIndex);
     
-    var elemDate = document.createElement('div');
-    elemDate.classList.add('decklayout-notes-editing-date');
-    elemDate.id = 'notesEditingDate';
-    elemDate.innerHTML = '02/14/2019';
-    elemContainer.appendChild(elemDate);
+    elemContainer.appendChild(CreateElement._createDiv('notesEditingDate', 'decklayout-notes-editing-date', '02/14/2019'));
     
-    var elemCheck = this._renderIcon(null, 'fa fa-check fa-lg decklayout-notes-editing-icon', 'save changes');
-    elemCheck.addEventListener('click', e => this._handleEditingCheckClick(e), false);
-    elemContainer.appendChild(elemCheck);
+    elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-check fa-lg decklayout-notes-editing-icon', 'save changes', e => this._handleEditingCheckClick(e)));
+    elemContainer.appendChild(CreateElement._createIcon(null, 'fas fa-times fa-lg decklayout-notes-editing-icon', 'discard changes', e => this._handleEditingDiscardClick(e)));
+    elemContainer.appendChild(CreateElement._createIcon('deleteNoteIcon', 'fa fa-trash fa-lg decklayout-notes-editing-icon', 'delete note', e => this._handleEditingTrashClick(e)));
 
-    var elemDiscard = this._renderIcon(null, 'fas fa-times fa-lg decklayout-notes-editing-icon', 'discard changes');
-    elemDiscard.addEventListener('click', e => this._handleEditingDiscardClick(e), false);
-    elemContainer.appendChild(elemDiscard);
-    
-    var elemTrash = this._renderIcon('deleteNoteIcon', 'fa fa-trash fa-lg decklayout-notes-editing-icon', 'delete note');
-    elemTrash.addEventListener('click', e => this._handleEditingTrashClick(e), false);
-    elemContainer.appendChild(elemTrash);
+    var elemInputContainer = CreateElement._createDiv(null, null);
+    elemInputContainer.appendChild(CreateElement._createTextArea('notesEditingInput', 'decklayout-notes-editing-input'));
 
-    var elemInputContainer = document.createElement('div');
-    var elemInput = document.createElement('textarea');
-    elemInput.classList.add('decklayout-notes-editing-input');
-    elemInput.id = 'notesEditingInput';
-    elemInputContainer.appendChild(elemInput);
     elemContainer.appendChild(elemInputContainer);
 
     return elemContainer;
@@ -386,38 +314,27 @@ class InfoDeck {
     var numCards = this._currentSubCardItems.length;
 
     if (numCards > 0 && this._currentSubCardNumber > 0) {
-      var elemPrev = this._renderIcon(null, 'fa fa-angle-double-left fa-lg decklayout-label-control-left', 'previous card');      
-      elemPrev.addEventListener('click', e => this._renderPreviousSubCardInfo(e), false);
-      elemContainer.appendChild(elemPrev);
+      elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-angle-double-left fa-lg decklayout-label-control-left', 'previous card', e => this._renderPreviousSubCardInfo(e)));
     }
     
-    var elemLabel = document.createElement('span');
-    elemLabel.innerHTML = label;
-    elemContainer.appendChild(elemLabel);
+    elemContainer.appendChild(CreateElement._createSpan(null, null, label));
     
     if (numCards > 0 && this._currentSubCardNumber < numCards - 1) {
-      var elemNext = this._renderIcon(null, 'fa fa-angle-double-right fa-lg decklayout-label-control-right', 'next card');
-      elemNext.addEventListener('click', e => this._rnderNextSubCardInfo(e), false);
-      elemContainer.appendChild(elemNext);
+      elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-angle-double-right fa-lg decklayout-label-control-right', 'next card', e => this._rnderNextSubCardInfo(e)));
     }
   }
   
   _renderGenericItem(title, itemValue) {
     var elemContainer = this._getContainer('decklayout-genericitems');
     
-    var elemItem = document.createElement('div');
+    var elemItem = CreateElement._createDiv(null, null);
     
-    var elemLabel = document.createElement('div');
-    elemLabel.classList.add('decklayout-genericitemlabel');
-    elemLabel.innerHTML = title;
+    var elemLabel = CreateElement._createDiv(null, 'decklayout-genericitemlabel', title);
     elemItem.appendChild(elemLabel);
     
-    var elemValue = document.createElement('div');
-    elemValue.classList.add('decklayout-genericitemvalue');
-    elemValue.innerHTML = itemValue;
-    elemItem.appendChild(elemValue);
-    
+    var elemValue = CreateElement._createDiv(null, 'decklayout-genericitemvalue', itemValue);
     elemValue.addEventListener('dblclick', e => this._handleGenericItemDoubleClick(e), false);
+    elemItem.appendChild(elemValue);
     
     elemContainer.appendChild(elemItem);
   }
@@ -444,24 +361,24 @@ class InfoDeck {
         badgeDisplayInfo = matchValInfo.display;
         
       } else if (matchValInfo.value == '[late>]') {
-        if (InfoDeck._isValidDate(itemValue)) {
-          if (InfoDeck._compareDateToNow(itemValue) < 0) {
+        if (MyDateTime._isValidDate(itemValue)) {
+          if (MyDateTime._compareDateToNow(itemValue) < 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is late (due [date])';
           }
         } 
         
       } else if (matchValInfo.value == '[late=]') {
-        if (InfoDeck._isValidDate(itemValue)) {
-          if (InfoDeck._compareDateToNow(itemValue) == 0) {
+        if (MyDateTime._isValidDate(itemValue)) {
+          if (MyDateTime._compareDateToNow(itemValue) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due today: [date]';
           }
         } 
 
       } else if (matchValInfo.value == '[window]') {
-        if (InfoDeck._isValidDate(itemValue)) {
-          if (InfoDeck._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
+        if (MyDateTime._isValidDate(itemValue)) {
+          if (MyDateTime._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due soon: [date]';
           }
@@ -491,32 +408,25 @@ class InfoDeck {
   }
   
   _renderBadgeImage(badgetype, badgeinfo, title, value, badgecolor) {
-    var elemImageContainer = document.createElement('div');
+    var elemImageContainer = CreateElement._createDiv(null, null);
 
     var hoverText = title;
     hoverText = hoverText.replace(/\[value\]/g, value);
-    hoverText = hoverText.replace(/\[date\]/g, InfoDeck._formatDate(value));
+    hoverText = hoverText.replace(/\[date\]/g, MyDateTime._formatDate(value));
     
     elemImageContainer.title = hoverText;
 
     if (badgetype == 'image') {
       elemImageContainer.classList.add('decklayout-badges-badgeimage');
-      var elemImage = document.createElement('img');
-      elemImage.src = badgeinfo;
-      elemImage.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
-      elemImageContainer.appendChild(elemImage);
+      elemImageContainer.appendChild(CreateElement._createImage(null, null, badgeinfo, '', null, e => this._handleBadgeDoubleClick(e)));
     
     } else if (badgetype == 'icon') {
       elemImageContainer.classList.add('decklayout-badges-badgeicon');
-      var classList = 'fa-lg ' + badgeinfo;
-      var elemIcon = this._renderIcon(null, classList, null);
-      elemIcon.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
-      elemImageContainer.appendChild(elemIcon);
+      elemImageContainer.appendChild(CreateElement._createIcon(null, 'fa-lg ' + badgeinfo, null, null, e => this._handleBadgeDoubleClick(e)));
       
     } else if (badgetype == 'unicode') {
       elemImageContainer.classList.add('decklayout-badges-badgeunicode');
-      var elemUni = document.createElement('div');
-      elemUni.innerHTML = String.fromCodePoint(...badgeinfo);
+      var elemUni = CreateElement._createDiv(null, null, String.fromCodePoint(...badgeinfo));
       elemUni.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
       elemImageContainer.appendChild(elemUni);
     }
@@ -530,18 +440,6 @@ class InfoDeck {
       
   _ignoreBadgeImage(badgeinfo) {
     return (badgeinfo.slice(0,1) == '[' && badgeinfo.slice(-1) == ']');
-  }
-
-  _renderIcon(id, classList, title) {
-    var elemIcon = document.createElement('i');
-    if (id != null && id != '') elemIcon.id = id;
-    var arrClasses = classList.split(' ');
-    for (var i = 0; i < arrClasses.length; i++) {
-      elemIcon.classList.add(arrClasses[i]);
-    }
-    if (title != null && title != '') elemIcon.title = title;
-    
-    return elemIcon;
   }
     
   //--------------------------------------------------------------------------
@@ -560,7 +458,7 @@ class InfoDeck {
     
     document.getElementById('notesEditingWorkingIndex').innerHTML = noteIndex;
     
-    var noteDate = InfoDeck._formatDate(Date.now());
+    var noteDate = MyDateTime._formatDate(Date.now());
     var noteText = '';
     if (initialNote != '') {
       var arrNote = initialNote.split(': ');
@@ -715,23 +613,12 @@ class InfoDeck {
   // clipboard functions
   //----------------------------------------
   static _copyToClipboard(txt) {
-		var clipboardElement = document.getElementById('text_for_clipboard');
-		clipboardElement.value = txt;
-		clipboardElement.style.display = 'block';
-		clipboardElement.select();
-		document.execCommand("Copy");
-		clipboardElement.selectionEnd = clipboardElement.selectionStart;
-		clipboardElement.style.display = 'none';
+    if (!this._clipboard) this._clipboard = new ClipboardCopy();
+
+    this._clipboard._copyToClipboard(txt);
     InfoDeck._setCopiedMessage('copied');
 	}	
-  
-  static _renderClipboardCopyArea() {
-    var elemClipboardArea = document.createElement('textarea');
-    elemClipboardArea.id = 'text_for_clipboard';
-    elemClipboardArea.style.display = 'none';
-    return elemClipboardArea;
-  }
-  
+    
   static _setCopiedMessage(msg) {
     var elemCopiedMessage = document.getElementById('copiedMessage');
     elemCopiedMessage.innerHTML = msg;
@@ -745,47 +632,5 @@ class InfoDeck {
   //---------------------------------------
   // utility functions
   //----------------------------------------
-  static _isValidDate(str) {
-    var d = new Date(str);
-    return !isNaN(d);
-  }
-  
-  static _formatDate(theDate) {
-    var formattedDate = theDate;
-    
-    if (InfoDeck._isValidDate(theDate)) {
-      formattedDate = '';
-      if (theDate != null & theDate != '') {
-        var objDate = new Date(theDate);
-        var day = ("00" + objDate.getDate()).slice(-2);
-        var month = ("00" + (objDate.getMonth() + 1)).slice(-2);
-        var year = (objDate.getFullYear() + '').slice(-2);
-        formattedDate = month + "/" + day + "/" + year;
-      }
-    }
-    
-    return formattedDate;
-  }
-  
-  static _compareDateToNow(date, daysInWindow) {
-    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
-    var parsedDate = new Date(Date.parse(date));
-    var now = new Date();
-    if (!daysInWindow || daysInWindow == null) daysInWindow = 0;
-    
-    var utc1 = Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
-    var utc2 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 
-    var daysLate = Math.floor((utc2 - utc1) / _MS_PER_DAY);
-    if (!daysInWindow || daysInWindow < 0) daysInWindow = 0;
-    
-    var result = 1;
-    if (daysLate > 0) {
-      result = -1;
-    } else if ((daysLate + daysInWindow) >= 0) {
-      result = 0;
-    }
-
-    return result;
-  }
 }
