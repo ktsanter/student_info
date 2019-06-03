@@ -7,7 +7,7 @@
 
 const app = function () {
   const apptitle = 'Student infoDeck reporting';
-  const appversion = '0.06';
+  const appversion = '0.07';
 	const page = {};
   const settings = {};
   
@@ -86,6 +86,10 @@ const app = function () {
     
     container.appendChild(CreateElement._createDiv(null, 'title-label', apptitle));
     container.appendChild(CreateElement._createIcon(null, 'fas fa-copy title-icon', 'copy reported data', e => _handleCopyClick(e)));
+    
+    page.copynotice = CreateElement._createSpan(null, 'title-copynotice', 'copy notice');
+    container.appendChild(page.copynotice);
+    
     container.appendChild(CreateElement._createDiv(null, 'title-version', 'v' + appversion));
     
     return container;
@@ -144,6 +148,7 @@ const app = function () {
   }
   
   function _renderSelectedData() {
+    _setCopiedMessage('');
     if (page.selecteddata && page.selecteddata != null) {
       page.selecteddata.parentNode.removeChild(page.selecteddata);
     }
@@ -542,20 +547,18 @@ const app = function () {
     if (!page._clipboard) page._clipboard = new ClipboardCopy();
 
     page._clipboard._copyToClipboard(txt);
-//    _setCopiedMessage('copied');
+    _setCopiedMessage('copied');
 	}	
 
-/*    
   function _setCopiedMessage(msg) {
-    var elemCopiedMessage = document.getElementById('copiedMessage');
-    elemCopiedMessage.innerHTML = msg;
+    var elem = page.copynotice;
+    elem.innerHTML = msg;
     if (msg == '') {
-      elemCopiedMessage.style.display = 'none';
+      elem.style.display = 'none';
     } else {
-      elemCopiedMessage.style.display = 'inline-block';
+      elem.style.display = 'inline-block';
     }
   }
-    */
 
 	//---------------------------------------
 	// utility functions
