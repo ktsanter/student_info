@@ -2,14 +2,12 @@
 //-----------------------------------------------------------------------------------
 // InfoDeck class
 //-----------------------------------------------------------------------------------
-// TODO: figure out badge ordering
-// TODO: add progress check badges, like early grade with windowed dates
 // TODO: adapt to work with Noah's config approach
 //-----------------------------------------------------------------------------------
 
 class InfoDeck {
   constructor() {
-    this._version = '0.15';
+    this._version = '0.16';
   }
   
   //--------------------------------------------------------------------------------
@@ -245,9 +243,29 @@ class InfoDeck {
     this._getContainer('decklayout-cardlabel').innerHTML = '';
     this._getContainer('decklayout-badges').style.minHeight = '3em';
     
-    var item = this._currentSubCardItems[this._currentSubCardNumber];
-    for (var key in item) {
-      this._renderCardItem(item, key);
+    var items = this._currentSubCardItems[this._currentSubCardNumber];
+    var badges = this._layout.badges;
+    var arrItemKeys = []
+    for (var key in items) {
+      var fieldType = this._layout.fieldtype[key];
+      var badgeInfo = this._layout.badges[fieldType.replace(/\(.*\)/, '')];
+      var order = 0;
+      if (badgeInfo) order = badgeInfo.order;
+      arrItemKeys.push({key: key, order: order});
+    }
+    
+    arrItemKeys = arrItemKeys.sort(
+      function (a, b) {
+        var result = 0;
+        if (a.order > b.order) result = 1;
+        if (a.order < b.order) result = -1;
+        if (result == 0) result = a.key.localeCompare(b.key);
+        return result;        
+      }
+    );
+    
+    for (var i = 0; i < arrItemKeys.length; i++) {
+      this._renderCardItem(items, arrItemKeys[i].key);
     }
   }
   

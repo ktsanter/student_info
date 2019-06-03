@@ -2,13 +2,12 @@
 //-----------------------------------------------------------------------------------
 // Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
-// TODO: ordering for badges
-// TODO: click on column title to sort results (by index or label)
+// TODO: 
 //-----------------------------------------------------------------------------------
 
 const app = function () {
   const apptitle = 'Student infoDeck reporting';
-  const appversion = '1.03';
+  const appversion = '0.05';
 	const page = {};
   const settings = {};
   
@@ -68,7 +67,6 @@ const app = function () {
   }
   
   function _renderPage() {
-    console.log(settings.studentdata);
     _identifyIndexAndCourseFields();
     page.contents = _createDiv(null, 'contents');
     page.body.appendChild(page.contents);
@@ -78,6 +76,8 @@ const app = function () {
     page.contents.appendChild(_renderCourseSelection());    
     page.contents.appendChild(_renderFilterSelection());
     
+    settings.sortby = 'index';
+    settings.sortbackwards = false;
     _renderSelectedData();    
   } 
   
@@ -91,39 +91,53 @@ const app = function () {
   }
   
   function _renderCourseSelection() {
-    var container = _createDiv(null, 'selection');    
-    container.appendChild(_createDiv(null, 'selection-title', settings.coursefieldkey));
-    
-    var courseList = _getSortedCourseList();
+    var container = _createDiv(null, 'selection');  
 
-    container.appendChild(document.createElement('br'));
-    container.appendChild(_createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
-    container.appendChild(_createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
+    var elemTitle = _createDiv(null, 'selection-title', settings.coursefieldkey)   
+    elemTitle.appendChild(_createIcon('courseUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
+    elemTitle.appendChild(_createIcon('courseDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));        
+    container.appendChild(elemTitle);
+
+    var courseList = _getSortedCourseList();
+    
+    var innercontainer = _createDiv('courseContents', 'selection-contents');
+
+    innercontainer.appendChild(document.createElement('br'));
+    innercontainer.appendChild(_createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
+    innercontainer.appendChild(_createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
 
     for (var i = 0; i < courseList.length; i++) {
       var elem = _createDiv(null, null, courseList[i]);
-      container.appendChild(document.createElement('br'));
-      container.appendChild(_createCheckbox('course' + i, null, 'course', courseList[i], courseList[i], true, _handleCourseSelection));
+      innercontainer.appendChild(document.createElement('br'));
+      innercontainer.appendChild(_createCheckbox('course' + i, null, 'course', courseList[i], courseList[i], true, _handleCourseSelection));
     }
+    container.appendChild(innercontainer);
     
     return container;
   }
    
   function _renderFilterSelection() {
     var container = _createDiv(null, 'selection');
-    container.appendChild(_createDiv(null, 'selection-title', 'filters'));
+    
+    var elemTitle = _createDiv(null, 'selection-title', 'filters');
+    elemTitle.appendChild(_createIcon('filterUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
+    elemTitle.appendChild(_createIcon('filterDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
+    container.appendChild(elemTitle);
     
     var filterList = _getFilterList();
+    
+    var innercontainer = _createDiv('filterContents', 'selection-contents');
 
-    container.appendChild(document.createElement('br'));
-    container.appendChild(_createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
-    container.appendChild(_createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
+    innercontainer.appendChild(document.createElement('br'));
+    innercontainer.appendChild(_createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
+    innercontainer.appendChild(_createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
 
     for (var i = 0; i < filterList.length; i++) {
       var elem = _createDiv(null, null, filterList[i]);
-      container.appendChild(document.createElement('br'));
-      container.appendChild(_createCheckbox('filter' + i, null, 'filter', filterList[i].fieldkey, filterList[i].fieldkey, true, _handleFilterSelection));
+      innercontainer.appendChild(document.createElement('br'));
+      innercontainer.appendChild(_createCheckbox('filter' + i, null, 'filter', filterList[i].fieldkey, filterList[i].fieldkey, true, _handleFilterSelection));
     }
+    container.appendChild(innercontainer);
     
     return container;
   }
@@ -138,8 +152,15 @@ const app = function () {
     page.selecteddata = _createDiv(null, 'selecteddata');
     
     var container = _createDiv(null, 'tabletitle');
-    container.appendChild(_createDiv(null, 'tabletitle-name', settings.indexfieldkey));
-    container.appendChild(_createDiv(null, 'tabletitle-course', settings.coursefieldkey));
+
+    var elemIndex = _createDiv(null, 'tabletitle-name', settings.indexfieldkey);
+    elemIndex.addEventListener('click', _handleIndexTitleClick, false);
+    container.appendChild(elemIndex);
+    
+    var elemCourse = _createDiv(null, 'tabletitle-course', settings.coursefieldkey);
+    elemCourse.addEventListener('click', _handleCourseTitleClick, false);
+    container.appendChild(elemCourse);
+    
     container.appendChild(_createDiv(null, 'tabletitle-items', 'items'));
     page.selecteddata.appendChild(container);
     
@@ -202,6 +223,28 @@ const app = function () {
     }
     return selected
   }
+  
+  function _doOpenClose(id) {
+    if (id == 'filterUp') {
+      document.getElementById('filterUp').style.display = 'none';
+      document.getElementById('filterDown').style.display = 'block';
+      document.getElementById('filterContents').style.display = 'none';
+    } else if (id == 'filterDown') {
+      document.getElementById('filterUp').style.display = 'block';
+      document.getElementById('filterDown').style.display = 'none';
+      document.getElementById('filterContents').style.display = 'block';
+      
+    }else if (id == 'courseUp') {
+      document.getElementById('courseUp').style.display = 'none';
+      document.getElementById('courseDown').style.display = 'block';
+      document.getElementById('courseContents').style.display = 'none';
+    } else if (id == 'courseDown') {
+      document.getElementById('courseUp').style.display = 'block';
+      document.getElementById('courseDown').style.display = 'none';
+      document.getElementById('courseContents').style.display = 'block';
+      
+    }
+  }
 
 	//------------------------------------------------------------------
 	// data processing
@@ -249,8 +292,19 @@ const app = function () {
           definition: badgeinfo[trimmedFieldType]});
       }
     }
+    
+    var sortedList = Array.from(filterList).sort(
+      function (a, b) {
+        var aval = a.fieldkey;
+        var bval = b.fieldkey;
+        var result = 0;
+        if (aval > bval) result = 1;
+        if (aval < bval) result = -1;
+        return result;
+      }
+    );
 
-    return Array.from(filterList);
+    return sortedList;
   }
   
   function _getSelectedData() {
@@ -268,6 +322,31 @@ const app = function () {
       }
     }
     
+    selectedData = selectedData.sort(
+      function(a,b) {
+        var primaryKey = settings.indexfieldkey;
+        var secondaryKey = settings.coursefieldkey;
+        if (settings.sortby != 'index') {
+          var primaryKey = settings.coursefieldkey;
+          var secondaryKey = settings.indexfieldkey;
+        }
+        
+        var aval = a.student[primaryKey];
+        var bval = b.student[primaryKey];
+        var result = aval.localeCompare(bval);
+        
+        if (result == 0) {
+          aval = a.student[secondaryKey];
+          bval = b.student[secondaryKey];
+          result = aval.localeCompare(bval);
+        }
+        
+        if (settings.sortbackwards) result *= -1;
+        
+        return result;
+      }
+    );
+
     return selectedData;
   }
   
@@ -399,6 +478,30 @@ const app = function () {
     _renderSelectedData();
   }
   
+  function _handleSelectionUpDown(e) {
+    _doOpenClose(e.target.id);
+  }
+  
+  function _handleIndexTitleClick() {
+    if (settings.sortby == 'index') {
+      settings.sortbackwards = !settings.sortbackwards;
+    } else {
+      settings.sortby = 'index';
+      settings.sortbackwards = false;
+    }
+    _renderSelectedData();
+  }
+  
+  function _handleCourseTitleClick() {
+    if (settings.sortby == 'course') {
+      settings.sortbackwards = !settings.sortbackwards;
+    } else {
+      settings.sortby = 'course';
+      settings.sortbackwards = false;
+    }
+    _renderSelectedData();
+  }
+  
   //------------------------------------------------------------------
   // date functions
   //------------------------------------------------------------------
@@ -486,6 +589,16 @@ const app = function () {
     if (id && id != '') elem.id = id;
     _addClassList(elem, classList);
     if (src != null) elem.src = src;
+    if (title) elem.title = title;
+    
+    return elem;
+  }
+    
+  function _createIcon(id, classList, title, handler) {
+    var elem = document.createElement('i');
+    if (id && id != '') elem.id = id;
+    _addClassList(elem, classList);
+    if (handler) elem.addEventListener('click', handler, false);
     if (title) elem.title = title;
     
     return elem;

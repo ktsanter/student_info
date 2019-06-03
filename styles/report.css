@@ -45,6 +45,8 @@ body {
   vertical-align: top;
   padding: 0.2em 0.3em;
   margin-right: 0.8em;  
+  min-width: 19.5em;
+  min-height: 0.9em;
 }
 
 .selection-title {
@@ -53,6 +55,19 @@ body {
   border: 1px solid black;
   border-radius: 6px 6px 0px 0px;
   margin: -4px -4px;
+}
+
+.selection-control {
+  vertical-align: middle;
+  float: right;
+  margin-right: 0.2em;
+  font-size: 1.2em;
+}
+
+.selection-contents {}
+
+#filterDown, #courseDown {
+  display: none;
 }
 
 .selecteddata {
