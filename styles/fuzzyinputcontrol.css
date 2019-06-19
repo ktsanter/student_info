@@ -3,6 +3,10 @@
 /*----------------------------------------------------------*/
 
 /* the input control */
+#selectControl {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
 .fuzzyinputcontrol {}
 
 /* list of matching items */

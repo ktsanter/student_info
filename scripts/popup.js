@@ -2,7 +2,7 @@
 //-----------------------------------------------------------------------------------
 // Student infoDeck Chrome extension
 //-----------------------------------------------------------------------------------
-// TODO: 
+// TODO: use new StandardNotice
 //-----------------------------------------------------------------------------------
 
 const app = function () {
@@ -274,51 +274,27 @@ const app = function () {
     return elemNotice;    
   }
  
-   function _renderReconfigureUI() {
+  function _renderReconfigureUI() {
     if (settings.deckinitialized) settings.deck.hideDeck()
     
-    page.reconfigureUI = document.createElement('div');
-    page.reconfigureUI.id = 'reconfigureUI';
-    page.reconfigureUI.classList.add('reconfigure');
-  
-    elemContainer = document.createElement('div');
-    elemContainer.classList.add('reconfigure-title');
-    var elemTitle = document.createElement('div');
-    elemTitle.classList.add('reconfigure-title-label');
-    elemTitle.innerHTML = 'student information spreadsheet URL';
-    elemContainer.appendChild(elemTitle);
-    
-    var elemCheck = document.createElement('i');
-    elemCheck.classList.add('fa');
-    elemCheck.classList.add('fa-check');
-    elemCheck.classList.add('fa-lg');
-    elemCheck.classList.add('reconfigure-icon');
-    elemCheck.title = 'save changes';
-    elemCheck.addEventListener('click', _completeReconfigure, false);
-    elemContainer.appendChild(elemCheck);
-    
-    if (settings.deckinitialized) {
-      var elemDiscard = document.createElement('i');
-      elemDiscard.classList.add('fas');
-      elemDiscard.classList.add('fa-times');
-      elemDiscard.classList.add('fa-lg');
-      elemDiscard.classList.add('reconfigure-icon');
-      elemDiscard.title = 'discard changes';
-      elemDiscard.addEventListener('click', _cancelReconfigure, false);
-      elemContainer.appendChild(elemDiscard);        
-    }
-    page.reconfigureUI.appendChild(elemContainer);
-
-    var elemContainer = document.createElement('div');
-    elemContainer.classList.add('reconfigure-item');    
-    var elemInput = document.createElement('input');
-    elemInput.classList.add('reconfigure-input');
-    elemInput.id = 'studentinfoSpreadsheetLink';
-    elemInput.value = settings.configparams.studentspreadsheetlink;
-    elemContainer.appendChild(elemInput);
-    page.reconfigureUI.appendChild(elemContainer);
-        
+    page.reconfigureUI = CreateElement.createDiv('reconfigureUI', 'reconfigure');
     page.body.appendChild(page.reconfigureUI);  
+  
+    var container = CreateElement.createDiv(null, 'reconfigure-title');
+    page.reconfigureUI.appendChild(container);
+    
+    container.appendChild(CreateElement.createDiv(null, 'reconfigure-title-label', 'student information spreadsheet URL'));
+    
+    container.appendChild(CreateElement.createIcon(null, 'fa fa-check reconfigure-icon', 'save changes', _completeReconfigure));
+  
+    if (settings.deckinitialized) {
+      container.appendChild(CreateElement.createIcon(null, 'fas fa-times reconfigure-icon', 'discard changes', _cancelReconfigure));    
+    }      
+
+    container = CreateElement.createDiv(null, 'reconfigure-item');
+    page.reconfigureUI.appendChild(container);
+   
+    container.appendChild(CreateElement.createTextInput('studentinfoSpreadsheetLink', 'reconfigure-input', settings.configparams.studentspreadsheetlink));
   }
   
   async function _endReconfigure(saveNewConfiguration) { 

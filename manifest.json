@@ -7,7 +7,7 @@
   
   "description": "Track student information",
   
-  "version": "0.21",
+  "version": "0.22",
   
   "browser_action": {
     "default_icon": "sid_16_rounded.png",

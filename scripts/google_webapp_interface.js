@@ -1,11 +1,9 @@
+"use strict";
 //---------------------------------------------------------------
 // Google Web API class 
 //---------------------------------------------------------------
-"use strict";
-
-//
 // TODO: 
-//
+//---------------------------------------------------------------
 
 class googleSheetWebAPI {
   //--------------------------------------------------------------
@@ -13,9 +11,9 @@ class googleSheetWebAPI {
   //   apiInfo: object with apiBase URL and API key, e.g {apibase: 'xxx', apikey: 'yyy'}
   //   dataset: dataset name passed to API
   //   params: JSON object holding any other query parameters passed to the API
-  //   funcError: (optional) function for error reporting
+  //   objNotice: (optional) object with "reportError" function for error reporting
   //--------------------------------------------------------------  
-  static async webAppGet(apiInfo, dataset, params, funcError) {
+  static async webAppGet(apiInfo, dataset, params, objNotice) {
     const METHOD_TITLE = 'webAppGet';
     
     this.__setAPIInfo__(apiInfo.apibase, apiInfo.apikey);
@@ -28,13 +26,13 @@ class googleSheetWebAPI {
 
       if (!json.success) {
         var errmsg = '*ERROR: in ' + METHOD_TITLE + ', ' + json.details;
-        if (funcError != null) funcError(METHOD_TITLE, {name: 'API failure', message: errmsg});
+        if (objNotice != null) objNotice.reportError(METHOD_TITLE, {name: 'API failure', message: errmsg});
         console.log(errmsg);
       }
       return json;
       
     } catch (error) {
-      if (funcError != null) funcError(METHOD_TITLE, error);
+      if (objNotice != null) objNotice.reportError(METHOD_TITLE, error);
       console.log('**ERROR: in ' + METHOD_TITLE + ', ' + error);
     }
   }  
@@ -44,9 +42,9 @@ class googleSheetWebAPI {
   //   apiInfo: object with apiBase URL and API key, e.g {apibase: 'xxx', apikey: 'yyy'}
   //   dataset: dataset name passed to API
   //   postData: JSON object holding data passed to the API
-  //   funcError: (optional) function for error reporting
+  //   objNotice: (optional) object with "reportError" function for error reporting
   //--------------------------------------------------------------  
-  static async webAppPost(apiInfo, dataset, postData, funcError) {
+  static async webAppPost(apiInfo, dataset, postData, objNotice) {
     const METHOD_TITLE = 'webAppPost';
 
     this.__setAPIInfo__(apiInfo.apibase, apiInfo.apikey);
@@ -59,13 +57,13 @@ class googleSheetWebAPI {
 
       if (!json.success) {
         var errmsg = '**ERROR: in ' + METHOD_TITLE + ', ' + json.details;
-        if (funcError != null) funcError(METHOD_TITLE, {name: 'API failure', message: errmsg});
+        if (objNotice != null) objNotice.reportError(METHOD_TITLE, {name: 'API failure', message: errmsg});
         console.log(errmsg);
       }
       return json;
 
     } catch (error) {
-      if (funcError != null) funcError(METHOD_TITLE, error);
+      if (objNotice != null) objNotice.reportError(METHOD_TITLE, error);
       console.log('**ERROR: in ' + METHOD_TITLE + ', ' + error);
     }  
   }

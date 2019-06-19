@@ -143,6 +143,10 @@
   margin-left: 0.5em;
 }
 
+#notesSelect {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
 .decklayout-notecontrol {
   width: 30em;
   overflow-x: auto;
@@ -162,6 +166,10 @@
 .decklayout-notes-editing-icon {
   float: right;
   margin-right: 6px;
+}
+
+#notesEditingInput {
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
 .decklayout-notes-editing-input {

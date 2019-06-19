@@ -7,7 +7,7 @@
 
 class InfoDeck {
   constructor() {
-    this._version = '0.17';
+    this._version = '0.18';
   }
   
   //--------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class InfoDeck {
   // rendering
   //--------------------------------------------------------------------------------
   renderDeck() {
-    this._elemDeckContainer = CreateElement._createDiv(null, 'decklayout-main');
+    this._elemDeckContainer = CreateElement.createDiv(null, 'decklayout-main');
     
     var elemNav = this._renderNavigation(this._title);
     this._elemDeckContainer.appendChild(elemNav);
@@ -68,13 +68,13 @@ class InfoDeck {
     this._elemDeckContainer.appendChild(this._renderAbout());
     //this._elemDeckContainer.appendChild(InfoDeck._renderClipboardCopyArea());
 
-    var elemCardContainer = CreateElement._createDiv(null, 'decklayout-card');
+    var elemCardContainer = CreateElement.createDiv(null, 'decklayout-card');
 
-    elemCardContainer.appendChild(CreateElement._createDiv('containerPicture', 'decklayout-picture'));  
-    elemCardContainer.appendChild(CreateElement._createDiv('containerGenericItems', 'decklayout-genericitems'));  
-    elemCardContainer.appendChild(CreateElement._createDiv('containerBadges', 'decklayout-badges'));  
-    elemCardContainer.appendChild(CreateElement._createDiv('containerNotes', 'decklayout-notes'));  
-    elemCardContainer.appendChild(CreateElement._createDiv('containerCardLabel', 'decklayout-cardlabel'));
+    elemCardContainer.appendChild(CreateElement.createDiv('containerPicture', 'decklayout-picture'));  
+    elemCardContainer.appendChild(CreateElement.createDiv('containerGenericItems', 'decklayout-genericitems'));  
+    elemCardContainer.appendChild(CreateElement.createDiv('containerBadges', 'decklayout-badges'));  
+    elemCardContainer.appendChild(CreateElement.createDiv('containerNotes', 'decklayout-notes'));  
+    elemCardContainer.appendChild(CreateElement.createDiv('containerCardLabel', 'decklayout-cardlabel'));
     
     this._elemDeckContainer.appendChild(elemCardContainer);
 
@@ -82,33 +82,33 @@ class InfoDeck {
   }
   
   _renderNavigation(title) {
-    var elemContainer = CreateElement._createDiv(null, 'decklayout-topnav');
+    var elemContainer = CreateElement.createDiv(null, 'decklayout-topnav');
     
-    var elemLink = CreateElement._createLink(null, 'decklayout-title', title, '');
+    var elemLink = CreateElement.createLink(null, 'decklayout-title', title, null, '#');
     elemContainer.appendChild(elemLink);
     
-    var elemSubLinksContainer = CreateElement._createDiv('deckNavLinks', null);
+    var elemSubLinksContainer = CreateElement.createDiv('deckNavLinks', null);
     
     var menuOptions = this._callbacks.menu;
     for (var i = 0; i < menuOptions.length; i++) {
       var handler = function (me, f) { return function(e) {me._doMenuOption(f);}} (this, menuOptions[i].callback);
-      elemLink = CreateElement._createLink(null, 'decklayout-navlink', menuOptions[i].label, null, handler); 
+      elemLink = CreateElement.createLink(null, 'decklayout-navlink', menuOptions[i].label, null, '#', handler); 
       elemSubLinksContainer.appendChild(elemLink);
     }
     
-    elemSubLinksContainer.appendChild(CreateElement._createHR(null, null));
-    elemSubLinksContainer.appendChild(CreateElement._createLink(null, 'decklayout-navigation', 'about', null, e => InfoDeck._doAbout(e)));
+    elemSubLinksContainer.appendChild(CreateElement.createHR(null, null));
+    elemSubLinksContainer.appendChild(CreateElement.createLink(null, 'decklayout-navigation', 'about', null, '#', e => InfoDeck._doAbout(e)));
     elemContainer.appendChild(elemSubLinksContainer);
     
-    elemLink = CreateElement._createLink('hamburger', 'icon', null, null, e => InfoDeck._toggleHamburgerMenu());
-    elemLink.appendChild(CreateElement._createIcon(null, 'fa fa-bars'));
+    elemLink = CreateElement.createLink('hamburger', 'icon', null, null, '#', e => InfoDeck._toggleHamburgerMenu());
+    elemLink.appendChild(CreateElement.createIcon(null, 'fa fa-bars'));
     elemContainer.appendChild(elemLink);
     
     return elemContainer;     
   }
   
   _renderSelect() {
-    var elemContainer = CreateElement._createDiv(null, 'decklayout-select-container');
+    var elemContainer = CreateElement.createDiv(null, 'decklayout-select-container');
 
     var fuzzySelect = new FuzzyInputControl(
       this._indexlist, 
@@ -120,7 +120,7 @@ class InfoDeck {
     elemFuzzySelect.classList.add('decklayout-select-control');
     elemContainer.appendChild(elemFuzzySelect);
 
-    elemContainer.appendChild(CreateElement._createDiv('copiedMessage', 'decklayout-select-copied'));
+    elemContainer.appendChild(CreateElement.createDiv('copiedMessage', 'decklayout-select-copied'));
     
     return elemContainer;
   } 
@@ -134,16 +134,16 @@ class InfoDeck {
       'contact: ktsanter@gmail.com',
       'uses: ' + 'InfoDeck ' + sinfoDeckVersion + ', ' + 'FuzzyInputControl ' + sFuzzyInputControlVersion
     ];
-    var elemContainer = CreateElement._createDiv('infoDeckAbout', 'decklayout-about');
+    var elemContainer = CreateElement.createDiv('infoDeckAbout', 'decklayout-about');
     
-    var elemTitle = CreateElement._createDiv(null, null);
-    elemTitle.appendChild(CreateElement._createDiv(null, 'decklayout-about-label', 'About <em>' + this._title + '</em> ' + sOuterAppVersion));
-    elemTitle.appendChild(CreateElement._createIcon(null, 'fas fa-times fa-lg decklayout-about-close', 'close "about"', e => this._handleAboutCloseClick(e)));
+    var elemTitle = CreateElement.createDiv(null, null);
+    elemTitle.appendChild(CreateElement.createDiv(null, 'decklayout-about-label', 'About <em>' + this._title + '</em> ' + sOuterAppVersion));
+    elemTitle.appendChild(CreateElement.createIcon(null, 'fas fa-times decklayout-about-close', 'close "about"', e => this._handleAboutCloseClick(e)));
     elemContainer.appendChild(elemTitle);
     
-    var elemDetailContainer = CreateElement._createDiv(null, null);
+    var elemDetailContainer = CreateElement.createDiv(null, null);
     for (var i = 0; i < details.length; i++) {
-      var elemDetail = CreateElement._createDiv('', 'deck-layout-about-detail', details[i]);
+      var elemDetail = CreateElement.createDiv('', 'deck-layout-about-detail', details[i]);
       elemDetail.innerHTML = details[i];
       elemDetailContainer.appendChild(elemDetail);      
     }
@@ -248,7 +248,7 @@ class InfoDeck {
       this._renderBadge(fieldType, fieldValue, key);
       
     } else if (fieldType == 'date') {
-      this._renderGenericItem(fieldTitle, MyDateTime._formatDate(fieldValue));
+      this._renderGenericItem(fieldTitle, DateTime.formatDate(fieldValue));
       
     } else {
       console.log('ERROR: unrecognized field type (' + fieldType + ') for field key = ' + key);
@@ -269,17 +269,17 @@ class InfoDeck {
     var arrNotes = notes.split('\n');
     var elemContainer = this._getContainer('decklayout-notes');
     
-    var elemLabelContainer = CreateElement._createDiv(null, 'decklayout-noteslabel');
-    elemLabelContainer.appendChild(CreateElement._createSpan(null, null, title));
-    elemLabelContainer.appendChild(CreateElement._createIcon('addTitle', 'fa fa-plus decklayout-notes-plus', 'add note', e => this._handleAddNote(e)));
+    var elemLabelContainer = CreateElement.createDiv(null, 'decklayout-noteslabel');
+    elemLabelContainer.appendChild(CreateElement.createSpan(null, null, title));
+    elemLabelContainer.appendChild(CreateElement.createIcon('addTitle', 'fa fa-plus decklayout-notes-plus', 'add note', e => this._handleAddNote(e)));
     elemContainer.appendChild(elemLabelContainer);
   
-    var elemSelect = CreateElement._createSelect('notesSelect', 'decklayout-notecontrol');  
+    var elemSelect = CreateElement.createSelect('notesSelect', 'decklayout-notecontrol');  
     elemSelect.size = 5;
     for (var i = 0; i < arrNotes.length; i++) {
       var note = arrNotes[i];
       if (note != '') {
-        elemSelect.appendChild(CreateElement._createOption(null, null, i, note.replace('|', ': ')));
+        elemSelect.appendChild(CreateElement.createOption(null, null, i, note.replace('|', ': ')));
       }
     }
     elemSelect.addEventListener('dblclick', e => this._handleNoteDoubleClick(e), false);
@@ -289,20 +289,20 @@ class InfoDeck {
   }
 
   _renderNotesEditingSection() {
-    var elemContainer = CreateElement._createDiv('notesEditing', 'decklayout-notes-editing');
+    var elemContainer = CreateElement.createDiv('notesEditing', 'decklayout-notes-editing');
     
-    var elemWorkingNoteIndex = CreateElement._createDiv('notesEditingWorkingIndex', null, '-1');
+    var elemWorkingNoteIndex = CreateElement.createDiv('notesEditingWorkingIndex', null, '-1');
     elemWorkingNoteIndex.style.display = 'none';
     elemContainer.appendChild(elemWorkingNoteIndex);
     
-    elemContainer.appendChild(CreateElement._createDiv('notesEditingDate', 'decklayout-notes-editing-date', '02/14/2019'));
+    elemContainer.appendChild(CreateElement.createDiv('notesEditingDate', 'decklayout-notes-editing-date', '02/14/2019'));
     
-    elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-check fa-lg decklayout-notes-editing-icon', 'save changes', e => this._handleEditingCheckClick(e)));
-    elemContainer.appendChild(CreateElement._createIcon(null, 'fas fa-times fa-lg decklayout-notes-editing-icon', 'discard changes', e => this._handleEditingDiscardClick(e)));
-    elemContainer.appendChild(CreateElement._createIcon('deleteNoteIcon', 'fa fa-trash fa-lg decklayout-notes-editing-icon', 'delete note', e => this._handleEditingTrashClick(e)));
+    elemContainer.appendChild(CreateElement.createIcon(null, 'fa fa-check decklayout-notes-editing-icon', 'save changes', e => this._handleEditingCheckClick(e)));
+    elemContainer.appendChild(CreateElement.createIcon(null, 'fas fa-times decklayout-notes-editing-icon', 'discard changes', e => this._handleEditingDiscardClick(e)));
+    elemContainer.appendChild(CreateElement.createIcon('deleteNoteIcon', 'fa fa-trash decklayout-notes-editing-icon', 'delete note', e => this._handleEditingTrashClick(e)));
 
-    var elemInputContainer = CreateElement._createDiv(null, null);
-    elemInputContainer.appendChild(CreateElement._createTextArea('notesEditingInput', 'decklayout-notes-editing-input'));
+    var elemInputContainer = CreateElement.createDiv(null, null);
+    elemInputContainer.appendChild(CreateElement.createTextArea('notesEditingInput', 'decklayout-notes-editing-input'));
 
     elemContainer.appendChild(elemInputContainer);
 
@@ -314,25 +314,25 @@ class InfoDeck {
     var numCards = this._currentSubCardItems.length;
 
     if (numCards > 0 && this._currentSubCardNumber > 0) {
-      elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-angle-double-left fa-lg decklayout-label-control-left', 'previous card', e => this._renderPreviousSubCardInfo(e)));
+      elemContainer.appendChild(CreateElement.createIcon(null, 'fa fa-angle-double-left decklayout-label-control-left', 'previous card', e => this._renderPreviousSubCardInfo(e)));
     }
     
-    elemContainer.appendChild(CreateElement._createSpan(null, null, label));
+    elemContainer.appendChild(CreateElement.createSpan(null, null, label));
     
     if (numCards > 0 && this._currentSubCardNumber < numCards - 1) {
-      elemContainer.appendChild(CreateElement._createIcon(null, 'fa fa-angle-double-right fa-lg decklayout-label-control-right', 'next card', e => this._rnderNextSubCardInfo(e)));
+      elemContainer.appendChild(CreateElement.createIcon(null, 'fa fa-angle-double-right decklayout-label-control-right', 'next card', e => this._rnderNextSubCardInfo(e)));
     }
   }
   
   _renderGenericItem(title, itemValue) {
     var elemContainer = this._getContainer('decklayout-genericitems');
     
-    var elemItem = CreateElement._createDiv(null, null);
+    var elemItem = CreateElement.createDiv(null, null);
     
-    var elemLabel = CreateElement._createDiv(null, 'decklayout-genericitemlabel', title);
+    var elemLabel = CreateElement.createDiv(null, 'decklayout-genericitemlabel', title);
     elemItem.appendChild(elemLabel);
     
-    var elemValue = CreateElement._createDiv(null, 'decklayout-genericitemvalue', itemValue);
+    var elemValue = CreateElement.createDiv(null, 'decklayout-genericitemvalue', itemValue);
     elemValue.addEventListener('dblclick', e => this._handleGenericItemDoubleClick(e), false);
     elemItem.appendChild(elemValue);
     
@@ -361,24 +361,24 @@ class InfoDeck {
         badgeDisplayInfo = matchValInfo.display;
         
       } else if (matchValInfo.value == '[late>]') {
-        if (MyDateTime._isValidDate(itemValue)) {
-          if (MyDateTime._compareDateToNow(itemValue) < 0) {
+        if (DateTime.isValidDate(itemValue)) {
+          if (DateTime.compareDateToNow(itemValue) < 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is late (due [date])';
           }
         } 
         
       } else if (matchValInfo.value == '[late=]') {
-        if (MyDateTime._isValidDate(itemValue)) {
-          if (MyDateTime._compareDateToNow(itemValue) == 0) {
+        if (DateTime.isValidDate(itemValue)) {
+          if (DateTime.compareDateToNow(itemValue) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due today: [date]';
           }
         } 
 
       } else if (matchValInfo.value == '[window]') {
-        if (MyDateTime._isValidDate(itemValue)) {
-          if (MyDateTime._compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
+        if (DateTime.isValidDate(itemValue)) {
+          if (DateTime.compareDateToNow(itemValue, parseInt(itemKeyParam)) == 0) {
             badgeDisplayInfo = matchValInfo.display;
             badgeInfo.hovertext = fieldName + ' is due soon: [date]';
           }
@@ -408,25 +408,25 @@ class InfoDeck {
   }
   
   _renderBadgeImage(badgetype, badgeinfo, title, value, badgecolor) {
-    var elemImageContainer = CreateElement._createDiv(null, null);
+    var elemImageContainer = CreateElement.createDiv(null, null);
 
     var hoverText = title;
     hoverText = hoverText.replace(/\[value\]/g, value);
-    hoverText = hoverText.replace(/\[date\]/g, MyDateTime._formatDate(value));
+    hoverText = hoverText.replace(/\[date\]/g, DateTime.formatDate(value));
     
     elemImageContainer.title = hoverText;
 
     if (badgetype == 'image') {
       elemImageContainer.classList.add('decklayout-badges-badgeimage');
-      elemImageContainer.appendChild(CreateElement._createImage(null, null, badgeinfo, '', null, e => this._handleBadgeDoubleClick(e)));
+      elemImageContainer.appendChild(CreateElement.createImage(null, null, badgeinfo, '', null, e => this._handleBadgeDoubleClick(e)));
     
     } else if (badgetype == 'icon') {
       elemImageContainer.classList.add('decklayout-badges-badgeicon');
-      elemImageContainer.appendChild(CreateElement._createIcon(null, 'fa-lg ' + badgeinfo, null, null, e => this._handleBadgeDoubleClick(e)));
+      elemImageContainer.appendChild(CreateElement.createIcon(null, 'fa-lg ' + badgeinfo, null, null, e => this._handleBadgeDoubleClick(e)));
       
     } else if (badgetype == 'unicode') {
       elemImageContainer.classList.add('decklayout-badges-badgeunicode');
-      var elemUni = CreateElement._createDiv(null, null, String.fromCodePoint(...badgeinfo));
+      var elemUni = CreateElement.createDiv(null, null, String.fromCodePoint(...badgeinfo));
       elemUni.addEventListener('dblclick', e => this._handleBadgeDoubleClick(e), false);
       elemImageContainer.appendChild(elemUni);
     }
@@ -458,7 +458,7 @@ class InfoDeck {
     
     document.getElementById('notesEditingWorkingIndex').innerHTML = noteIndex;
     
-    var noteDate = MyDateTime._formatDate(Date.now());
+    var noteDate = DateTime.formatDate(Date.now());
     var noteText = '';
     if (initialNote != '') {
       var arrNote = initialNote.split(': ');
@@ -597,7 +597,7 @@ class InfoDeck {
   }
   
   _handleGenericItemDoubleClick(e) {
-    InfoDeck._copyToClipboard(e.target.innerHTML);
+    this._copyToClipboard(e.target.innerHTML);
     if (window.getSelection) {
       window.getSelection().removeAllRanges();
     } else if (document.selection) {
@@ -606,16 +606,17 @@ class InfoDeck {
   }
   
   _handleBadgeDoubleClick(e) {
-    InfoDeck._copyToClipboard(e.target.parentNode.title);
+    this._copyToClipboard(e.target.parentNode.title);
   }
   
   //---------------------------------------
   // clipboard functions
   //----------------------------------------
-  static _copyToClipboard(txt) {
-    if (!this._clipboard) this._clipboard = new ClipboardCopy();
+  _copyToClipboard(txt) {
+    if (!this._elemDeckContainer._clipboard) this._elemDeckContainer._clipboard = new ClipboardCopy(this._elemDeckContainer, 'plain');
 
-    this._clipboard._copyToClipboard(txt);
+    this._elemDeckContainer._clipboard.copyToClipboard(txt);
+    
     InfoDeck._setCopiedMessage('copied');
 	}	
     

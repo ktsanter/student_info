@@ -1,25 +1,50 @@
 "use strict";
 //-----------------------------------------------------------------------------------
 // copy to and from clipboard
+// note: if copyType is 'rendered' or 'both' then "clipboard.min.js" must be included
 //-----------------------------------------------------------------------------------
 // TODO: 
 //-----------------------------------------------------------------------------------
 
 class ClipboardCopy {
-  constructor() {
-    this._version = '0.01';
+  constructor(appendTo, copyType) {
+    this._version = '0.02';
     
-    this._clipboardArea = this._renderClipboardCopyArea();
-    document.getElementsByTagName('body')[0].appendChild(this._clipboardArea);
+    if (!appendTo) appendTo = document.getElementsByTagName('body')[0]
+    
+    if (copyType == 'plain' || copyType == 'both') {
+      this._clipboardArea = this._renderClipboardCopyArea();
+      appendTo.appendChild(this._clipboardArea);
+    }
+    
+    if (copyType == 'rendered' || copyType == 'both') {
+      this._renderedClipboardArea = this._renderRenderedClipboardCopyArea();
+      appendTo.appendChild(this._renderedClipboardArea);
+    }
   }
  
   _renderClipboardCopyArea() {
-    var elemClipboardArea = document.createElement('textarea');
-    elemClipboardArea.style.display = 'none';
-    return elemClipboardArea;
+    var elem = document.createElement('textarea');
+    elem.style.display = 'none';
+    return elem;
+  }
+  
+  _renderRenderedClipboardCopyArea() {
+    var container = CreateElement.createDiv('renderedCopyContainer', 'renderedcopy');
+    container.style.display = 'none';
+    
+    var elemButton = CreateElement.createButton('btnCopyRendered', null, 'hide me');
+    var elemTarget = CreateElement.createDiv('copyRenderedTarget', null);
+    elemButton.setAttribute('data-clipboard-target', '#' + elemTarget.id);
+    var junk = new Clipboard(elemButton); 
+    
+    container.appendChild(elemButton);
+    container.appendChild(elemTarget);
+    
+    return container;
   }
 
-  _copyToClipboard(txt) {
+  copyToClipboard(txt) {
 		var clipboardElement = this._clipboardArea;
 		clipboardElement.value = txt;
 		clipboardElement.style.display = 'block';
@@ -28,4 +53,15 @@ class ClipboardCopy {
 		clipboardElement.selectionEnd = clipboardElement.selectionStart;
 		clipboardElement.style.display = 'none';
 	}	
+  
+  copyRenderedToClipboard(txt) {
+    var container = document.getElementById('renderedCopyContainer');
+    var elemButton = document.getElementById('btnCopyRendered');
+    var elemTarget = document.getElementById('copyRenderedTarget');
+    
+    container.style.display = 'block';
+    elemTarget.innerHTML = txt;
+    elemButton.click();
+    container.style.display = 'none';
+  }  
 }

@@ -4,20 +4,24 @@
 //-----------------------------------------------------------------------------------
 // TODO: 
 //-----------------------------------------------------------------------------------
-class MyDateTime {
+class DateTime {
   constructor() {
-    this._version = '0.01';
+    this_version = '0.04';
   }
   
-  static _isValidDate(str) {
+  static _getDebugNow() {
+    return null;//'10/13/2019';
+  }
+  
+  static isValidDate(str) {
     var d = new Date(str);
     return !isNaN(d);
   }
 
-  static _formatDate(theDate) {
+  static formatDate(theDate) {
     var formattedDate = theDate;
     
-    if (MyDateTime._isValidDate(theDate)) {
+    if (DateTime.isValidDate(theDate)) {
       formattedDate = '';
       if (theDate != null & theDate != '') {
         var objDate = new Date(theDate);
@@ -30,12 +34,38 @@ class MyDateTime {
     
     return formattedDate;
   }
+  
+  static formatDateShort(theDate) {
+    var formattedDate = theDate;
+    
+    if (DateTime.isValidDate(theDate)) {
+      formattedDate = DateTime.formatDate(theDate).slice(0, -3);
+    }
+    
+    return formattedDate;
+  }
 
-  static _compareDateToNow(date, daysInWindow) {
+  
+  static formatDateShortWithWeekday(theDate) {
+    var weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var formattedDate = theDate;
+    
+    if (DateTime.isValidDate(theDate)) {
+      var objDate = new Date(theDate);
+      formattedDate = weekDays[objDate.getDay()] + ' ' + DateTime.formatDateShort(theDate);
+    }
+    
+    return formattedDate;
+  }
+    
+  static compareDateToNow(date, daysInWindow) {
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
     var parsedDate = new Date(Date.parse(date));
     var now = new Date();
+    
+    var debugNow = DateTime._getDebugNow();
+    if (debugNow != null) now = new Date(Date.parse(debugNow));
     
     var utc1 = Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
     var utc2 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -49,6 +79,25 @@ class MyDateTime {
     } else if ((daysLate + daysInWindow) >= 0) {
       result = 0;
     }
+    
+    return result;
+  }
+  
+  static isNowInWeek(date) {
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    var parsedDate = new Date(Date.parse(date));
+    var now = new Date();
+
+    var debugNow = DateTime._getDebugNow();
+    if (debugNow != null) now = new Date(Date.parse(debugNow));
+    
+    var utcDate = Date.UTC(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+    var utcNow = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+    var result = false;
+    var daysLater = Math.floor(utcNow - utcDate) / _MS_PER_DAY;
+    if (daysLater >= 0 && daysLater < 7) result = true;
 
     return result;
   }
