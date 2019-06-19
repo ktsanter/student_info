@@ -7,7 +7,7 @@
 
 const app = function () {
   const apptitle = 'Student infoDeck reporting';
-  const appversion = '0.08';
+  const appversion = '0.09';
 	const page = {};
   const settings = {};
   
@@ -98,25 +98,28 @@ const app = function () {
   function _renderCourseSelection() {
     var container = CreateElement.createDiv(null, 'selection');  
 
-    var elemTitle = CreateElement.createDiv(null, 'selection-title', settings.coursefieldkey)   
-    elemTitle.appendChild(CreateElement.createIcon('courseUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
-    elemTitle.appendChild(CreateElement.createIcon('courseDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));        
-    container.appendChild(elemTitle);
+    var title = CreateElement.createDiv(null, 'selection-title');   
+    container.appendChild(title);
+    title.appendChild(CreateElement.createDiv(null, 'selection-title-label', settings.coursefieldkey));
+    
+    var updowncontainer = CreateElement.createDiv(null, 'selection-control-container');
+    title.appendChild(updowncontainer);
+    updowncontainer.appendChild(CreateElement.createIcon('courseUp', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
+    updowncontainer.appendChild(CreateElement.createIcon('courseDown', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));        
 
     var courseList = _getSortedCourseList();
     
     var innercontainer = CreateElement.createDiv('courseContents', 'selection-contents');
+    container.appendChild(innercontainer);
 
-    innercontainer.appendChild(CreateElement.createBR(null, null));
-    innercontainer.appendChild(CreateElement.createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
-    innercontainer.appendChild(CreateElement.createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
+    innercontainer.appendChild(CreateElement.createButton(null, 'selection-control-button', 'all', 'select all', _handleSelectAllCourses));
+    innercontainer.appendChild(CreateElement.createButton(null, 'selection-control-button', 'clear', 'clear all', _handleDeSelectAllCourses));
 
     for (var i = 0; i < courseList.length; i++) {
       var elem = CreateElement.createDiv(null, null, courseList[i]);
       innercontainer.appendChild(CreateElement.createBR(null, null));
       innercontainer.appendChild(CreateElement.createCheckbox('course' + i, null, 'course', courseList[i], courseList[i], true, _handleCourseSelection));
     }
-    container.appendChild(innercontainer);
     
     return container;
   }
@@ -124,25 +127,28 @@ const app = function () {
   function _renderFilterSelection() {
     var container = CreateElement.createDiv(null, 'selection');
     
-    var elemTitle = CreateElement.createDiv(null, 'selection-title', 'filters');
-    elemTitle.appendChild(CreateElement.createIcon('filterUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
-    elemTitle.appendChild(CreateElement.createIcon('filterDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
-    container.appendChild(elemTitle);
+    var title = CreateElement.createDiv(null, 'selection-title');
+    container.appendChild(title);
+    title.appendChild(CreateElement.createDiv(null, 'selection-title-label', 'filter'));
+    
+    var updowncontainer = CreateElement.createDiv(null, 'selection-control-container');
+    title.appendChild(updowncontainer);
+    updowncontainer.appendChild(CreateElement.createIcon('filterUp', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
+    updowncontainer.appendChild(CreateElement.createIcon('filterDown', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
     
     var filterList = _getFilterList();
     
     var innercontainer = CreateElement.createDiv('filterContents', 'selection-contents');
+    container.appendChild(innercontainer);
 
-    innercontainer.appendChild(CreateElement.createBR(null, null));
-    innercontainer.appendChild(CreateElement.createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
-    innercontainer.appendChild(CreateElement.createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
+    innercontainer.appendChild(CreateElement.createButton(null, 'selection-control-button', 'all', 'select all filters', _handleSelectAllFilters));
+    innercontainer.appendChild(CreateElement.createButton(null, 'selection-control-button', 'clear', 'clear all filters', _handleDeSelectAllFilters));
 
     for (var i = 0; i < filterList.length; i++) {
       var elem = CreateElement.createDiv(null, null, filterList[i]);
       innercontainer.appendChild(CreateElement.createBR(null, null));
       innercontainer.appendChild(CreateElement.createCheckbox('filter' + i, null, 'filter', filterList[i].fieldkey, filterList[i].fieldkey, true, _handleFilterSelection));
     }
-    container.appendChild(innercontainer);
     
     return container;
   }
@@ -544,9 +550,9 @@ const app = function () {
   // clipboard functions
   //----------------------------------------
   function _copyToClipboard(txt) {
-    if (!page._clipboard) page._clipboard = new ClipboardCopy();
+    if (!page._clipboard) page._clipboard = new ClipboardCopy(page.body, 'plain');
 
-    page._clipboard._copyToClipboard(txt);
+    page._clipboard.copyToClipboard(txt);
     _setCopiedMessage('copied');
 	}	
 

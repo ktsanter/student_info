@@ -5,10 +5,10 @@
 body {
 	color: black;
 	background-color: #eee;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Segoe UI", Tahoe, Arial, sans-serif;
 	font-size: 13px;
-	margin-left: 12px;
-	margin-right: 12px;
+	margin-left: 0.4em;
+	margin-right: 0.4em;
 }
 
 .notice {
@@ -46,6 +46,7 @@ body {
 .title-version {
   display: inline-block;
   float: right;
+  font-size: 0.9em;
 }
 
 .selection {
@@ -68,6 +69,17 @@ body {
   margin: -4px -4px;
 }
 
+.selection-title-label {
+  display: inline-block;
+  margin-right: 0.6em;
+}
+
+.selection-control-container {
+  display: inline-block;
+  float: right;
+  margin-top: 0.1em;
+}
+
 .selection-control {
   vertical-align: middle;
   float: right;
@@ -75,9 +87,19 @@ body {
   font-size: 1.2em;
 }
 
-.selection-contents {}
+.selection-control-button {
+  font-family: "Segoe UI", Tahoe, Arial, sans-serif;
+  margin-top: 0.8em;
+  font-size: 0.9em;
+  padding-top: 0em;
+  padding-bottom: 0em;
+}
 
-#filterDown, #courseDown {
+.selection-contents {
+  display: none;
+}
+
+#filterUp, #courseUp {
   display: none;
 }
 
@@ -138,11 +160,10 @@ body {
 .student-item-image {
   display: inline-block;
   margin-right: 0.2em;
-  min-height: 2.8em;
 }
 
 .student-item-image img {
-  width: 30px;
+  width: 2em;
   height: auto;
   vertical-align: middle
 }
@@ -171,5 +192,3 @@ body {
   font-size: 24px;
   vertical-align: middle;
 }
-
-
