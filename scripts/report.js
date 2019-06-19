@@ -7,7 +7,7 @@
 
 const app = function () {
   const apptitle = 'Student infoDeck reporting';
-  const appversion = '0.07';
+  const appversion = '0.08';
 	const page = {};
   const settings = {};
   
@@ -62,13 +62,13 @@ const app = function () {
 	// page rendering
 	//-----------------------------------------------------------------------------  
   function _renderStandardElements() {
-    page.notice = CreateElement._createDiv('notice', 'notice');
+    page.notice = CreateElement.createDiv('notice', 'notice');
     page.body.appendChild(page.notice);
   }
   
   function _renderPage() {
     _identifyIndexAndCourseFields();
-    page.contents = CreateElement._createDiv(null, 'contents');
+    page.contents = CreateElement.createDiv(null, 'contents');
     page.body.appendChild(page.contents);
     page.selecteddata = null;
     
@@ -82,39 +82,39 @@ const app = function () {
   } 
   
   function _renderTitle() {
-    var container = CreateElement._createDiv(null, 'title');
+    var container = CreateElement.createDiv(null, 'title');
     
-    container.appendChild(CreateElement._createDiv(null, 'title-label', apptitle));
-    container.appendChild(CreateElement._createIcon(null, 'fas fa-copy title-icon', 'copy reported data', e => _handleCopyClick(e)));
+    container.appendChild(CreateElement.createDiv(null, 'title-label', apptitle));
+    container.appendChild(CreateElement.createIcon(null, 'fas fa-copy title-icon', 'copy reported data', e => _handleCopyClick(e)));
     
-    page.copynotice = CreateElement._createSpan(null, 'title-copynotice', 'copy notice');
+    page.copynotice = CreateElement.createSpan(null, 'title-copynotice', 'copy notice');
     container.appendChild(page.copynotice);
     
-    container.appendChild(CreateElement._createDiv(null, 'title-version', 'v' + appversion));
+    container.appendChild(CreateElement.createDiv(null, 'title-version', 'v' + appversion));
     
     return container;
   }
   
   function _renderCourseSelection() {
-    var container = CreateElement._createDiv(null, 'selection');  
+    var container = CreateElement.createDiv(null, 'selection');  
 
-    var elemTitle = CreateElement._createDiv(null, 'selection-title', settings.coursefieldkey)   
-    elemTitle.appendChild(CreateElement._createIcon('courseUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
-    elemTitle.appendChild(CreateElement._createIcon('courseDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));        
+    var elemTitle = CreateElement.createDiv(null, 'selection-title', settings.coursefieldkey)   
+    elemTitle.appendChild(CreateElement.createIcon('courseUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
+    elemTitle.appendChild(CreateElement.createIcon('courseDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));        
     container.appendChild(elemTitle);
 
     var courseList = _getSortedCourseList();
     
-    var innercontainer = CreateElement._createDiv('courseContents', 'selection-contents');
+    var innercontainer = CreateElement.createDiv('courseContents', 'selection-contents');
 
-    innercontainer.appendChild(CreateElement._createBR(null, null));
-    innercontainer.appendChild(CreateElement._createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
-    innercontainer.appendChild(CreateElement._createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
+    innercontainer.appendChild(CreateElement.createBR(null, null));
+    innercontainer.appendChild(CreateElement.createButton(null, null, 'all', 'select all', _handleSelectAllCourses));
+    innercontainer.appendChild(CreateElement.createButton(null, null, 'clear', 'clear all', _handleDeSelectAllCourses));
 
     for (var i = 0; i < courseList.length; i++) {
-      var elem = CreateElement._createDiv(null, null, courseList[i]);
-      innercontainer.appendChild(CreateElement._createBR(null, null));
-      innercontainer.appendChild(CreateElement._createCheckbox('course' + i, null, 'course', courseList[i], courseList[i], true, _handleCourseSelection));
+      var elem = CreateElement.createDiv(null, null, courseList[i]);
+      innercontainer.appendChild(CreateElement.createBR(null, null));
+      innercontainer.appendChild(CreateElement.createCheckbox('course' + i, null, 'course', courseList[i], courseList[i], true, _handleCourseSelection));
     }
     container.appendChild(innercontainer);
     
@@ -122,25 +122,25 @@ const app = function () {
   }
    
   function _renderFilterSelection() {
-    var container = CreateElement._createDiv(null, 'selection');
+    var container = CreateElement.createDiv(null, 'selection');
     
-    var elemTitle = CreateElement._createDiv(null, 'selection-title', 'filters');
-    elemTitle.appendChild(CreateElement._createIcon('filterUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
-    elemTitle.appendChild(CreateElement._createIcon('filterDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
+    var elemTitle = CreateElement.createDiv(null, 'selection-title', 'filters');
+    elemTitle.appendChild(CreateElement.createIcon('filterUp', 'fas fa-caret-square-up selection-control', null, _handleSelectionUpDown));
+    elemTitle.appendChild(CreateElement.createIcon('filterDown', 'fas fa-caret-square-down selection-control', null, _handleSelectionUpDown));
     container.appendChild(elemTitle);
     
     var filterList = _getFilterList();
     
-    var innercontainer = CreateElement._createDiv('filterContents', 'selection-contents');
+    var innercontainer = CreateElement.createDiv('filterContents', 'selection-contents');
 
-    innercontainer.appendChild(CreateElement._createBR(null, null));
-    innercontainer.appendChild(CreateElement._createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
-    innercontainer.appendChild(CreateElement._createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
+    innercontainer.appendChild(CreateElement.createBR(null, null));
+    innercontainer.appendChild(CreateElement.createButton(null, null, 'all', 'select all filters', _handleSelectAllFilters));
+    innercontainer.appendChild(CreateElement.createButton(null, null, 'clear', 'clear all filters', _handleDeSelectAllFilters));
 
     for (var i = 0; i < filterList.length; i++) {
-      var elem = CreateElement._createDiv(null, null, filterList[i]);
-      innercontainer.appendChild(CreateElement._createBR(null, null));
-      innercontainer.appendChild(CreateElement._createCheckbox('filter' + i, null, 'filter', filterList[i].fieldkey, filterList[i].fieldkey, true, _handleFilterSelection));
+      var elem = CreateElement.createDiv(null, null, filterList[i]);
+      innercontainer.appendChild(CreateElement.createBR(null, null));
+      innercontainer.appendChild(CreateElement.createCheckbox('filter' + i, null, 'filter', filterList[i].fieldkey, filterList[i].fieldkey, true, _handleFilterSelection));
     }
     container.appendChild(innercontainer);
     
@@ -155,30 +155,30 @@ const app = function () {
     
     var selectedData = _getSelectedData();
     
-    page.selecteddata = CreateElement._createDiv(null, 'selecteddata');
+    page.selecteddata = CreateElement.createDiv(null, 'selecteddata');
     
-    var container = CreateElement._createDiv(null, 'tabletitle');
+    var container = CreateElement.createDiv(null, 'tabletitle');
 
-    var elemIndex = CreateElement._createDiv(null, 'tabletitle-name', settings.indexfieldkey);
+    var elemIndex = CreateElement.createDiv(null, 'tabletitle-name', settings.indexfieldkey);
     elemIndex.addEventListener('click', _handleIndexTitleClick, false);
     container.appendChild(elemIndex);
     
-    var elemCourse = CreateElement._createDiv(null, 'tabletitle-course', settings.coursefieldkey);
+    var elemCourse = CreateElement.createDiv(null, 'tabletitle-course', settings.coursefieldkey);
     elemCourse.addEventListener('click', _handleCourseTitleClick, false);
     container.appendChild(elemCourse);
     
-    container.appendChild(CreateElement._createDiv(null, 'tabletitle-items', 'items'));
+    container.appendChild(CreateElement.createDiv(null, 'tabletitle-items', 'items'));
     page.selecteddata.appendChild(container);
     
     for (var i = 0; i < selectedData.length; i++) {
-      container = CreateElement._createDiv(null, 'student');
+      container = CreateElement.createDiv(null, 'student');
       var student = selectedData[i].student;
       var display = selectedData[i].display;
       
-      container.appendChild(CreateElement._createDiv('student-name', 'student-name', student[settings.indexfieldkey]));
-      container.appendChild(CreateElement._createDiv('student-course', 'student-course', student[settings.coursefieldkey]));
+      container.appendChild(CreateElement.createDiv('student-name', 'student-name', student[settings.indexfieldkey]));
+      container.appendChild(CreateElement.createDiv('student-course', 'student-course', student[settings.coursefieldkey]));
 
-      var containerItems = CreateElement._createDiv('student-items', 'student-items');
+      var containerItems = CreateElement.createDiv('student-items', 'student-items');
       for (var j = 0; j < display.length; j++) {
         var filterDisplay = display[j].filterdisplay;
         containerItems.appendChild(_renderFilterDisplay(filterDisplay));
@@ -192,7 +192,7 @@ const app = function () {
   }
   
   function _renderFilterDisplay(filterDisplay) {
-    var container = CreateElement._createDiv(null, 'student-item');
+    var container = CreateElement.createDiv(null, 'student-item');
     
     var displayType = filterDisplay.display.type;
     var displayData = filterDisplay.display.data;
@@ -200,11 +200,11 @@ const app = function () {
     var studentValue = filterDisplay.studentvalue;
     
     hoverText = hoverText.replace(/\[value\]/g, studentValue);
-    hoverText = hoverText.replace(/\[date\]/g, MyDateTime._formatDate(studentValue));
+    hoverText = hoverText.replace(/\[date\]/g, DateTime.formatDate(studentValue));
     
     if (displayType == '[image]' || displayType == 'image') {
-      CreateElement._addClassList(container, 'student-item-image');
-      container.appendChild(CreateElement._createImage(null, null, displayData, hoverText));
+      CreateElement.addClassList(container, 'student-item-image');
+      container.appendChild(CreateElement.createImage(null, null, displayData, hoverText));
       
     } else {
       console.log('display type not implemented: ' + displayType);
@@ -426,22 +426,22 @@ const app = function () {
         result = {display: filterRule.display, hovertext: hoverText, studentvalue: studentValue};
       
       } else if (filterRule.value == '[late>]') {
-        if (MyDateTime._isValidDate(studentValue)) {
-          if (MyDateTime._compareDateToNow(studentValue) < 0) {
+        if (DateTime.isValidDate(studentValue)) {
+          if (DateTime.compareDateToNow(studentValue) < 0) {
             result = {display: filterRule.display, hovertext: filter.fieldkey + ' is late (due [date])', studentvalue: studentValue};
           }
         }
         
       } else if (filterRule.value == '[late=]') {
-        if (MyDateTime._isValidDate(studentValue)) {
-          if (MyDateTime._compareDateToNow(studentValue) == 0) {
+        if (DateTime.isValidDate(studentValue)) {
+          if (DateTime.compareDateToNow(studentValue) == 0) {
             result = {display: filterRule.display, hovertext: filter.fieldkey + ' is due today: [date]', studentvalue: studentValue};
           }
         }
         
       } else if (filterRule.value == '[window]') {
-        if (MyDateTime._isValidDate(studentValue)) {
-          if (MyDateTime._compareDateToNow(studentValue, parseInt(filterFieldTypeParam)) == 0) {
+        if (DateTime.isValidDate(studentValue)) {
+          if (DateTime.compareDateToNow(studentValue, parseInt(filterFieldTypeParam)) == 0) {
             result = {display: filterRule.display, hovertext: filter.fieldkey + ' is due soon: [date]', studentvalue: studentValue};
           }
         }
