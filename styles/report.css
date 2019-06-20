@@ -93,6 +93,8 @@ body {
   font-size: 0.9em;
   padding-top: 0em;
   padding-bottom: 0em;
+  border: 1px solid black;
+  border-radius: 4px;
 }
 
 .selection-contents {
