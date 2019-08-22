@@ -17,6 +17,7 @@ class InfoDeck {
   //      title: string,
   //      version: string
   //      indexlist: array of strings, used to select cards from deck
+  //      initialsearchtext: string
   //      indexfield: name of field used for indexing cards
   //      layout {
   //        fieldtype: { fieldname: fieldtype, ... },
@@ -32,6 +33,7 @@ class InfoDeck {
   init(deckParams) {
     this._title = deckParams.title;
     this._indexlist = deckParams.indexlist;
+    this._initialsearchtext = deckParams.initialsearchtext;
     this._indexfield = deckParams.indexfield;
     this._layout = deckParams.layout;
     this._itemdetails = deckParams.itemdetails;
@@ -113,7 +115,8 @@ class InfoDeck {
     var fuzzySelect = new FuzzyInputControl(
       this._indexlist, 
       e => this._handleSelection(e), 
-      this._callbacks.isfuzzyequal
+      this._callbacks.isfuzzyequal,
+      this._initialsearchtext
     );
     this._fuzzyInputControl = fuzzySelect;
     var elemFuzzySelect = fuzzySelect.render();

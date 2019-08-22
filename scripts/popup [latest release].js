@@ -31,7 +31,7 @@ const app = function () {
 	//---------------------------------------
 	// get things going
 	//----------------------------------------
-  function init() {    
+  function init() {
 		page.body = document.getElementsByTagName('body')[0];
     page.body.classList.add('colorscheme');
     
@@ -42,13 +42,6 @@ const app = function () {
   async function _continue_init() {
     settings.deck = new InfoDeck();
 
-    if (settings.configparams.forcedpopup) {
-      // emulate behavior of extension popup if called from background
-      window.addEventListener('blur', function() {
-        //window.close();
-      });
-    }
-    
     if (settings.configparams.hasOwnProperty('studentspreadsheetid') && settings.configparams.studentspreadsheetid != '') {
       _configureAndRenderDeck(settings.deck);
     } else {
@@ -61,18 +54,14 @@ const app = function () {
   //-------------------------------------------------------------------------------------
   const storageKeys = {
     sheetid: 'sid_fileid',
-    sheeturl: 'sid_fileurl',
-    forcedpopup: 'sid_forcedpopup',
-    searchtext: 'sid_searchtext'
+    sheeturl: 'sid_fileurl'
   };
     
   function _getConfigurationParameters(callback) {        
-    chrome.storage.sync.get( [storageKeys.sheetid, storageKeys.sheeturl, storageKeys.forcedpopup, storageKeys.searchtext],  function (result) {
+    chrome.storage.sync.get( [storageKeys.sheetid, storageKeys.sheeturl],  function (result) {
       var configParams = {
         studentspreadsheetid: '',
-        studentspreadsheetlink: '',
-        forcedpopup: false,
-        searchtext: ''
+        studentspreadsheetlink: ''
       };
       
       if (typeof result[storageKeys.sheetid] != 'undefined') {
@@ -81,15 +70,9 @@ const app = function () {
       if (typeof result[storageKeys.sheeturl] != 'undefined') {
         configParams.studentspreadsheetlink = result[storageKeys.sheeturl];
       }        
-      if (typeof result[storageKeys.forcedpopup] != 'undefined') {
-        configParams.forcedpopup = result[storageKeys.forcedpopup] == 'yes';
-      }        
-      if (typeof result[storageKeys.searchtext] != 'undefined') {
-        configParams.searchtext = result[storageKeys.searchtext];
-      }        
       
       settings.configparams = configParams;
-      chrome.storage.sync.set({"sid_forcedpopup": 'no', "sid_searchtext": ''}, callback);
+      callback();
     });
   }
   
@@ -160,7 +143,6 @@ const app = function () {
         title: settings.appName,
         version: chrome.runtime.getManifest().version,
         indexlist: _makeIndexList(indexfield, settings.studentandlayoutdata.studentinfo),
-        initialsearchtext: settings.configparams.searchtext,
         indexfield: indexfield,
         layout: {
           fieldtype: _makeFieldTypeParams(settings.studentandlayoutdata.layoutinfo),
@@ -307,9 +289,7 @@ const app = function () {
   
     if (settings.deckinitialized) {
       container.appendChild(CreateElement.createIcon(null, 'fas fa-times reconfigure-icon', 'discard changes', _cancelReconfigure));    
-    }
-    
-    container.appendChild(CreateElement.createIcon(null, 'fas fa-question reconfigure-icon', 'help', _showHelp));
+    }      
 
     container = CreateElement.createDiv(null, 'reconfigure-item');
     page.reconfigureUI.appendChild(container);
@@ -322,15 +302,10 @@ const app = function () {
       var userEntry = document.getElementById('studentinfoSpreadsheetLink').value;
 
       var sID = userEntry.match(/\?id=([a-zA-Z0-9-_]+)/);
-      if (sID != null) {
-        sID = sID[0].slice(4);
+      if (sID == null) {
+        sID = '';
       } else {
-        sID = userEntry.match(/\/([a-zA-Z0-9-_]+)\/edit\?usp/);
-        if (sID != null) {
-          sID = sID[0].slice(1, -9);
-        } else {
-          sID = '';
-        }
+        sID = sID[0].slice(4);
       }
 
       var dataSourceIsValid = await _validateDataSource(sID);

@@ -12,12 +12,14 @@ class FuzzyInputControl {
   // indexList:  array of string values in which to search for matches
   // handleSelection: callback for when selection is completed
   // isFuzzyEqual: (optional) callback for fuzzy comparison between 2 strings
+  // initialSearchText: string value to begin search
   
-  constructor (indexList, handleSelection, isFuzzyEqual) {
+  constructor (indexList, handleSelection, isFuzzyEqual, initialSearchText) {
     this._version = '0.02';
     this._indexList = indexList;
     this._handleSelectionCallback = handleSelection;
     this._isFuzzyEqualCallback = isFuzzyEqual;
+    this._initialSearchText = initialSearchText;
     
     this._elemInput = null;
     this._currentFocus;
@@ -41,6 +43,16 @@ class FuzzyInputControl {
       me._closeAllLists(e.target);
     }}(this));
     
+    if (this._initialSearchText != '') {
+      this._elemInput.value = this._initialSearchText;
+      var evt = new Event('input', {
+        'bubbles': true,
+        'cancelable': true
+      });
+      
+      this._elemInput.dispatchEvent(evt);
+    }
+    
     return renderResult.container;
   }
   
@@ -63,6 +75,7 @@ class FuzzyInputControl {
     
     elemInput.addEventListener("input", e => this._handleInput(e), false);
     elemInput.addEventListener("keydown", e => this._handleKeydown(e), false);
+
    
     return {container: elemContainer, inputelement: elemInput};
   }
