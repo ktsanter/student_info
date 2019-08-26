@@ -212,6 +212,10 @@ const app = function () {
       CreateElement.addClassList(container, 'student-item-image');
       container.appendChild(CreateElement.createImage(null, null, displayData, hoverText));
       
+    } else if (displayType == 'icon') {
+      CreateElement.addClassList(container, 'student-item-image');
+      container.appendChild(CreateElement.createIcon(null, 'fa-lg ' + displayData, hoverText, null, null));
+      
     } else {
       console.log('display type not implemented: ' + displayType);
       container.innerHTML = '???';
