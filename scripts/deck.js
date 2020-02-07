@@ -175,7 +175,8 @@ class InfoDeck {
     
     for (var i = 0; i < arrItems.length; i++) {
       var item = arrItems[i];
-      if (item[this._indexfield] == indexvalue) {
+      var sanitizedIndexField = item[this._indexfield].replace(/\'/g, '`');
+      if (sanitizedIndexField == indexvalue) {
         matchingItems.push(item);
       }
     }
@@ -394,6 +395,7 @@ class InfoDeck {
         badgeDisplayInfo = matchValInfo.display;
       }
     }
+    
         
     if (badgeDisplayInfo == null) {
       console.log('ERROR: no match for badge type "' + itemKey + '" value=' + itemValue);  

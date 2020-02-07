@@ -89,7 +89,7 @@ class googleSheetWebAPI {
     for (var param in params) {
       url += '&' + param + '=' + params[param].replace(/ /g, '%20');
     }
-    //console.log('buildApiUrl: url=' + url);
+    console.log('buildApiUrl: url=' + url);
     
     return url;
   }  

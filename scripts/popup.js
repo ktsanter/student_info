@@ -198,7 +198,8 @@ const app = function () {
   function _makeIndexList(indexfield, data) {
     var indexlistWithDupes = [];
     for (var i = 0; i < data.length; i++) {
-      indexlistWithDupes.push(data[i][indexfield])
+      var sanitizedIndexField = data[i][indexfield].replace(/\'/g, '`');
+      indexlistWithDupes.push(sanitizedIndexField);
     }
     
     var indexList = Array.from(new Set(indexlistWithDupes));
@@ -250,6 +251,7 @@ const app = function () {
     var splitName = fullindexVal.split(', ');
     var firstName = splitName[1];
     var lastName = splitName[0];
+
     var cutFirstName = firstName.substr(0, enteredVal.length);
     var cutLastName = lastName.substr(0, enteredVal.length);
     var remainderFirstName = firstName.slice(cutFirstName.length);
